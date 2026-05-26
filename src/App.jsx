@@ -143,85 +143,104 @@ const PlayerCard = ({ player, card, attrs, scale=1, reveal=false }) => {
     {top:'6%',left:'42%',sz:7,rot:30,op:.15},{top:'28%',right:'5%',sz:9,rot:55,op:.14},
     {top:'14%',left:'28%',sz:5,rot:15,op:.12},{top:'32%',left:'10%',sz:8,rot:40,op:.10},
   ];
+  // 3D overflow: foto Destaque é mais alta, cabeça estoura acima da borda
+  const photoH   = (isDestaque ? 375 : 220) * scale;
+  const photoBtm = (isDestaque ? 72  : 68 ) * scale;
+
   return (
+    // Wrapper SEM overflow:hidden — permite que a foto estoure para cima
     <div style={{
-      width:W, height:H, position:'relative', borderRadius:16*scale,
-      background:effBg, flexShrink:0,
-      border:`${(isDestaque?3:2.5)*scale}px solid ${isDestaque?effBrd:t.brd+'88'}`,
-      boxShadow: isDestaque
-        ? `0 0 ${25*scale}px ${dGlow}66,0 0 ${60*scale}px ${dGlow}33,0 0 ${14*scale}px ${t.glow}44,inset 0 0 ${55*scale}px rgba(0,0,0,.8),inset 0 ${2*scale}px ${32*scale}px ${dGlow}22`
-        : `0 0 ${18*scale}px ${t.glow}33,0 0 ${40*scale}px ${t.glow}15,inset 0 0 ${42*scale}px rgba(0,0,0,.62)`,
-      overflow:'hidden',
+      width:W, height:H, position:'relative', flexShrink:0,
       animation: reveal ? 'lbcReveal .5s cubic-bezier(.34,1.56,.64,1) forwards' : 'none',
     }}>
       <style>{`@keyframes lbcFloat{0%,100%{transform:translateX(-50%) translateY(0px)}50%{transform:translateX(-50%) translateY(-${6*scale}px)}}`}</style>
 
-      {/* BG: grade losango dourada para Destaque, listras para os demais */}
-      <div style={{position:'absolute',inset:0,pointerEvents:'none',
-        backgroundImage: isDestaque
-          ? `repeating-linear-gradient(45deg,rgba(200,160,32,.042) 0px,rgba(200,160,32,.042) 1px,transparent 1px,transparent 26px),repeating-linear-gradient(-45deg,rgba(200,160,32,.042) 0px,rgba(200,160,32,.042) 1px,transparent 1px,transparent 26px)`
-          : `repeating-linear-gradient(0deg,${t.pat} 0px,${t.pat} 1px,transparent 1px,transparent 7px)`,
-      }}/>
-
-      {/* Top glow */}
-      <div style={{position:'absolute',top:0,left:0,right:0,height:H*(isDestaque?.55:.45),pointerEvents:'none',
-        background:`radial-gradient(ellipse 80% 60% at 50% 0%,${effGlow}${isDestaque?'28':'18'} 0%,transparent 70%)`,
-      }}/>
-
-      {/* Shine sweep */}
-      {(isGold||isDia||isSilv||isDestaque) && (
-        <div style={{position:'absolute',top:0,bottom:0,width:'50%',pointerEvents:'none',
-          background:isDestaque
-            ? `linear-gradient(100deg,transparent 20%,${dGlow}1c 50%,transparent 80%)`
-            : `linear-gradient(100deg,transparent 20%,${t.glow}1a 50%,transparent 80%)`,
-          animation:`lbcShine ${isDestaque||isDia?2.8:isGold?4:5}s ease-in-out infinite`,
+      {/* ── CAMADA 1: corpo do card (overflow:hidden clipa bg/ornamentos) ── */}
+      <div style={{
+        position:'absolute',inset:0,borderRadius:16*scale,background:effBg,overflow:'hidden',zIndex:1,
+        border:`${(isDestaque?3:2.5)*scale}px solid ${isDestaque?effBrd:t.brd+'88'}`,
+        boxShadow: isDestaque
+          ? `0 0 ${25*scale}px ${dGlow}66,0 0 ${60*scale}px ${dGlow}33,0 0 ${14*scale}px ${t.glow}44,inset 0 0 ${55*scale}px rgba(0,0,0,.8),inset 0 ${2*scale}px ${32*scale}px ${dGlow}22`
+          : `0 0 ${18*scale}px ${t.glow}33,0 0 ${40*scale}px ${t.glow}15,inset 0 0 ${42*scale}px rgba(0,0,0,.62)`,
+      }}>
+        {/* BG texture */}
+        <div style={{position:'absolute',inset:0,pointerEvents:'none',
+          backgroundImage: isDestaque
+            ? `repeating-linear-gradient(45deg,rgba(200,160,32,.042) 0px,rgba(200,160,32,.042) 1px,transparent 1px,transparent 26px),repeating-linear-gradient(-45deg,rgba(200,160,32,.042) 0px,rgba(200,160,32,.042) 1px,transparent 1px,transparent 26px)`
+            : `repeating-linear-gradient(0deg,${t.pat} 0px,${t.pat} 1px,transparent 1px,transparent 7px)`,
         }}/>
+        {/* Top glow */}
+        <div style={{position:'absolute',top:0,left:0,right:0,height:H*(isDestaque?.55:.45),pointerEvents:'none',
+          background:`radial-gradient(ellipse 80% 60% at 50% 0%,${effGlow}${isDestaque?'28':'18'} 0%,transparent 70%)`,
+        }}/>
+        {/* Shine sweep */}
+        {(isGold||isDia||isSilv||isDestaque) && (
+          <div style={{position:'absolute',top:0,bottom:0,width:'50%',pointerEvents:'none',
+            background:isDestaque?`linear-gradient(100deg,transparent 20%,${dGlow}1c 50%,transparent 80%)`:`linear-gradient(100deg,transparent 20%,${t.glow}1a 50%,transparent 80%)`,
+            animation:`lbcShine ${isDestaque||isDia?2.8:isGold?4:5}s ease-in-out infinite`,
+          }}/>
+        )}
+        {/* Destaque: losangos flutuantes */}
+        {isDestaque && dDiamonds.map((d,i) => (
+          <div key={i} style={{position:'absolute',top:d.top,left:d.left,right:d.right,pointerEvents:'none',
+            width:d.sz*scale,height:d.sz*scale,background:`rgba(212,160,48,${d.op})`,
+            border:`1px solid rgba(212,160,48,${Math.min(1,d.op*2.2)})`,
+            transform:`rotate(${d.rot}deg)`,boxShadow:`0 0 ${d.sz*scale}px rgba(212,160,48,${d.op})`,
+          }}/>
+        ))}
+        {/* Corner ornamentos externos */}
+        {[
+          {top:(isDestaque?14:8)*scale,left:8*scale,borderTop:`${2*scale}px solid ${effBrd}${bA}`,borderLeft:`${2*scale}px solid ${effBrd}${bA}`},
+          {top:(isDestaque?14:8)*scale,right:8*scale,borderTop:`${2*scale}px solid ${effBrd}${bA}`,borderRight:`${2*scale}px solid ${effBrd}${bA}`},
+          {bottom:8*scale,left:8*scale,borderBottom:`${2*scale}px solid ${effBrd}${bA}`,borderLeft:`${2*scale}px solid ${effBrd}${bA}`},
+          {bottom:8*scale,right:8*scale,borderBottom:`${2*scale}px solid ${effBrd}${bA}`,borderRight:`${2*scale}px solid ${effBrd}${bA}`},
+        ].map((c,i) => <div key={i} style={{position:'absolute',...c,width:(isDestaque?22:16)*scale,height:(isDestaque?22:16)*scale}}/>)}
+        {/* Destaque: corner ornamentos internos */}
+        {isDestaque && [
+          {top:21*scale,left:14*scale,borderTop:`1px solid ${dBrd}44`,borderLeft:`1px solid ${dBrd}44`},
+          {top:21*scale,right:14*scale,borderTop:`1px solid ${dBrd}44`,borderRight:`1px solid ${dBrd}44`},
+          {bottom:15*scale,left:14*scale,borderBottom:`1px solid ${dBrd}44`,borderLeft:`1px solid ${dBrd}44`},
+          {bottom:15*scale,right:14*scale,borderBottom:`1px solid ${dBrd}44`,borderRight:`1px solid ${dBrd}44`},
+        ].map((c,i) => <div key={i} style={{position:'absolute',...c,width:13*scale,height:13*scale}}/>)}
+        {/* Destaque: linha acento dourado */}
+        {isDestaque && (
+          <div style={{position:'absolute',top:96*scale,left:12*scale,right:12*scale,height:1,pointerEvents:'none',
+            background:`linear-gradient(90deg,transparent,${dBrd}99,${t.glow}77,${dBrd}99,transparent)`,
+          }}/>
+        )}
+        {/* Gems ciano Diamante */}
+        {isDia && [{p:'8% 14%',s:5},{p:'22% 7%',s:4},{p:'37% 12%',s:6},{p:'12% 29%',s:3},{p:'50% 5%',s:4},{p:'5% 42%',s:3}].map((g,i) => {
+          const [top,right]=g.p.split(' ');
+          return <div key={i} style={{position:'absolute',top,right,width:g.s*scale,height:g.s*scale,borderRadius:'50%',
+            background:'radial-gradient(circle,#ffffff,#00ccff)',
+            boxShadow:`0 0 ${g.s*3*scale}px #00aaff,0 0 ${g.s*6*scale}px #0055ff`,
+            animation:`lbcGem ${1.5+i*.4}s ease-in-out infinite`,animationDelay:`${i*.28}s`}}/>;
+        })}
+      </div>
+      {/* ── FIM camada 1 ── */}
+
+      {/* ── CAMADA 2: foto — z=3, estoura para FORA da borda no topo ── */}
+      {(player.photoClean||player.photo) ? (
+        <img src={player.photoClean||player.photo} alt="" style={{
+          position:'absolute', bottom:photoBtm, left:'50%',
+          height:photoH, maxWidth:'100%',
+          objectFit:player.photoClean?'contain':'cover',
+          objectPosition:'top center',
+          borderRadius:player.photoClean?0:8*scale,
+          filter:`drop-shadow(0 ${-3*scale}px ${(isDestaque?24:13)*scale}px ${effGlow}${isDestaque?'ee':'bb'})`,
+          animation:'lbcFloat 4s ease-in-out infinite',
+          zIndex:3,
+        }}/>
+      ) : (
+        <div style={{position:'absolute',bottom:photoBtm,left:'50%',transform:'translateX(-50%)',
+          width:100*scale,height:isDestaque?152*scale:140*scale,borderRadius:8*scale,
+          background:`${effBrd}0e`,border:`${1.5*scale}px dashed ${effBrd}30`,
+          display:'flex',alignItems:'center',justifyContent:'center',fontSize:38*scale,opacity:.3,zIndex:3}}>👤</div>
       )}
 
-      {/* Destaque: losangos decorativos flutuantes */}
-      {isDestaque && dDiamonds.map((d,i) => (
-        <div key={i} style={{
-          position:'absolute',top:d.top,left:d.left,right:d.right,pointerEvents:'none',
-          width:d.sz*scale,height:d.sz*scale,
-          background:`rgba(212,160,48,${d.op})`,
-          border:`1px solid rgba(212,160,48,${Math.min(1,d.op*2.2)})`,
-          transform:`rotate(${d.rot}deg)`,
-          boxShadow:`0 0 ${d.sz*scale}px rgba(212,160,48,${d.op})`,
-        }}/>
-      ))}
-
-      {/* Destaque: escudo badge no topo central */}
-      {isDestaque && (
-        <div style={{
-          position:'absolute',top:-2*scale,left:'50%',transform:'translateX(-50%)',
-          width:48*scale,height:42*scale,zIndex:10,pointerEvents:'none',
-          background:`linear-gradient(180deg,${dBrd} 0%,#7a5806 100%)`,
-          clipPath:'polygon(8% 0%,92% 0%,100% 20%,100% 68%,50% 100%,0% 68%,0% 20%)',
-          display:'flex',alignItems:'center',justifyContent:'center',
-          boxShadow:`0 ${4*scale}px ${18*scale}px ${dGlow}99,0 0 ${8*scale}px ${dGlow}`,
-        }}>
-          <span style={{fontSize:14*scale,color:'#100700',fontWeight:900,fontFamily:FO,lineHeight:1,marginTop:-3*scale}}>★</span>
-        </div>
-      )}
-
-      {/* Corner ornaments externos */}
-      {[
-        {top:(isDestaque?14:8)*scale,left:8*scale,borderTop:`${2*scale}px solid ${effBrd}${bA}`,borderLeft:`${2*scale}px solid ${effBrd}${bA}`},
-        {top:(isDestaque?14:8)*scale,right:8*scale,borderTop:`${2*scale}px solid ${effBrd}${bA}`,borderRight:`${2*scale}px solid ${effBrd}${bA}`},
-        {bottom:8*scale,left:8*scale,borderBottom:`${2*scale}px solid ${effBrd}${bA}`,borderLeft:`${2*scale}px solid ${effBrd}${bA}`},
-        {bottom:8*scale,right:8*scale,borderBottom:`${2*scale}px solid ${effBrd}${bA}`,borderRight:`${2*scale}px solid ${effBrd}${bA}`},
-      ].map((c,i) => <div key={i} style={{position:'absolute',...c,width:(isDestaque?22:16)*scale,height:(isDestaque?22:16)*scale}}/>)}
-
-      {/* Destaque: corner ornaments internos (efeito duplo) */}
-      {isDestaque && [
-        {top:21*scale,left:14*scale,borderTop:`1px solid ${dBrd}44`,borderLeft:`1px solid ${dBrd}44`},
-        {top:21*scale,right:14*scale,borderTop:`1px solid ${dBrd}44`,borderRight:`1px solid ${dBrd}44`},
-        {bottom:15*scale,left:14*scale,borderBottom:`1px solid ${dBrd}44`,borderLeft:`1px solid ${dBrd}44`},
-        {bottom:15*scale,right:14*scale,borderBottom:`1px solid ${dBrd}44`,borderRight:`1px solid ${dBrd}44`},
-      ].map((c,i) => <div key={i} style={{position:'absolute',...c,width:13*scale,height:13*scale}}/>)}
-
-      {/* Header: Overall (esquerda) + Logo (direita) */}
-      <div style={{position:'absolute',top:(isDestaque?16:10)*scale,left:13*scale,right:13*scale,display:'flex',justifyContent:'space-between',alignItems:'flex-start'}}>
+      {/* ── CAMADA 3: header (overall + logo) — z=4, sempre legível sobre a foto ── */}
+      <div style={{position:'absolute',top:(isDestaque?16:10)*scale,left:13*scale,right:13*scale,
+        display:'flex',justifyContent:'space-between',alignItems:'flex-start',zIndex:4}}>
         <div>
           <div style={{fontSize:(isDestaque?62:58)*scale,fontWeight:900,lineHeight:1,color:effScore,letterSpacing:-2*scale,fontFamily:FO,
             textShadow:`0 0 ${14*scale}px ${effGlow},0 0 ${28*scale}px ${effGlow}66,0 0 ${55*scale}px ${effGlow}22`}}>
@@ -240,47 +259,26 @@ const PlayerCard = ({ player, card, attrs, scale=1, reveal=false }) => {
         </div>
       </div>
 
-      {/* Destaque: linha acento dourado separando header da foto */}
+      {/* ── CAMADA 4: escudo badge — z=5, flutua sobre tudo no topo ── */}
       {isDestaque && (
-        <div style={{position:'absolute',top:96*scale,left:12*scale,right:12*scale,height:1,pointerEvents:'none',
-          background:`linear-gradient(90deg,transparent,${dBrd}99,${t.glow}77,${dBrd}99,transparent)`,
-        }}/>
+        <div style={{
+          position:'absolute',top:-2*scale,left:'50%',transform:'translateX(-50%)',
+          width:48*scale,height:42*scale,zIndex:5,pointerEvents:'none',
+          background:`linear-gradient(180deg,${dBrd} 0%,#7a5806 100%)`,
+          clipPath:'polygon(8% 0%,92% 0%,100% 20%,100% 68%,50% 100%,0% 68%,0% 20%)',
+          display:'flex',alignItems:'center',justifyContent:'center',
+          boxShadow:`0 ${4*scale}px ${18*scale}px ${dGlow}99,0 0 ${8*scale}px ${dGlow}`,
+        }}>
+          <span style={{fontSize:14*scale,color:'#100700',fontWeight:900,fontFamily:FO,lineHeight:1,marginTop:-3*scale}}>★</span>
+        </div>
       )}
 
-      {/* Foto do jogador */}
-      {(player.photoClean||player.photo) ? (
-        <img src={player.photoClean||player.photo} alt="" style={{
-          position:'absolute',bottom:(isDestaque?72:68)*scale,left:'50%',
-          height:(isDestaque?242:220)*scale,maxWidth:'100%',
-          objectFit:player.photoClean?'contain':'cover',
-          borderRadius:player.photoClean?0:8*scale,
-          filter:`drop-shadow(0 0 ${(isDestaque?18:13)*scale}px ${effGlow}${isDestaque?'dd':'bb'})`,
-          animation:'lbcFloat 4s ease-in-out infinite',
-        }}/>
-      ) : (
-        <div style={{position:'absolute',bottom:(isDestaque?76:72)*scale,left:'50%',transform:'translateX(-50%)',
-          width:100*scale,height:(isDestaque?152:140)*scale,borderRadius:8*scale,
-          background:`${effBrd}0e`,border:`${1.5*scale}px dashed ${effBrd}30`,
-          display:'flex',alignItems:'center',justifyContent:'center',fontSize:38*scale,opacity:.3}}>👤</div>
-      )}
-
-      {/* Fade gradiente abaixo da foto */}
-      <div style={{position:'absolute',bottom:62*scale,left:0,right:0,height:65*scale,pointerEvents:'none',
-        background:'linear-gradient(0deg,rgba(0,0,0,.9) 0%,transparent 100%)',
+      {/* ── CAMADA 5: fade + stats — z=6/7, cobrem a parte inferior da foto ── */}
+      <div style={{position:'absolute',bottom:60*scale,left:0,right:0,height:65*scale,pointerEvents:'none',zIndex:6,
+        background:'linear-gradient(0deg,rgba(0,0,0,.92) 0%,transparent 100%)',
       }}/>
-
-      {/* Gems ciano do Diamante (mantidos mesmo no Destaque) */}
-      {isDia && [{p:'8% 14%',s:5},{p:'22% 7%',s:4},{p:'37% 12%',s:6},{p:'12% 29%',s:3},{p:'50% 5%',s:4},{p:'5% 42%',s:3}].map((g,i) => {
-        const [top,right]=g.p.split(' ');
-        return <div key={i} style={{position:'absolute',top,right,width:g.s*scale,height:g.s*scale,borderRadius:'50%',
-          background:'radial-gradient(circle,#ffffff,#00ccff)',
-          boxShadow:`0 0 ${g.s*3*scale}px #00aaff,0 0 ${g.s*6*scale}px #0055ff`,
-          animation:`lbcGem ${1.5+i*.4}s ease-in-out infinite`,animationDelay:`${i*.28}s`}}/>;
-      })}
-
-      {/* Painel de stats */}
-      <div style={{position:'absolute',bottom:0,left:0,right:0,
-        background:'linear-gradient(0deg,rgba(0,0,0,.97),rgba(0,0,0,.75))',
+      <div style={{position:'absolute',bottom:0,left:0,right:0,zIndex:7,
+        background:'linear-gradient(0deg,rgba(0,0,0,.97),rgba(0,0,0,.78))',
         padding:`${8*scale}px ${10*scale}px ${10*scale}px`,
         borderTop:`${(isDestaque?2:1.5)*scale}px solid ${effBrd}${isDestaque?'55':'28'}`,
         backdropFilter:'blur(8px)'}}>
