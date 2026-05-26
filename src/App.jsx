@@ -206,6 +206,24 @@ const PlayerCard = ({ player, card, attrs, scale=1, reveal=false }) => {
             boxShadow:`0 0 ${g.s*3*S}px #00aaff,0 0 ${g.s*6*S}px #0055ff`,
             animation:`lbcGem ${1.5+i*.4}s ease-in-out infinite`,animationDelay:`${i*.28}s`}}/>;
         })}
+        {/* ── Cantos: L-brackets DENTRO do card (border-radius recorta naturalmente) ── */}
+        {isDestaque && [
+          {top:0,left:0,   borderTop:`${3*S}px solid ${dBrd}`,borderLeft:`${3*S}px solid ${dBrd}`},
+          {top:0,right:0,  borderTop:`${3*S}px solid ${dBrd}`,borderRight:`${3*S}px solid ${dBrd}`},
+          {bottom:0,left:0,borderBottom:`${3*S}px solid ${dBrd}`,borderLeft:`${3*S}px solid ${dBrd}`},
+          {bottom:0,right:0,borderBottom:`${3*S}px solid ${dBrd}`,borderRight:`${3*S}px solid ${dBrd}`},
+        ].map((c,i)=>(
+          <div key={`oc${i}`} style={{position:'absolute',...c,width:40*S,height:40*S,
+            boxShadow:`0 0 ${14*S}px ${dGlow}cc,0 0 ${8*S}px ${t.glow}77`}}/>
+        ))}
+        {isDestaque && [
+          {top:10*S,left:10*S,   borderTop:`1px solid ${dBrd}55`,borderLeft:`1px solid ${dBrd}55`},
+          {top:10*S,right:10*S,  borderTop:`1px solid ${dBrd}55`,borderRight:`1px solid ${dBrd}55`},
+          {bottom:10*S,left:10*S,borderBottom:`1px solid ${dBrd}55`,borderLeft:`1px solid ${dBrd}55`},
+          {bottom:10*S,right:10*S,borderBottom:`1px solid ${dBrd}55`,borderRight:`1px solid ${dBrd}55`},
+        ].map((c,i)=>(
+          <div key={`ic${i}`} style={{position:'absolute',...c,width:22*S,height:22*S}}/>
+        ))}
         {/* Destaque: anel interno azul pulsante (efeito cristal) */}
         {isDestaque && (
           <div style={{
@@ -215,71 +233,26 @@ const PlayerCard = ({ player, card, attrs, scale=1, reveal=false }) => {
             animation:'lbcPulseBlue 3s ease-in-out infinite',
           }}/>
         )}
-        {/* Destaque: segundo anel interno (ainda mais dentro) */}
+        {/* Destaque: segundo anel interno dourado */}
         {isDestaque && (
           <div style={{
-            position:'absolute',inset:`${12*S}px`,borderRadius:8*S,background:'transparent',pointerEvents:'none',
+            position:'absolute',inset:`${13*S}px`,borderRadius:7*S,background:'transparent',pointerEvents:'none',
             border:`1px solid rgba(200,160,32,0.14)`,
             animation:'lbcBorderGlow 4s ease-in-out infinite',animationDelay:'.8s',
           }}/>
         )}
       </div>
 
-      {/* ══ CANTOS ELABORADOS (no wrapper, podem sair da borda) ══ */}
-      {isDestaque && <>
-        {/* — Topo-esquerdo — */}
-        <div style={{position:'absolute',top:0,left:0,width:34*S,height:34*S,zIndex:8,pointerEvents:'none',
-          borderTop:`${3.5*S}px solid ${dBrd}`,borderLeft:`${3.5*S}px solid ${dBrd}`,
-          boxShadow:`0 0 ${12*S}px ${dGlow}dd,0 0 ${7*S}px ${t.glow}66`,
-          borderRadius:`${4*S}px 0 0 0`,
-        }}/>
-        <div style={{position:'absolute',top:9*S,left:9*S,width:15*S,height:15*S,zIndex:8,pointerEvents:'none',
-          borderTop:`1px solid ${dBrd}55`,borderLeft:`1px solid ${dBrd}55`,
-        }}/>
-        <div style={{position:'absolute',top:-4*S,left:-4*S,width:8*S,height:8*S,zIndex:9,pointerEvents:'none',
-          background:`linear-gradient(135deg,#ffe066,${dBrd})`,transform:'rotate(45deg)',
+      {/* ══ Losangos dourados nos cantos (sobre a borda do card) ══ */}
+      {isDestaque && [
+        {top:5*S,left:5*S},{top:5*S,right:5*S},
+        {bottom:5*S,left:5*S},{bottom:5*S,right:5*S},
+      ].map((pos,i)=>(
+        <div key={`cd${i}`} style={{position:'absolute',...pos,width:9*S,height:9*S,zIndex:9,pointerEvents:'none',
+          background:`linear-gradient(135deg,#ffe599,${dBrd})`,transform:'rotate(45deg)',
           boxShadow:`0 0 ${14*S}px ${dGlow},0 0 ${8*S}px ${t.glow}99`,
         }}/>
-        {/* — Topo-direito — */}
-        <div style={{position:'absolute',top:0,right:0,width:34*S,height:34*S,zIndex:8,pointerEvents:'none',
-          borderTop:`${3.5*S}px solid ${dBrd}`,borderRight:`${3.5*S}px solid ${dBrd}`,
-          boxShadow:`0 0 ${12*S}px ${dGlow}dd,0 0 ${7*S}px ${t.glow}66`,
-          borderRadius:`0 ${4*S}px 0 0`,
-        }}/>
-        <div style={{position:'absolute',top:9*S,right:9*S,width:15*S,height:15*S,zIndex:8,pointerEvents:'none',
-          borderTop:`1px solid ${dBrd}55`,borderRight:`1px solid ${dBrd}55`,
-        }}/>
-        <div style={{position:'absolute',top:-4*S,right:-4*S,width:8*S,height:8*S,zIndex:9,pointerEvents:'none',
-          background:`linear-gradient(135deg,#ffe066,${dBrd})`,transform:'rotate(45deg)',
-          boxShadow:`0 0 ${14*S}px ${dGlow},0 0 ${8*S}px ${t.glow}99`,
-        }}/>
-        {/* — Baixo-esquerdo — */}
-        <div style={{position:'absolute',bottom:0,left:0,width:34*S,height:34*S,zIndex:8,pointerEvents:'none',
-          borderBottom:`${3.5*S}px solid ${dBrd}`,borderLeft:`${3.5*S}px solid ${dBrd}`,
-          boxShadow:`0 0 ${12*S}px ${dGlow}dd,0 0 ${7*S}px ${t.glow}66`,
-          borderRadius:`0 0 0 ${4*S}px`,
-        }}/>
-        <div style={{position:'absolute',bottom:9*S,left:9*S,width:15*S,height:15*S,zIndex:8,pointerEvents:'none',
-          borderBottom:`1px solid ${dBrd}55`,borderLeft:`1px solid ${dBrd}55`,
-        }}/>
-        <div style={{position:'absolute',bottom:-4*S,left:-4*S,width:8*S,height:8*S,zIndex:9,pointerEvents:'none',
-          background:`linear-gradient(135deg,#ffe066,${dBrd})`,transform:'rotate(45deg)',
-          boxShadow:`0 0 ${14*S}px ${dGlow},0 0 ${8*S}px ${t.glow}99`,
-        }}/>
-        {/* — Baixo-direito — */}
-        <div style={{position:'absolute',bottom:0,right:0,width:34*S,height:34*S,zIndex:8,pointerEvents:'none',
-          borderBottom:`${3.5*S}px solid ${dBrd}`,borderRight:`${3.5*S}px solid ${dBrd}`,
-          boxShadow:`0 0 ${12*S}px ${dGlow}dd,0 0 ${7*S}px ${t.glow}66`,
-          borderRadius:`0 0 ${4*S}px 0`,
-        }}/>
-        <div style={{position:'absolute',bottom:9*S,right:9*S,width:15*S,height:15*S,zIndex:8,pointerEvents:'none',
-          borderBottom:`1px solid ${dBrd}55`,borderRight:`1px solid ${dBrd}55`,
-        }}/>
-        <div style={{position:'absolute',bottom:-4*S,right:-4*S,width:8*S,height:8*S,zIndex:9,pointerEvents:'none',
-          background:`linear-gradient(135deg,#ffe066,${dBrd})`,transform:'rotate(45deg)',
-          boxShadow:`0 0 ${14*S}px ${dGlow},0 0 ${8*S}px ${t.glow}99`,
-        }}/>
-      </>}
+      ))}
 
       {/* ══ ORNAMENTOS LATERAIS (losangos na borda) ══ */}
       {isDestaque && <>
