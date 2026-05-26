@@ -120,119 +120,119 @@ const SectionLabel = ({ children, color='#5a3030' }) => (
 // ═══ PLAYER CARD ═════════════════════════════════════════════
 const PlayerCard = ({ player, card, attrs, scale=1, reveal=false }) => {
   const t = getTier(card.overall);
-  const W = 260*scale, H = 400*scale;
-  const isDia = t.name==='Diamante', isGold = t.name==='Ouro', isSilv = t.name==='Prata';
-  const gems = isDia ? [
-    {p:'8% 14%',s:5},{p:'22% 7%',s:4},{p:'37% 12%',s:6},
-    {p:'12% 29%',s:3},{p:'50% 5%',s:4},{p:'5% 42%',s:3},
-  ] : [];
-  const corners = [
-    {t:8,l:8,sides:['Top','Left']},{t:8,r:8,sides:['Top','Right']},
-    {b:8,l:8,sides:['Bottom','Left']},{b:8,r:8,sides:['Bottom','Right']},
-  ];
+  const isDestaque = card.overall >= 90;
+  const W = (isDestaque ? 278 : 260) * scale;
+  const H = (isDestaque ? 418 : 400) * scale;
+  const sa = attrs.slice(0, 6);
+  const isDia = t.name === 'Diamante';
+  const isGold = t.name === 'Ouro';
+  const isSilv = t.name === 'Prata';
+  const bA = isDestaque ? 'bb' : '55';
   return (
     <div style={{
-      width:W, height:H, position:'relative', borderRadius:16*scale, background:t.bg,
-      border:`${2.5*scale}px solid ${t.brd}`, flexShrink:0,
-      boxShadow:[
-        `0 0 ${18*scale}px ${t.glow}44`, `0 0 ${45*scale}px ${t.glow}22`,
-        `0 0 ${90*scale}px ${t.glow}0e`, `inset 0 0 ${45*scale}px rgba(0,0,0,.65)`,
-        `inset 0 ${2*scale}px ${25*scale}px ${t.glow}16`,
-      ].join(','),
+      width:W, height:H, position:'relative', borderRadius:16*scale, background:t.bg, flexShrink:0,
+      border:`${(isDestaque?3:2.5)*scale}px solid ${isDestaque?t.brd:t.brd+'88'}`,
+      boxShadow: isDestaque
+        ? `0 0 ${22*scale}px ${t.glow}55,0 0 ${55*scale}px ${t.glow}28,0 0 ${110*scale}px ${t.glow}12,inset 0 0 ${55*scale}px rgba(0,0,0,.7),inset 0 ${2*scale}px ${32*scale}px ${t.glow}22`
+        : `0 0 ${18*scale}px ${t.glow}33,0 0 ${40*scale}px ${t.glow}15,inset 0 0 ${42*scale}px rgba(0,0,0,.62)`,
       overflow:'hidden',
       animation: reveal ? 'lbcReveal .5s cubic-bezier(.34,1.56,.64,1) forwards' : 'none',
     }}>
       <style>{`@keyframes lbcFloat{0%,100%{transform:translateX(-50%) translateY(0px)}50%{transform:translateX(-50%) translateY(-${6*scale}px)}}`}</style>
-      {/* Stripe pattern */}
+
+      {/* BG texture */}
       <div style={{position:'absolute',inset:0,backgroundImage:`repeating-linear-gradient(0deg,${t.pat} 0px,${t.pat} 1px,transparent 1px,transparent 7px)`,pointerEvents:'none'}}/>
+
       {/* Top glow */}
-      <div style={{position:'absolute',top:0,left:0,right:0,height:H*.45,background:`radial-gradient(ellipse 80% 55% at 50% 0%,${t.glow}18 0%,transparent 70%)`,pointerEvents:'none'}}/>
-      {/* Corner ornaments */}
-      {corners.map((c, i) => {
-        const pos = {position:'absolute'};
-        if(c.t !== undefined) pos.top    = c.t*scale;
-        if(c.b !== undefined) pos.bottom = c.b*scale;
-        if(c.l !== undefined) pos.left   = c.l*scale;
-        if(c.r !== undefined) pos.right  = c.r*scale;
-        const bs = {};
-        c.sides.forEach(s => { bs[`border${s}`] = `${2*scale}px solid ${t.brd}70`; });
-        return <div key={i} style={{...pos, width:22*scale, height:22*scale, ...bs}}/>;
-      })}
+      <div style={{position:'absolute',top:0,left:0,right:0,height:H*(isDestaque?.55:.45),background:`radial-gradient(ellipse 80% 60% at 50% 0%,${t.glow}${isDestaque?'22':'18'} 0%,transparent 70%)`,pointerEvents:'none'}}/>
+
       {/* Shine sweep */}
-      {(isGold || isDia || isSilv) && (
+      {(isGold||isDia||isSilv) && (
         <div style={{position:'absolute',top:0,bottom:0,width:'50%',pointerEvents:'none',
-          background:`linear-gradient(100deg,transparent 20%,${t.glow}1a 50%,transparent 80%)`,
-          animation:`lbcShine ${isGold?4:isSilv?5:2.5}s ease-in-out infinite`}}/>
+          background:`linear-gradient(100deg,transparent 20%,${t.glow}${isDestaque?'22':'1a'} 50%,transparent 80%)`,
+          animation:`lbcShine ${isDia?2.5:isGold?4:5}s ease-in-out infinite`}}/>
       )}
-      {/* Diamond gems */}
-      {gems.map((g, i) => (
-        <div key={i} style={{
-          position:'absolute', top:g.p.split(' ')[0], right:g.p.split(' ')[1],
-          width:g.s*scale, height:g.s*scale, borderRadius:'50%',
-          background:'radial-gradient(circle,#ffffff,#00ccff)',
-          boxShadow:`0 0 ${g.s*3*scale}px #00aaff,0 0 ${g.s*6*scale}px #0055ff`,
-          animation:`lbcGem ${1.5+i*.4}s ease-in-out infinite`, animationDelay:`${i*.28}s`,
-        }}/>
-      ))}
-      {/* Score */}
-      <div style={{position:'absolute',top:13*scale,left:15*scale,fontSize:62*scale,fontWeight:900,lineHeight:1,
-        color:t.score,letterSpacing:-3*scale,fontFamily:FO,
-        textShadow:`0 0 ${14*scale}px ${t.glow},0 0 ${28*scale}px ${t.glow}66,0 0 ${55*scale}px ${t.glow}22`}}>
-        {card.overall}
+
+      {/* DESTAQUE ribbon */}
+      {isDestaque && (
+        <div style={{position:'absolute',top:0,left:0,right:0,zIndex:5,pointerEvents:'none',
+          background:`linear-gradient(90deg,transparent 5%,${t.glow}99 25%,${t.brd} 50%,${t.glow}99 75%,transparent 95%)`,
+          padding:`${4*scale}px 0`,textAlign:'center',fontSize:7*scale,fontWeight:900,
+          letterSpacing:4.5*scale,color:isDia?'#000c28':'#1a0800',fontFamily:FO,
+          textTransform:'uppercase',boxShadow:`0 ${3*scale}px ${14*scale}px ${t.glow}55`,
+        }}>★ DESTAQUE ★</div>
+      )}
+
+      {/* Corner ornaments */}
+      {[
+        {top:(isDestaque?16:8)*scale,left:8*scale,borderTop:`${2*scale}px solid ${t.brd}${bA}`,borderLeft:`${2*scale}px solid ${t.brd}${bA}`},
+        {top:(isDestaque?16:8)*scale,right:8*scale,borderTop:`${2*scale}px solid ${t.brd}${bA}`,borderRight:`${2*scale}px solid ${t.brd}${bA}`},
+        {bottom:8*scale,left:8*scale,borderBottom:`${2*scale}px solid ${t.brd}${bA}`,borderLeft:`${2*scale}px solid ${t.brd}${bA}`},
+        {bottom:8*scale,right:8*scale,borderBottom:`${2*scale}px solid ${t.brd}${bA}`,borderRight:`${2*scale}px solid ${t.brd}${bA}`},
+      ].map((c,i) => <div key={i} style={{position:'absolute',...c,width:(isDestaque?20:16)*scale,height:(isDestaque?20:16)*scale}}/>)}
+
+      {/* Header: Overall (left) + Logo (right) */}
+      <div style={{position:'absolute',top:(isDestaque?17:10)*scale,left:13*scale,right:13*scale,display:'flex',justifyContent:'space-between',alignItems:'flex-start'}}>
+        <div>
+          <div style={{fontSize:(isDestaque?62:58)*scale,fontWeight:900,lineHeight:1,color:t.score,letterSpacing:-2*scale,fontFamily:FO,textShadow:`0 0 ${14*scale}px ${t.glow},0 0 ${28*scale}px ${t.glow}66,0 0 ${55*scale}px ${t.glow}22`}}>{card.overall}</div>
+          <div style={{fontSize:8*scale,fontWeight:700,letterSpacing:2.5*scale,color:t.txt,textTransform:'uppercase',fontFamily:F,borderTop:`${1*scale}px solid ${t.brd}55`,paddingTop:2*scale,marginTop:1*scale}}>{t.lbl}</div>
+        </div>
+        <div style={{display:'flex',flexDirection:'column',alignItems:'center'}}>
+          <img src="/logo.png" alt="" style={{width:38*scale,height:38*scale,objectFit:'contain',filter:`drop-shadow(0 0 ${7*scale}px ${t.glow}88)`}}
+            onError={e=>{e.target.style.display='none';if(e.target.nextSibling)e.target.nextSibling.style.display='block';}}/>
+          <span style={{display:'none'}}><FL1IP size={0.44*scale} opacity={0.65}/></span>
+        </div>
       </div>
-      {/* Tier label */}
-      <div style={{position:'absolute',top:82*scale,left:15*scale,fontSize:8.5*scale,fontWeight:700,
-        letterSpacing:3*scale,color:t.txt,textTransform:'uppercase',
-        textShadow:`0 0 ${6*scale}px ${t.glow}`,fontFamily:F,
-        borderTop:`${1*scale}px solid ${t.brd}55`,paddingTop:3*scale}}>
-        {t.lbl}
-      </div>
-      {/* Nick */}
-      <div style={{position:'absolute',top:13*scale,right:13*scale,fontSize:15*scale,fontWeight:700,
-        color:t.txt,textAlign:'right',textTransform:'uppercase',letterSpacing:1.2*scale,
-        lineHeight:1.2,maxWidth:140*scale,textShadow:`0 0 ${8*scale}px ${t.glow}`,fontFamily:F}}>
-        {player.nick || '???'}
-      </div>
-      {/* Photo */}
-      {(player.photoClean || player.photo) ? (
-        <img src={player.photoClean || player.photo} alt="" style={{
-          position:'absolute', bottom:68*scale, left:'50%', height:222*scale, maxWidth:'95%',
-          objectFit: player.photoClean ? 'contain' : 'cover',
-          borderRadius: player.photoClean ? 0 : 8*scale,
-          filter:`drop-shadow(0 0 ${13*scale}px ${t.glow}bb)`,
+
+      {/* Player photo */}
+      {(player.photoClean||player.photo) ? (
+        <img src={player.photoClean||player.photo} alt="" style={{
+          position:'absolute',bottom:(isDestaque?72:68)*scale,left:'50%',
+          height:(isDestaque?242:220)*scale,maxWidth:'100%',
+          objectFit:player.photoClean?'contain':'cover',
+          borderRadius:player.photoClean?0:8*scale,
+          filter:`drop-shadow(0 0 ${(isDestaque?17:13)*scale}px ${t.glow}${isDestaque?'cc':'bb'})`,
           animation:'lbcFloat 4s ease-in-out infinite',
         }}/>
       ) : (
-        <div style={{position:'absolute',bottom:72*scale,left:'50%',transform:'translateX(-50%)',
-          width:100*scale,height:140*scale,borderRadius:8*scale,
-          background:`${t.brd}0e`,border:`${1.5*scale}px dashed ${t.brd}30`,
-          display:'flex',alignItems:'center',justifyContent:'center',fontSize:38*scale,opacity:.3}}>👤</div>
+        <div style={{position:'absolute',bottom:(isDestaque?76:72)*scale,left:'50%',transform:'translateX(-50%)',width:100*scale,height:(isDestaque?152:140)*scale,borderRadius:8*scale,background:`${t.brd}0e`,border:`${1.5*scale}px dashed ${t.brd}30`,display:'flex',alignItems:'center',justifyContent:'center',fontSize:38*scale,opacity:.3}}>👤</div>
       )}
+
       {/* Photo fade */}
-      <div style={{position:'absolute',bottom:62*scale,left:0,right:0,height:55*scale,
-        background:'linear-gradient(0deg,rgba(0,0,0,.75) 0%,transparent 100%)',pointerEvents:'none'}}/>
-      {/* FL1IP watermark */}
-      <div style={{position:'absolute',bottom:67*scale,right:10*scale,opacity:.45,lineHeight:1}}>
-        <FL1IP size={0.38*scale}/>
-      </div>
-      {/* Stats bar */}
-      <div style={{position:'absolute',bottom:0,left:0,right:0,
-        background:'linear-gradient(0deg,rgba(0,0,0,.93),rgba(0,0,0,.65))',
-        padding:`${9*scale}px ${8*scale}px ${11*scale}px`,
-        display:'flex',justifyContent:'space-around',alignItems:'center',
-        borderTop:`${1.5*scale}px solid ${t.brd}40`,backdropFilter:'blur(6px)'}}>
-        {attrs.slice(0,6).map(a => (
-          <div key={a.id} style={{textAlign:'center'}}>
-            <div style={{fontSize:15*scale,fontWeight:700,color:t.score,lineHeight:1,
-              textShadow:`0 0 ${5*scale}px ${t.glow}`,fontFamily:FO}}>
-              {Math.round(card.scores?.[a.id] ?? 0)}
-            </div>
-            <div style={{fontSize:6.5*scale,color:t.txt,opacity:.6,marginTop:2*scale,
-              textTransform:'uppercase',letterSpacing:1*scale,fontFamily:F}}>
-              {a.name.slice(0,5)}
-            </div>
+      <div style={{position:'absolute',bottom:62*scale,left:0,right:0,height:62*scale,background:'linear-gradient(0deg,rgba(0,0,0,.85) 0%,transparent 100%)',pointerEvents:'none'}}/>
+
+      {/* Diamante gems */}
+      {isDia && [{p:'8% 14%',s:5},{p:'22% 7%',s:4},{p:'37% 12%',s:6},{p:'12% 29%',s:3},{p:'50% 5%',s:4},{p:'5% 42%',s:3}].map((g,i) => {
+        const [top,right]=g.p.split(' ');
+        return <div key={i} style={{position:'absolute',top,right,width:g.s*scale,height:g.s*scale,borderRadius:'50%',background:'radial-gradient(circle,#ffffff,#00ccff)',boxShadow:`0 0 ${g.s*3*scale}px #00aaff,0 0 ${g.s*6*scale}px #0055ff`,animation:`lbcGem ${1.5+i*.4}s ease-in-out infinite`,animationDelay:`${i*.28}s`}}/>;
+      })}
+
+      {/* Stats panel */}
+      <div style={{position:'absolute',bottom:0,left:0,right:0,background:'linear-gradient(0deg,rgba(0,0,0,.95),rgba(0,0,0,.72))',padding:`${8*scale}px ${10*scale}px ${10*scale}px`,borderTop:`${(isDestaque?2:1.5)*scale}px solid ${t.brd}${isDestaque?'44':'28'}`,backdropFilter:'blur(8px)'}}>
+        {/* Nick */}
+        <div style={{textAlign:'center',fontSize:11.5*scale,fontWeight:700,color:t.txt,textTransform:'uppercase',letterSpacing:1.8*scale,fontFamily:F,textShadow:`0 0 ${8*scale}px ${t.glow}`,borderBottom:`${1*scale}px solid ${t.brd}22`,paddingBottom:5*scale,marginBottom:5*scale,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>
+          {player.nick||'???'}
+        </div>
+        {/* Stats 2-column FUT style */}
+        <div style={{display:'flex',gap:6*scale}}>
+          <div style={{flex:1}}>
+            {sa.slice(0,3).map(a=>(
+              <div key={a.id} style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:3*scale}}>
+                <span style={{fontSize:7*scale,color:t.txt,opacity:.6,textTransform:'uppercase',letterSpacing:.8*scale,fontFamily:F}}>{a.name.slice(0,5)}</span>
+                <span style={{fontSize:13*scale,fontWeight:700,color:t.score,fontFamily:FO,textShadow:`0 0 ${4*scale}px ${t.glow}`}}>{Math.round(card.scores?.[a.id]??0)}</span>
+              </div>
+            ))}
           </div>
-        ))}
+          <div style={{width:1,background:`${t.brd}22`,margin:`0 ${2*scale}px`}}/>
+          <div style={{flex:1}}>
+            {sa.slice(3,6).map(a=>(
+              <div key={a.id} style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:3*scale}}>
+                <span style={{fontSize:7*scale,color:t.txt,opacity:.6,textTransform:'uppercase',letterSpacing:.8*scale,fontFamily:F}}>{a.name.slice(0,5)}</span>
+                <span style={{fontSize:13*scale,fontWeight:700,color:t.score,fontFamily:FO,textShadow:`0 0 ${4*scale}px ${t.glow}`}}>{Math.round(card.scores?.[a.id]??0)}</span>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );
