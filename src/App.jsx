@@ -146,22 +146,26 @@ const PlayerCard = ({ player, card, attrs, scale=1, reveal=false }) => {
   // 3D overflow: foto Destaque é mais alta, cabeça estoura acima da borda
   const photoH   = (isDestaque ? 375 : 220) * scale;
   const photoBtm = (isDestaque ? 72  : 68 ) * scale;
+  const S = scale; // atalho
 
   return (
-    // Wrapper SEM overflow:hidden — permite que a foto estoure para cima
     <div style={{
       width:W, height:H, position:'relative', flexShrink:0,
       animation: reveal ? 'lbcReveal .5s cubic-bezier(.34,1.56,.64,1) forwards' : 'none',
     }}>
-      <style>{`@keyframes lbcFloat{0%,100%{transform:translateX(-50%) translateY(0px)}50%{transform:translateX(-50%) translateY(-${6*scale}px)}}`}</style>
+      <style>{`
+        @keyframes lbcFloat{0%,100%{transform:translateX(-50%) translateY(0px)}50%{transform:translateX(-50%) translateY(-${6*S}px)}}
+        @keyframes lbcPulseBlue{0%,100%{opacity:.28}50%{opacity:.75}}
+        @keyframes lbcBorderGlow{0%,100%{opacity:.6}50%{opacity:1}}
+      `}</style>
 
-      {/* ── CAMADA 1: corpo do card (overflow:hidden clipa bg/ornamentos) ── */}
+      {/* ══ CAMADA 1: fundo do card (overflow:hidden) ══ */}
       <div style={{
-        position:'absolute',inset:0,borderRadius:16*scale,background:effBg,overflow:'hidden',zIndex:1,
-        border:`${(isDestaque?3:2.5)*scale}px solid ${isDestaque?effBrd:t.brd+'88'}`,
+        position:'absolute',inset:0,borderRadius:16*S,background:effBg,overflow:'hidden',zIndex:1,
+        border:`${(isDestaque?3:2.5)*S}px solid ${isDestaque?effBrd:t.brd+'88'}`,
         boxShadow: isDestaque
-          ? `0 0 ${25*scale}px ${dGlow}66,0 0 ${60*scale}px ${dGlow}33,0 0 ${14*scale}px ${t.glow}44,inset 0 0 ${55*scale}px rgba(0,0,0,.8),inset 0 ${2*scale}px ${32*scale}px ${dGlow}22`
-          : `0 0 ${18*scale}px ${t.glow}33,0 0 ${40*scale}px ${t.glow}15,inset 0 0 ${42*scale}px rgba(0,0,0,.62)`,
+          ? `0 0 ${28*S}px ${dGlow}77,0 0 ${65*S}px ${dGlow}38,0 0 ${20*S}px ${t.glow}66,0 0 ${80*S}px ${t.glow}28,inset 0 0 ${55*S}px rgba(0,0,0,.85),inset 0 0 ${28*S}px ${dGlow}14,inset 0 0 ${22*S}px rgba(0,180,255,0.12)`
+          : `0 0 ${18*S}px ${t.glow}33,0 0 ${40*S}px ${t.glow}15,inset 0 0 ${42*S}px rgba(0,0,0,.62)`,
       }}>
         {/* BG texture */}
         <div style={{position:'absolute',inset:0,pointerEvents:'none',
@@ -171,140 +175,217 @@ const PlayerCard = ({ player, card, attrs, scale=1, reveal=false }) => {
         }}/>
         {/* Top glow */}
         <div style={{position:'absolute',top:0,left:0,right:0,height:H*(isDestaque?.55:.45),pointerEvents:'none',
-          background:`radial-gradient(ellipse 80% 60% at 50% 0%,${effGlow}${isDestaque?'28':'18'} 0%,transparent 70%)`,
+          background:`radial-gradient(ellipse 80% 60% at 50% 0%,${effGlow}${isDestaque?'30':'18'} 0%,transparent 70%)`,
         }}/>
         {/* Shine sweep */}
         {(isGold||isDia||isSilv||isDestaque) && (
           <div style={{position:'absolute',top:0,bottom:0,width:'50%',pointerEvents:'none',
-            background:isDestaque?`linear-gradient(100deg,transparent 20%,${dGlow}1c 50%,transparent 80%)`:`linear-gradient(100deg,transparent 20%,${t.glow}1a 50%,transparent 80%)`,
+            background:isDestaque?`linear-gradient(100deg,transparent 20%,${dGlow}1e 50%,transparent 80%)`:`linear-gradient(100deg,transparent 20%,${t.glow}1a 50%,transparent 80%)`,
             animation:`lbcShine ${isDestaque||isDia?2.8:isGold?4:5}s ease-in-out infinite`,
           }}/>
         )}
         {/* Destaque: losangos flutuantes */}
         {isDestaque && dDiamonds.map((d,i) => (
           <div key={i} style={{position:'absolute',top:d.top,left:d.left,right:d.right,pointerEvents:'none',
-            width:d.sz*scale,height:d.sz*scale,background:`rgba(212,160,48,${d.op})`,
+            width:d.sz*S,height:d.sz*S,background:`rgba(212,160,48,${d.op})`,
             border:`1px solid rgba(212,160,48,${Math.min(1,d.op*2.2)})`,
-            transform:`rotate(${d.rot}deg)`,boxShadow:`0 0 ${d.sz*scale}px rgba(212,160,48,${d.op})`,
+            transform:`rotate(${d.rot}deg)`,boxShadow:`0 0 ${d.sz*S}px rgba(212,160,48,${d.op})`,
           }}/>
         ))}
-        {/* Corner ornamentos externos */}
-        {[
-          {top:(isDestaque?14:8)*scale,left:8*scale,borderTop:`${2*scale}px solid ${effBrd}${bA}`,borderLeft:`${2*scale}px solid ${effBrd}${bA}`},
-          {top:(isDestaque?14:8)*scale,right:8*scale,borderTop:`${2*scale}px solid ${effBrd}${bA}`,borderRight:`${2*scale}px solid ${effBrd}${bA}`},
-          {bottom:8*scale,left:8*scale,borderBottom:`${2*scale}px solid ${effBrd}${bA}`,borderLeft:`${2*scale}px solid ${effBrd}${bA}`},
-          {bottom:8*scale,right:8*scale,borderBottom:`${2*scale}px solid ${effBrd}${bA}`,borderRight:`${2*scale}px solid ${effBrd}${bA}`},
-        ].map((c,i) => <div key={i} style={{position:'absolute',...c,width:(isDestaque?22:16)*scale,height:(isDestaque?22:16)*scale}}/>)}
-        {/* Destaque: corner ornamentos internos */}
-        {isDestaque && [
-          {top:21*scale,left:14*scale,borderTop:`1px solid ${dBrd}44`,borderLeft:`1px solid ${dBrd}44`},
-          {top:21*scale,right:14*scale,borderTop:`1px solid ${dBrd}44`,borderRight:`1px solid ${dBrd}44`},
-          {bottom:15*scale,left:14*scale,borderBottom:`1px solid ${dBrd}44`,borderLeft:`1px solid ${dBrd}44`},
-          {bottom:15*scale,right:14*scale,borderBottom:`1px solid ${dBrd}44`,borderRight:`1px solid ${dBrd}44`},
-        ].map((c,i) => <div key={i} style={{position:'absolute',...c,width:13*scale,height:13*scale}}/>)}
         {/* Destaque: linha acento dourado */}
         {isDestaque && (
-          <div style={{position:'absolute',top:96*scale,left:12*scale,right:12*scale,height:1,pointerEvents:'none',
-            background:`linear-gradient(90deg,transparent,${dBrd}99,${t.glow}77,${dBrd}99,transparent)`,
+          <div style={{position:'absolute',top:96*S,left:12*S,right:12*S,height:1,pointerEvents:'none',
+            background:`linear-gradient(90deg,transparent,${dBrd}99,${t.glow}88,${dBrd}99,transparent)`,
           }}/>
         )}
         {/* Gems ciano Diamante */}
         {isDia && [{p:'8% 14%',s:5},{p:'22% 7%',s:4},{p:'37% 12%',s:6},{p:'12% 29%',s:3},{p:'50% 5%',s:4},{p:'5% 42%',s:3}].map((g,i) => {
           const [top,right]=g.p.split(' ');
-          return <div key={i} style={{position:'absolute',top,right,width:g.s*scale,height:g.s*scale,borderRadius:'50%',
+          return <div key={i} style={{position:'absolute',top,right,width:g.s*S,height:g.s*S,borderRadius:'50%',
             background:'radial-gradient(circle,#ffffff,#00ccff)',
-            boxShadow:`0 0 ${g.s*3*scale}px #00aaff,0 0 ${g.s*6*scale}px #0055ff`,
+            boxShadow:`0 0 ${g.s*3*S}px #00aaff,0 0 ${g.s*6*S}px #0055ff`,
             animation:`lbcGem ${1.5+i*.4}s ease-in-out infinite`,animationDelay:`${i*.28}s`}}/>;
         })}
+        {/* Destaque: anel interno azul pulsante (efeito cristal) */}
+        {isDestaque && (
+          <div style={{
+            position:'absolute',inset:`${5*S}px`,borderRadius:12*S,background:'transparent',pointerEvents:'none',
+            border:`1px solid rgba(0,210,255,0.22)`,
+            boxShadow:`inset 0 0 ${18*S}px rgba(0,170,255,0.12),inset 0 0 ${40*S}px rgba(0,100,255,0.06)`,
+            animation:'lbcPulseBlue 3s ease-in-out infinite',
+          }}/>
+        )}
+        {/* Destaque: segundo anel interno (ainda mais dentro) */}
+        {isDestaque && (
+          <div style={{
+            position:'absolute',inset:`${12*S}px`,borderRadius:8*S,background:'transparent',pointerEvents:'none',
+            border:`1px solid rgba(200,160,32,0.14)`,
+            animation:'lbcBorderGlow 4s ease-in-out infinite',animationDelay:'.8s',
+          }}/>
+        )}
       </div>
-      {/* ── FIM camada 1 ── */}
 
-      {/* ── CAMADA 2: foto — z=3, estoura para FORA da borda no topo ── */}
+      {/* ══ CANTOS ELABORADOS (no wrapper, podem sair da borda) ══ */}
+      {isDestaque && <>
+        {/* — Topo-esquerdo — */}
+        <div style={{position:'absolute',top:0,left:0,width:34*S,height:34*S,zIndex:8,pointerEvents:'none',
+          borderTop:`${3.5*S}px solid ${dBrd}`,borderLeft:`${3.5*S}px solid ${dBrd}`,
+          boxShadow:`0 0 ${12*S}px ${dGlow}dd,0 0 ${7*S}px ${t.glow}66`,
+          borderRadius:`${4*S}px 0 0 0`,
+        }}/>
+        <div style={{position:'absolute',top:9*S,left:9*S,width:15*S,height:15*S,zIndex:8,pointerEvents:'none',
+          borderTop:`1px solid ${dBrd}55`,borderLeft:`1px solid ${dBrd}55`,
+        }}/>
+        <div style={{position:'absolute',top:-4*S,left:-4*S,width:8*S,height:8*S,zIndex:9,pointerEvents:'none',
+          background:`linear-gradient(135deg,#ffe066,${dBrd})`,transform:'rotate(45deg)',
+          boxShadow:`0 0 ${14*S}px ${dGlow},0 0 ${8*S}px ${t.glow}99`,
+        }}/>
+        {/* — Topo-direito — */}
+        <div style={{position:'absolute',top:0,right:0,width:34*S,height:34*S,zIndex:8,pointerEvents:'none',
+          borderTop:`${3.5*S}px solid ${dBrd}`,borderRight:`${3.5*S}px solid ${dBrd}`,
+          boxShadow:`0 0 ${12*S}px ${dGlow}dd,0 0 ${7*S}px ${t.glow}66`,
+          borderRadius:`0 ${4*S}px 0 0`,
+        }}/>
+        <div style={{position:'absolute',top:9*S,right:9*S,width:15*S,height:15*S,zIndex:8,pointerEvents:'none',
+          borderTop:`1px solid ${dBrd}55`,borderRight:`1px solid ${dBrd}55`,
+        }}/>
+        <div style={{position:'absolute',top:-4*S,right:-4*S,width:8*S,height:8*S,zIndex:9,pointerEvents:'none',
+          background:`linear-gradient(135deg,#ffe066,${dBrd})`,transform:'rotate(45deg)',
+          boxShadow:`0 0 ${14*S}px ${dGlow},0 0 ${8*S}px ${t.glow}99`,
+        }}/>
+        {/* — Baixo-esquerdo — */}
+        <div style={{position:'absolute',bottom:0,left:0,width:34*S,height:34*S,zIndex:8,pointerEvents:'none',
+          borderBottom:`${3.5*S}px solid ${dBrd}`,borderLeft:`${3.5*S}px solid ${dBrd}`,
+          boxShadow:`0 0 ${12*S}px ${dGlow}dd,0 0 ${7*S}px ${t.glow}66`,
+          borderRadius:`0 0 0 ${4*S}px`,
+        }}/>
+        <div style={{position:'absolute',bottom:9*S,left:9*S,width:15*S,height:15*S,zIndex:8,pointerEvents:'none',
+          borderBottom:`1px solid ${dBrd}55`,borderLeft:`1px solid ${dBrd}55`,
+        }}/>
+        <div style={{position:'absolute',bottom:-4*S,left:-4*S,width:8*S,height:8*S,zIndex:9,pointerEvents:'none',
+          background:`linear-gradient(135deg,#ffe066,${dBrd})`,transform:'rotate(45deg)',
+          boxShadow:`0 0 ${14*S}px ${dGlow},0 0 ${8*S}px ${t.glow}99`,
+        }}/>
+        {/* — Baixo-direito — */}
+        <div style={{position:'absolute',bottom:0,right:0,width:34*S,height:34*S,zIndex:8,pointerEvents:'none',
+          borderBottom:`${3.5*S}px solid ${dBrd}`,borderRight:`${3.5*S}px solid ${dBrd}`,
+          boxShadow:`0 0 ${12*S}px ${dGlow}dd,0 0 ${7*S}px ${t.glow}66`,
+          borderRadius:`0 0 ${4*S}px 0`,
+        }}/>
+        <div style={{position:'absolute',bottom:9*S,right:9*S,width:15*S,height:15*S,zIndex:8,pointerEvents:'none',
+          borderBottom:`1px solid ${dBrd}55`,borderRight:`1px solid ${dBrd}55`,
+        }}/>
+        <div style={{position:'absolute',bottom:-4*S,right:-4*S,width:8*S,height:8*S,zIndex:9,pointerEvents:'none',
+          background:`linear-gradient(135deg,#ffe066,${dBrd})`,transform:'rotate(45deg)',
+          boxShadow:`0 0 ${14*S}px ${dGlow},0 0 ${8*S}px ${t.glow}99`,
+        }}/>
+      </>}
+
+      {/* ══ ORNAMENTOS LATERAIS (losangos na borda) ══ */}
+      {isDestaque && <>
+        <div style={{position:'absolute',left:-5*S,top:'42%',transform:'translateY(-50%) rotate(45deg)',
+          width:11*S,height:11*S,zIndex:9,pointerEvents:'none',
+          background:`linear-gradient(135deg,#ffe066,${dBrd})`,
+          boxShadow:`0 0 ${15*S}px ${dGlow},0 0 ${9*S}px ${t.glow}aa`,
+        }}/>
+        <div style={{position:'absolute',right:-5*S,top:'42%',transform:'translateY(-50%) rotate(45deg)',
+          width:11*S,height:11*S,zIndex:9,pointerEvents:'none',
+          background:`linear-gradient(135deg,#ffe066,${dBrd})`,
+          boxShadow:`0 0 ${15*S}px ${dGlow},0 0 ${9*S}px ${t.glow}aa`,
+        }}/>
+        <div style={{position:'absolute',bottom:-5*S,left:'50%',transform:'translateX(-50%) rotate(45deg)',
+          width:11*S,height:11*S,zIndex:9,pointerEvents:'none',
+          background:`linear-gradient(135deg,#ffe066,${dBrd})`,
+          boxShadow:`0 0 ${15*S}px ${dGlow},0 0 ${9*S}px ${t.glow}aa`,
+        }}/>
+      </>}
+
+      {/* ══ FOTO — z=3, estoura para fora no topo ══ */}
       {(player.photoClean||player.photo) ? (
         <img src={player.photoClean||player.photo} alt="" style={{
           position:'absolute', bottom:photoBtm, left:'50%',
           height:photoH, maxWidth:'100%',
           objectFit:player.photoClean?'contain':'cover',
           objectPosition:'top center',
-          borderRadius:player.photoClean?0:8*scale,
-          filter:`drop-shadow(0 ${-3*scale}px ${(isDestaque?24:13)*scale}px ${effGlow}${isDestaque?'ee':'bb'})`,
+          borderRadius:player.photoClean?0:8*S,
+          filter:`drop-shadow(0 ${-3*S}px ${(isDestaque?24:13)*S}px ${effGlow}${isDestaque?'ee':'bb'})`,
           animation:'lbcFloat 4s ease-in-out infinite',
           zIndex:3,
         }}/>
       ) : (
         <div style={{position:'absolute',bottom:photoBtm,left:'50%',transform:'translateX(-50%)',
-          width:100*scale,height:isDestaque?152*scale:140*scale,borderRadius:8*scale,
-          background:`${effBrd}0e`,border:`${1.5*scale}px dashed ${effBrd}30`,
-          display:'flex',alignItems:'center',justifyContent:'center',fontSize:38*scale,opacity:.3,zIndex:3}}>👤</div>
+          width:100*S,height:isDestaque?152*S:140*S,borderRadius:8*S,
+          background:`${effBrd}0e`,border:`${1.5*S}px dashed ${effBrd}30`,
+          display:'flex',alignItems:'center',justifyContent:'center',fontSize:38*S,opacity:.3,zIndex:3}}>👤</div>
       )}
 
-      {/* ── CAMADA 3: header (overall + logo) — z=4, sempre legível sobre a foto ── */}
-      <div style={{position:'absolute',top:(isDestaque?16:10)*scale,left:13*scale,right:13*scale,
+      {/* ══ HEADER (overall + logo) — z=4 ══ */}
+      <div style={{position:'absolute',top:(isDestaque?16:10)*S,left:13*S,right:13*S,
         display:'flex',justifyContent:'space-between',alignItems:'flex-start',zIndex:4}}>
         <div>
-          <div style={{fontSize:(isDestaque?62:58)*scale,fontWeight:900,lineHeight:1,color:effScore,letterSpacing:-2*scale,fontFamily:FO,
-            textShadow:`0 0 ${14*scale}px ${effGlow},0 0 ${28*scale}px ${effGlow}66,0 0 ${55*scale}px ${effGlow}22`}}>
+          <div style={{fontSize:(isDestaque?62:58)*S,fontWeight:900,lineHeight:1,color:effScore,letterSpacing:-2*S,fontFamily:FO,
+            textShadow:`0 0 ${14*S}px ${effGlow},0 0 ${28*S}px ${effGlow}66,0 0 ${55*S}px ${effGlow}22`}}>
             {card.overall}
           </div>
-          <div style={{fontSize:8*scale,fontWeight:700,letterSpacing:2.5*scale,color:effTxt,textTransform:'uppercase',fontFamily:F,
-            borderTop:`${1*scale}px solid ${effBrd}55`,paddingTop:2*scale,marginTop:1*scale}}>
+          <div style={{fontSize:8*S,fontWeight:700,letterSpacing:2.5*S,color:effTxt,textTransform:'uppercase',fontFamily:F,
+            borderTop:`${1*S}px solid ${effBrd}55`,paddingTop:2*S,marginTop:1*S}}>
             {t.lbl}
           </div>
         </div>
         <div style={{display:'flex',flexDirection:'column',alignItems:'center'}}>
-          <img src="/logo.png" alt="" style={{width:38*scale,height:38*scale,objectFit:'contain',
-            filter:`drop-shadow(0 0 ${7*scale}px ${effGlow}99)`}}
+          <img src="/logo.png" alt="" style={{width:38*S,height:38*S,objectFit:'contain',
+            filter:`drop-shadow(0 0 ${7*S}px ${effGlow}99)`}}
             onError={e=>{e.target.style.display='none';if(e.target.nextSibling)e.target.nextSibling.style.display='block';}}/>
-          <span style={{display:'none'}}><FL1IP size={0.44*scale} opacity={0.65}/></span>
+          <span style={{display:'none'}}><FL1IP size={0.44*S} opacity={0.65}/></span>
         </div>
       </div>
 
-      {/* ── CAMADA 4: escudo badge — z=5, flutua sobre tudo no topo ── */}
+      {/* ══ ESCUDO BADGE — z=5 ══ */}
       {isDestaque && (
         <div style={{
-          position:'absolute',top:-2*scale,left:'50%',transform:'translateX(-50%)',
-          width:48*scale,height:42*scale,zIndex:5,pointerEvents:'none',
-          background:`linear-gradient(180deg,${dBrd} 0%,#7a5806 100%)`,
+          position:'absolute',top:-2*S,left:'50%',transform:'translateX(-50%)',
+          width:48*S,height:42*S,zIndex:5,pointerEvents:'none',
+          background:`linear-gradient(180deg,#ffe066 0%,${dBrd} 40%,#7a5806 100%)`,
           clipPath:'polygon(8% 0%,92% 0%,100% 20%,100% 68%,50% 100%,0% 68%,0% 20%)',
           display:'flex',alignItems:'center',justifyContent:'center',
-          boxShadow:`0 ${4*scale}px ${18*scale}px ${dGlow}99,0 0 ${8*scale}px ${dGlow}`,
+          boxShadow:`0 ${4*S}px ${20*S}px ${dGlow}cc,0 0 ${10*S}px ${t.glow}77`,
         }}>
-          <span style={{fontSize:14*scale,color:'#100700',fontWeight:900,fontFamily:FO,lineHeight:1,marginTop:-3*scale}}>★</span>
+          <span style={{fontSize:14*S,color:'#0d0500',fontWeight:900,fontFamily:FO,lineHeight:1,marginTop:-3*S}}>★</span>
         </div>
       )}
 
-      {/* ── CAMADA 5: fade + stats — z=6/7, cobrem a parte inferior da foto ── */}
-      <div style={{position:'absolute',bottom:60*scale,left:0,right:0,height:65*scale,pointerEvents:'none',zIndex:6,
+      {/* ══ FADE + STATS — z=6/7 ══ */}
+      <div style={{position:'absolute',bottom:60*S,left:0,right:0,height:65*S,pointerEvents:'none',zIndex:6,
         background:'linear-gradient(0deg,rgba(0,0,0,.92) 0%,transparent 100%)',
       }}/>
       <div style={{position:'absolute',bottom:0,left:0,right:0,zIndex:7,
         background:'linear-gradient(0deg,rgba(0,0,0,.97),rgba(0,0,0,.78))',
-        padding:`${8*scale}px ${10*scale}px ${10*scale}px`,
-        borderTop:`${(isDestaque?2:1.5)*scale}px solid ${effBrd}${isDestaque?'55':'28'}`,
+        padding:`${8*S}px ${10*S}px ${10*S}px`,
+        borderTop:`${(isDestaque?2:1.5)*S}px solid ${effBrd}${isDestaque?'66':'28'}`,
         backdropFilter:'blur(8px)'}}>
-        <div style={{textAlign:'center',fontSize:11.5*scale,fontWeight:700,color:effTxt,
-          textTransform:'uppercase',letterSpacing:1.8*scale,fontFamily:F,
-          textShadow:`0 0 ${8*scale}px ${effGlow}`,
-          borderBottom:`${1*scale}px solid ${effBrd}22`,
-          paddingBottom:5*scale,marginBottom:5*scale,
+        <div style={{textAlign:'center',fontSize:11.5*S,fontWeight:700,color:effTxt,
+          textTransform:'uppercase',letterSpacing:1.8*S,fontFamily:F,
+          textShadow:`0 0 ${8*S}px ${effGlow}`,
+          borderBottom:`${1*S}px solid ${effBrd}22`,
+          paddingBottom:5*S,marginBottom:5*S,
           overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>
           {player.nick||'???'}
         </div>
-        <div style={{display:'flex',gap:6*scale}}>
+        <div style={{display:'flex',gap:6*S}}>
           <div style={{flex:1}}>
             {sa.slice(0,3).map(a=>(
-              <div key={a.id} style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:3*scale}}>
-                <span style={{fontSize:7*scale,color:effTxt,opacity:.6,textTransform:'uppercase',letterSpacing:.8*scale,fontFamily:F}}>{a.name.slice(0,5)}</span>
-                <span style={{fontSize:13*scale,fontWeight:700,color:effScore,fontFamily:FO,textShadow:`0 0 ${4*scale}px ${effGlow}`}}>{Math.round(card.scores?.[a.id]??0)}</span>
+              <div key={a.id} style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:3*S}}>
+                <span style={{fontSize:7*S,color:effTxt,opacity:.6,textTransform:'uppercase',letterSpacing:.8*S,fontFamily:F}}>{a.name.slice(0,5)}</span>
+                <span style={{fontSize:13*S,fontWeight:700,color:effScore,fontFamily:FO,textShadow:`0 0 ${4*S}px ${effGlow}`}}>{Math.round(card.scores?.[a.id]??0)}</span>
               </div>
             ))}
           </div>
-          <div style={{width:1,background:`${effBrd}22`,margin:`0 ${2*scale}px`}}/>
+          <div style={{width:1,background:`${effBrd}22`,margin:`0 ${2*S}px`}}/>
           <div style={{flex:1}}>
             {sa.slice(3,6).map(a=>(
-              <div key={a.id} style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:3*scale}}>
-                <span style={{fontSize:7*scale,color:effTxt,opacity:.6,textTransform:'uppercase',letterSpacing:.8*scale,fontFamily:F}}>{a.name.slice(0,5)}</span>
-                <span style={{fontSize:13*scale,fontWeight:700,color:effScore,fontFamily:FO,textShadow:`0 0 ${4*scale}px ${effGlow}`}}>{Math.round(card.scores?.[a.id]??0)}</span>
+              <div key={a.id} style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:3*S}}>
+                <span style={{fontSize:7*S,color:effTxt,opacity:.6,textTransform:'uppercase',letterSpacing:.8*S,fontFamily:F}}>{a.name.slice(0,5)}</span>
+                <span style={{fontSize:13*S,fontWeight:700,color:effScore,fontFamily:FO,textShadow:`0 0 ${4*S}px ${effGlow}`}}>{Math.round(card.scores?.[a.id]??0)}</span>
               </div>
             ))}
           </div>
