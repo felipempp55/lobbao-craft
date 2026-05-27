@@ -264,18 +264,6 @@ const PlayerCard = ({ player, card, attrs, scale=1, reveal=false }) => {
             boxShadow:`0 0 ${g.s*3*S}px #00aaff,0 0 ${g.s*6*S}px #0055ff`,
             animation:`lbcGem ${1.5+i*.4}s ease-in-out infinite`,animationDelay:`${i*.28}s`}}/>;
         })}
-        {/* Cantos L — lvl2: subtil | lvl3: pronunciado (dentro do overflow:hidden → border-radius clipa) */}
-        {lvl >= 2 && !isDestaque && [
-          {top:0,left:0,   borderTop:`${(lvl===3?2.5:1.5)*S}px solid ${t.brd}${lvl===3?'cc':'66'}`,borderLeft:`${(lvl===3?2.5:1.5)*S}px solid ${t.brd}${lvl===3?'cc':'66'}`},
-          {top:0,right:0,  borderTop:`${(lvl===3?2.5:1.5)*S}px solid ${t.brd}${lvl===3?'cc':'66'}`,borderRight:`${(lvl===3?2.5:1.5)*S}px solid ${t.brd}${lvl===3?'cc':'66'}`},
-          {bottom:0,left:0,borderBottom:`${(lvl===3?2.5:1.5)*S}px solid ${t.brd}${lvl===3?'cc':'66'}`,borderLeft:`${(lvl===3?2.5:1.5)*S}px solid ${t.brd}${lvl===3?'cc':'66'}`},
-          {bottom:0,right:0,borderBottom:`${(lvl===3?2.5:1.5)*S}px solid ${t.brd}${lvl===3?'cc':'66'}`,borderRight:`${(lvl===3?2.5:1.5)*S}px solid ${t.brd}${lvl===3?'cc':'66'}`},
-        ].map((c,i)=>(
-          <div key={`lc${i}`} style={{position:'absolute',...c,
-            width:(lvl===3?38:20)*S,height:(lvl===3?38:20)*S,
-            boxShadow:lvl===3?`0 0 ${10*S}px ${t.glow}66`:'none',
-          }}/>
-        ))}
         {/* Anel pulsante — lvl3: dourado | GOAT: azul+dourado */}
         {lvl === 3 && (
           <div style={{position:'absolute',inset:`${5*S}px`,borderRadius:12*S,background:'transparent',pointerEvents:'none',
