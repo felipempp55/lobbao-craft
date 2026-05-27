@@ -5,16 +5,19 @@ const RG = '#dd1100';
 const RD = 'rgba(200,17,17,0.15)';
 // ═══ TIERS ═══════════════════════════════════════════════════
 const TIERS = [
-  { name:'Bronze',   min:0,  max:70, lbl:'BRONZE',
-    bg:'linear-gradient(170deg,#0f0500 0%,#3a1806 30%,#521f07 55%,#3a1806 80%,#0f0500 100%)',
-    brd:'#b87333',glow:'#d07020',txt:'#f0a055',score:'#ffbb44',pat:'rgba(200,120,40,0.06)' },
-  { name:'Prata',    min:71, max:80, lbl:'PRATA',
+  { name:'Melhor Freezar', min:0,  max:59, lbl:'MELHOR FREEZAR',
+    bg:'linear-gradient(170deg,#120000 0%,#2a0505 30%,#3d0808 55%,#2a0505 80%,#120000 100%)',
+    brd:'#882222',glow:'#cc2222',txt:'#ff8888',score:'#ffaaaa',pat:'rgba(180,30,30,0.07)' },
+  { name:'Bagre',          min:60, max:69, lbl:'BAGRE',
+    bg:'linear-gradient(170deg,#060a10 0%,#0f1e30 30%,#162840 55%,#0f1e30 80%,#060a10 100%)',
+    brd:'#5588aa',glow:'#6699bb',txt:'#99bbcc',score:'#c0dde8',pat:'rgba(80,130,170,0.05)' },
+  { name:'Bom de jogo',    min:70, max:79, lbl:'BOM DE JOGO',
     bg:'linear-gradient(170deg,#070c16 0%,#1a2b3e 30%,#283c55 55%,#1a2b3e 80%,#070c16 100%)',
     brd:'#c8d8e8',glow:'#a0b5cc',txt:'#ddeeff',score:'#f5f9ff',pat:'rgba(180,205,230,0.04)' },
-  { name:'Ouro',     min:81, max:90, lbl:'OURO',
+  { name:'Dream Lobby',    min:80, max:90, lbl:'DREAM LOBBY',
     bg:'linear-gradient(170deg,#0e0800 0%,#3d2600 30%,#5e3a00 55%,#3d2600 80%,#0e0800 100%)',
     brd:'#ffd700',glow:'#ffaa00',txt:'#ffe880',score:'#fff100',pat:'rgba(255,190,0,0.06)' },
-  { name:'Diamante', min:91, max:99, lbl:'GOAT',
+  { name:'GOAT',           min:91, max:99, lbl:'GOAT',
     bg:'linear-gradient(170deg,#000420 0%,#000d45 30%,#001575 55%,#000d45 80%,#000420 100%)',
     brd:'#00d4ff',glow:'#00eeff',txt:'#88e8ff',score:'#ffffff',pat:'rgba(0,210,255,0.05)' },
 ];
@@ -120,13 +123,13 @@ const SectionLabel = ({ children, color='#c09090' }) => (
 // ═══ PLAYER CARD ═════════════════════════════════════════════
 const PlayerCard = ({ player, card, attrs, scale=1, reveal=false }) => {
   const t = getTier(card.overall);
-  const isDestaque = card.overall >= 90;
+  const isDestaque = card.overall >= 91;
   const W = (isDestaque ? 278 : 260) * scale;
   const H = (isDestaque ? 418 : 400) * scale;
   const sa = attrs.slice(0, 6);
-  const isDia = t.name === 'Diamante';
-  const isGold = t.name === 'Ouro';
-  const isSilv = t.name === 'Prata';
+  const isDia  = t.name === 'GOAT';
+  const isGold = t.name === 'Dream Lobby';
+  const isSilv = t.name === 'Bom de jogo';
   const bA = isDestaque ? 'bb' : '55';
 
   // Destaque: gold theme overrides tier colors
