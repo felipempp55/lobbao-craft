@@ -374,6 +374,7 @@ const PlayerCard = ({ player, card, attrs, scale=1, reveal=false }) => {
             ? `grayscale(35%) brightness(0.85) drop-shadow(0 0 ${6*S}px ${effGlow}44)`
             : `drop-shadow(0 ${-3*S}px ${[6,10,14,18,24][lvl]*S}px ${effGlow}${['77','99','bb','cc','ee'][lvl]})`,
           animation: lvl >= 1 ? 'lbcFloat 4s ease-in-out infinite' : 'none',
+          transform: lvl >= 1 ? undefined : 'translateX(-50%)',
           zIndex:3,
         }}/>
       ) : (
@@ -402,18 +403,6 @@ const PlayerCard = ({ player, card, attrs, scale=1, reveal=false }) => {
             {t.lbl}
           </div>
         </div>
-        {/* Logo apenas lvl2+ */}
-        {lvl >= 2 && (
-          <div style={{display:'flex',flexDirection:'column',alignItems:'center'}}>
-            <img src="/logo.png" alt="" style={{
-              width:38*S,height:38*S,objectFit:'contain',
-              opacity: lvl===2 ? 0.7 : 1,
-              filter:`drop-shadow(0 0 ${7*S}px ${effGlow}${lvl>=3?'99':'55'})`,
-            }}
-              onError={e=>{e.target.style.display='none';if(e.target.nextSibling)e.target.nextSibling.style.display='block';}}/>
-            <span style={{display:'none'}}><FL1IP size={0.44*S} opacity={0.65}/></span>
-          </div>
-        )}
       </div>
 
 
