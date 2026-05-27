@@ -164,7 +164,7 @@ const PlayerCard = ({ player, card, attrs, scale=1, reveal=false }) => {
         position:'absolute',inset:0,borderRadius:16*S,background:effBg,overflow:'hidden',zIndex:1,
         border:`${(isDestaque?3:2.5)*S}px solid ${isDestaque?effBrd:t.brd+'88'}`,
         boxShadow: isDestaque
-          ? `0 0 ${28*S}px ${dGlow}77,0 0 ${65*S}px ${dGlow}38,0 0 ${20*S}px ${t.glow}66,0 0 ${80*S}px ${t.glow}28,inset 0 0 ${55*S}px rgba(0,0,0,.85),inset 0 0 ${28*S}px ${dGlow}14,inset 0 0 ${22*S}px rgba(0,180,255,0.12)`
+          ? `0 0 ${28*S}px ${dGlow}77,0 0 ${65*S}px ${dGlow}38,0 0 ${28*S}px ${t.glow}cc,0 0 ${70*S}px ${t.glow}66,0 0 ${110*S}px ${t.glow}33,inset 0 0 ${55*S}px rgba(0,0,0,.85),inset 0 0 ${28*S}px ${dGlow}14,inset 0 0 ${32*S}px rgba(0,180,255,0.28)`
           : `0 0 ${18*S}px ${t.glow}33,0 0 ${40*S}px ${t.glow}15,inset 0 0 ${42*S}px rgba(0,0,0,.62)`,
       }}>
         {/* BG texture */}
@@ -210,19 +210,29 @@ const PlayerCard = ({ player, card, attrs, scale=1, reveal=false }) => {
         {isDestaque && (
           <div style={{
             position:'absolute',inset:`${5*S}px`,borderRadius:12*S,background:'transparent',pointerEvents:'none',
-            border:`1px solid rgba(0,210,255,0.22)`,
-            boxShadow:`inset 0 0 ${18*S}px rgba(0,170,255,0.12),inset 0 0 ${40*S}px rgba(0,100,255,0.06)`,
-            animation:'lbcPulseBlue 3s ease-in-out infinite',
+            border:`2px solid rgba(0,210,255,0.75)`,
+            boxShadow:`inset 0 0 ${24*S}px rgba(0,180,255,0.40),inset 0 0 ${55*S}px rgba(0,100,255,0.20), 0 0 ${22*S}px rgba(0,210,255,0.50)`,
+            animation:'lbcBorderGlow 3s ease-in-out infinite',
           }}/>
         )}
         {/* Destaque: segundo anel interno dourado */}
         {isDestaque && (
           <div style={{
             position:'absolute',inset:`${13*S}px`,borderRadius:7*S,background:'transparent',pointerEvents:'none',
-            border:`1px solid rgba(200,160,32,0.14)`,
+            border:`1px solid rgba(200,160,32,0.25)`,
             animation:'lbcBorderGlow 4s ease-in-out infinite',animationDelay:'.8s',
           }}/>
         )}
+        {/* Destaque: cantos azuis internos */}
+        {isDestaque && [
+          {top:0,left:0,   borderTop:`2px solid rgba(0,210,255,0.80)`,borderLeft:`2px solid rgba(0,210,255,0.80)`},
+          {top:0,right:0,  borderTop:`2px solid rgba(0,210,255,0.80)`,borderRight:`2px solid rgba(0,210,255,0.80)`},
+          {bottom:0,left:0,borderBottom:`2px solid rgba(0,210,255,0.80)`,borderLeft:`2px solid rgba(0,210,255,0.80)`},
+          {bottom:0,right:0,borderBottom:`2px solid rgba(0,210,255,0.80)`,borderRight:`2px solid rgba(0,210,255,0.80)`},
+        ].map((c,i)=>(
+          <div key={`bc${i}`} style={{position:'absolute',...c,width:36*S,height:36*S,
+            boxShadow:`0 0 ${16*S}px rgba(0,210,255,0.70), 0 0 ${8*S}px rgba(0,210,255,0.50)`}}/>
+        ))}
       </div>
 
 
@@ -285,7 +295,7 @@ const PlayerCard = ({ player, card, attrs, scale=1, reveal=false }) => {
               opacity:r.op,
             }}/>
           ))}
-          {/* Cintilações ao redor da âncora */}
+          {/* Cintilações douradas ao redor da âncora */}
           {[
             {top:28, right:26, s:4.5, d:'0s'},
             {top:14, right:48, s:3,   d:'0.55s'},
@@ -301,6 +311,25 @@ const PlayerCard = ({ player, card, attrs, scale=1, reveal=false }) => {
               boxShadow:`0 0 ${sp.s*2*S}px ${dGlow}ee, 0 0 ${sp.s*6*S}px ${dGlow}77`,
               zIndex:5, pointerEvents:'none',
               animation:`lbcGem ${1.4+i*.38}s ease-in-out infinite`,
+              animationDelay:sp.d,
+            }}/>
+          ))}
+          {/* Cintilações AZUIS — lado esquerdo e inferior */}
+          {[
+            {top:55,  left:18, s:4,   d:'0.2s'},
+            {top:80,  left:32, s:3,   d:'0.7s'},
+            {top:38,  left:10, s:2.5, d:'1.0s'},
+            {top:100, left:55, s:3.5, d:'0.4s'},
+            {top:72,  left:70, s:2.5, d:'0.9s'},
+            {top:115, left:28, s:2,   d:'0.1s'},
+          ].map((sp,i) => (
+            <div key={`bspark${i}`} style={{
+              position:'absolute', top:sp.top*S, left:sp.left*S,
+              width:sp.s*S, height:sp.s*S, borderRadius:'50%',
+              background:`radial-gradient(circle, #ffffff, ${t.glow})`,
+              boxShadow:`0 0 ${sp.s*2*S}px ${t.glow}ff, 0 0 ${sp.s*7*S}px ${t.glow}88`,
+              zIndex:5, pointerEvents:'none',
+              animation:`lbcGem ${1.3+i*.36}s ease-in-out infinite`,
               animationDelay:sp.d,
             }}/>
           ))}
