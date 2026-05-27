@@ -225,12 +225,17 @@ const PlayerCard = ({ player, card, attrs, scale=1, reveal=false }) => {
           <div style={{position:'absolute',inset:`${10*S}px`,borderRadius:9*S,background:'transparent',pointerEvents:'none',
             border:`1px solid ${t.brd}44`,
             boxShadow:`inset 0 0 ${18*S}px ${t.glow}16`}}/>
-          {/* Gems nos cantos do frame interno */}
-          {[{top:10*S,left:10*S},{top:10*S,right:10*S},{bottom:10*S,left:10*S},{bottom:10*S,right:10*S}].map((pos,i)=>(
+          {/* Gems no meio das bordas do frame interno (não nos cantos) */}
+          {[
+            {top:10*S,  left:'50%', transform:'translateX(-50%)'},
+            {bottom:10*S,left:'50%',transform:'translateX(-50%)'},
+            {top:'50%', left:10*S,  transform:'translateY(-50%)'},
+            {top:'50%', right:10*S, transform:'translateY(-50%)'},
+          ].map((pos,i)=>(
             <div key={`ifg${i}`} style={{position:'absolute',...pos,pointerEvents:'none',
               width:5*S,height:5*S,borderRadius:'50%',
               background:`radial-gradient(circle,${t.score},${t.brd})`,
-              boxShadow:`0 0 ${10*S}px ${t.glow}cc,0 0 ${5*S}px ${t.glow}88`}}/>
+              boxShadow:`0 0 ${8*S}px ${t.glow}bb,0 0 ${4*S}px ${t.glow}77`}}/>
           ))}
           {/* Losango central de fundo */}
           <div style={{position:'absolute',top:'10%',left:'50%',
