@@ -219,6 +219,38 @@ const PlayerCard = ({ player, card, attrs, scale=1, reveal=false }) => {
             background:`linear-gradient(90deg,transparent,${effBrd}99,${effGlow}88,${effBrd}99,transparent)`,
           }}/>
         )}
+        {/* ══ Dream Lobby: elementos internos extras ══ */}
+        {lvl === 3 && !isDestaque && <>
+          {/* Frame interno */}
+          <div style={{position:'absolute',inset:`${10*S}px`,borderRadius:9*S,background:'transparent',pointerEvents:'none',
+            border:`1px solid ${t.brd}44`,
+            boxShadow:`inset 0 0 ${18*S}px ${t.glow}16`}}/>
+          {/* Gems nos cantos do frame interno */}
+          {[{top:10*S,left:10*S},{top:10*S,right:10*S},{bottom:10*S,left:10*S},{bottom:10*S,right:10*S}].map((pos,i)=>(
+            <div key={`ifg${i}`} style={{position:'absolute',...pos,pointerEvents:'none',
+              width:5*S,height:5*S,borderRadius:'50%',
+              background:`radial-gradient(circle,${t.score},${t.brd})`,
+              boxShadow:`0 0 ${10*S}px ${t.glow}cc,0 0 ${5*S}px ${t.glow}88`}}/>
+          ))}
+          {/* Losango central de fundo */}
+          <div style={{position:'absolute',top:'10%',left:'50%',
+            width:95*S,height:95*S,pointerEvents:'none',
+            transform:'translateX(-50%) rotate(45deg)',
+            background:`radial-gradient(ellipse at center,${t.glow}1c 0%,${t.brd}0e 50%,transparent 70%)`,
+            border:`1px solid ${t.brd}1c`}}/>
+          {/* Linha acento inferior */}
+          <div style={{position:'absolute',bottom:92*S,left:14*S,right:14*S,height:1,pointerEvents:'none',
+            background:`linear-gradient(90deg,transparent,${effBrd}66,${effGlow}55,${effBrd}66,transparent)`}}/>
+          {/* Ticks laterais centrais */}
+          <div style={{position:'absolute',left:8*S,top:'42%',pointerEvents:'none',
+            width:6*S,height:6*S,background:t.brd,borderRadius:1*S,
+            transform:'translateY(-50%) rotate(45deg)',
+            boxShadow:`0 0 ${8*S}px ${t.glow}aa`}}/>
+          <div style={{position:'absolute',right:8*S,top:'42%',pointerEvents:'none',
+            width:6*S,height:6*S,background:t.brd,borderRadius:1*S,
+            transform:'translateY(-50%) rotate(45deg)',
+            boxShadow:`0 0 ${8*S}px ${t.glow}aa`}}/>
+        </>}
         {/* Gems cyan — GOAT only */}
         {isDestaque && [{p:'8% 14%',s:5},{p:'22% 7%',s:4},{p:'37% 12%',s:6},{p:'12% 29%',s:3},{p:'50% 5%',s:4},{p:'5% 42%',s:3}].map((g,i)=>{
           const [top,right]=g.p.split(' ');
@@ -255,17 +287,32 @@ const PlayerCard = ({ player, card, attrs, scale=1, reveal=false }) => {
         </>}
       </div>
 
-      {/* ══ Losangos nos cantos da borda — lvl3+ ══ */}
-      {lvl >= 3 && [
+      {/* ══ GOAT: losangos nos cantos da borda ══ */}
+      {isDestaque && [
         {top:5*S,left:5*S},{top:5*S,right:5*S},{bottom:5*S,left:5*S},{bottom:5*S,right:5*S},
       ].map((pos,i)=>(
         <div key={`cd${i}`} style={{position:'absolute',...pos,zIndex:9,pointerEvents:'none',
-          width:(isDestaque?9:7)*S,height:(isDestaque?9:7)*S,
-          background:isDestaque?`linear-gradient(135deg,#ffe599,${dBrd})`:`linear-gradient(135deg,${t.score},${t.brd})`,
+          width:9*S,height:9*S,
+          background:`linear-gradient(135deg,#ffe599,${dBrd})`,
           transform:'rotate(45deg)',
           boxShadow:`0 0 ${14*S}px ${effGlow},0 0 ${8*S}px ${t.glow}99`,
         }}/>
       ))}
+      {/* ══ Dream Lobby: cantos curvos ornamentados (fora do overflow:hidden) ══ */}
+      {lvl === 3 && !isDestaque && <>
+        <div style={{position:'absolute',top:0,left:0,width:40*S,height:40*S,zIndex:9,pointerEvents:'none',
+          borderTop:`${2.5*S}px solid ${t.score}cc`,borderLeft:`${2.5*S}px solid ${t.score}cc`,
+          borderTopLeftRadius:16*S,boxShadow:`0 0 ${14*S}px ${t.glow}66`}}/>
+        <div style={{position:'absolute',top:0,right:0,width:40*S,height:40*S,zIndex:9,pointerEvents:'none',
+          borderTop:`${2.5*S}px solid ${t.score}cc`,borderRight:`${2.5*S}px solid ${t.score}cc`,
+          borderTopRightRadius:16*S,boxShadow:`0 0 ${14*S}px ${t.glow}66`}}/>
+        <div style={{position:'absolute',bottom:0,left:0,width:40*S,height:40*S,zIndex:9,pointerEvents:'none',
+          borderBottom:`${2.5*S}px solid ${t.score}cc`,borderLeft:`${2.5*S}px solid ${t.score}cc`,
+          borderBottomLeftRadius:16*S,boxShadow:`0 0 ${14*S}px ${t.glow}66`}}/>
+        <div style={{position:'absolute',bottom:0,right:0,width:40*S,height:40*S,zIndex:9,pointerEvents:'none',
+          borderBottom:`${2.5*S}px solid ${t.score}cc`,borderRight:`${2.5*S}px solid ${t.score}cc`,
+          borderBottomRightRadius:16*S,boxShadow:`0 0 ${14*S}px ${t.glow}66`}}/>
+      </>}
 
       {/* ══ Losangos laterais + inferior — lvl3+ ══ */}
       {lvl >= 3 && [-1,1].map((side,i)=>(
@@ -322,6 +369,20 @@ const PlayerCard = ({ player, card, attrs, scale=1, reveal=false }) => {
             boxShadow:`0 0 ${sp.s*2*S}px ${t.glow}ff,0 0 ${sp.s*7*S}px ${t.glow}88`,
             zIndex:5,pointerEvents:'none',
             animation:`lbcGem ${1.3+i*.36}s ease-in-out infinite`,animationDelay:sp.d}}/>
+        ))}
+      </>}
+
+      {/* ══ Dream Lobby: sparkles dourados externos ══ */}
+      {lvl === 3 && !isDestaque && <>
+        {[{top:24,right:18,s:3,d:'0s'},{top:16,right:40,s:2,d:'0.5s'},{top:40,right:14,s:2.5,d:'0.8s'},
+          {top:10,right:56,s:2,d:'0.3s'},{top:52,right:30,s:2,d:'1.1s'},{top:20,right:64,s:1.5,d:'0.7s'},
+        ].map((sp,i)=>(
+          <div key={`dlsp${i}`} style={{position:'absolute',top:sp.top*S,right:sp.right*S,
+            width:sp.s*S,height:sp.s*S,borderRadius:'50%',
+            background:`radial-gradient(circle,#ffffff,${t.glow})`,
+            boxShadow:`0 0 ${sp.s*2.5*S}px ${t.glow}ee,0 0 ${sp.s*5*S}px ${t.glow}66`,
+            zIndex:5,pointerEvents:'none',
+            animation:`lbcGem ${1.6+i*.4}s ease-in-out infinite`,animationDelay:sp.d}}/>
         ))}
       </>}
 
