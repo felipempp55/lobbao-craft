@@ -14,7 +14,7 @@ const TIERS = [
   { name:'Ouro',     min:81, max:90, lbl:'OURO',
     bg:'linear-gradient(170deg,#0e0800 0%,#3d2600 30%,#5e3a00 55%,#3d2600 80%,#0e0800 100%)',
     brd:'#ffd700',glow:'#ffaa00',txt:'#ffe880',score:'#fff100',pat:'rgba(255,190,0,0.06)' },
-  { name:'Diamante', min:91, max:99, lbl:'DIAMANTE',
+  { name:'Diamante', min:91, max:99, lbl:'GOAT',
     bg:'linear-gradient(170deg,#000420 0%,#000d45 30%,#001575 55%,#000d45 80%,#000420 100%)',
     brd:'#00d4ff',glow:'#00eeff',txt:'#88e8ff',score:'#ffffff',pat:'rgba(0,210,255,0.05)' },
 ];
@@ -206,24 +206,6 @@ const PlayerCard = ({ player, card, attrs, scale=1, reveal=false }) => {
             boxShadow:`0 0 ${g.s*3*S}px #00aaff,0 0 ${g.s*6*S}px #0055ff`,
             animation:`lbcGem ${1.5+i*.4}s ease-in-out infinite`,animationDelay:`${i*.28}s`}}/>;
         })}
-        {/* ── Cantos: L-brackets DENTRO do card (border-radius recorta naturalmente) ── */}
-        {isDestaque && [
-          {top:0,left:0,   borderTop:`${3*S}px solid ${dBrd}`,borderLeft:`${3*S}px solid ${dBrd}`},
-          {top:0,right:0,  borderTop:`${3*S}px solid ${dBrd}`,borderRight:`${3*S}px solid ${dBrd}`},
-          {bottom:0,left:0,borderBottom:`${3*S}px solid ${dBrd}`,borderLeft:`${3*S}px solid ${dBrd}`},
-          {bottom:0,right:0,borderBottom:`${3*S}px solid ${dBrd}`,borderRight:`${3*S}px solid ${dBrd}`},
-        ].map((c,i)=>(
-          <div key={`oc${i}`} style={{position:'absolute',...c,width:40*S,height:40*S,
-            boxShadow:`0 0 ${14*S}px ${dGlow}cc,0 0 ${8*S}px ${t.glow}77`}}/>
-        ))}
-        {isDestaque && [
-          {top:10*S,left:10*S,   borderTop:`1px solid ${dBrd}55`,borderLeft:`1px solid ${dBrd}55`},
-          {top:10*S,right:10*S,  borderTop:`1px solid ${dBrd}55`,borderRight:`1px solid ${dBrd}55`},
-          {bottom:10*S,left:10*S,borderBottom:`1px solid ${dBrd}55`,borderLeft:`1px solid ${dBrd}55`},
-          {bottom:10*S,right:10*S,borderBottom:`1px solid ${dBrd}55`,borderRight:`1px solid ${dBrd}55`},
-        ].map((c,i)=>(
-          <div key={`ic${i}`} style={{position:'absolute',...c,width:22*S,height:22*S}}/>
-        ))}
         {/* Destaque: anel interno azul pulsante (efeito cristal) */}
         {isDestaque && (
           <div style={{
@@ -243,16 +225,6 @@ const PlayerCard = ({ player, card, attrs, scale=1, reveal=false }) => {
         )}
       </div>
 
-      {/* ══ Losangos dourados nos cantos (sobre a borda do card) ══ */}
-      {isDestaque && [
-        {top:5*S,left:5*S},{top:5*S,right:5*S},
-        {bottom:5*S,left:5*S},{bottom:5*S,right:5*S},
-      ].map((pos,i)=>(
-        <div key={`cd${i}`} style={{position:'absolute',...pos,width:9*S,height:9*S,zIndex:9,pointerEvents:'none',
-          background:`linear-gradient(135deg,#ffe599,${dBrd})`,transform:'rotate(45deg)',
-          boxShadow:`0 0 ${14*S}px ${dGlow},0 0 ${8*S}px ${t.glow}99`,
-        }}/>
-      ))}
 
       {/* ══ ORNAMENTOS LATERAIS (losangos na borda) ══ */}
       {isDestaque && <>
@@ -272,6 +244,68 @@ const PlayerCard = ({ player, card, attrs, scale=1, reveal=false }) => {
           boxShadow:`0 0 ${15*S}px ${dGlow},0 0 ${9*S}px ${t.glow}aa`,
         }}/>
       </>}
+
+      {/* ══ AURA GOAT — raios + orbe no canto superior direito ══ */}
+      {isDestaque && (
+        <>
+          {/* Orbe pulsante — canto superior direito */}
+          <div style={{
+            position:'absolute', top:-20*S, right:-20*S,
+            width:130*S, height:130*S, borderRadius:'50%',
+            background:`radial-gradient(circle at 50% 50%, ${dGlow}55 0%, ${dGlow}22 45%, transparent 70%)`,
+            zIndex:2, pointerEvents:'none',
+            animation:'lbcBorderGlow 2.8s ease-in-out infinite',
+          }}/>
+          <div style={{
+            position:'absolute', top:0, right:0,
+            width:68*S, height:68*S, borderRadius:'50%',
+            background:`radial-gradient(circle at 50% 50%, ${t.glow}44 0%, transparent 65%)`,
+            zIndex:2, pointerEvents:'none',
+            animation:'lbcPulseBlue 2.1s ease-in-out infinite',
+            animationDelay:'0.4s',
+          }}/>
+          {/* Raios em diagonal cima-direita, saindo para fora da carta */}
+          {[
+            {angle: 92, len:115, w:2,   op:0.50},
+            {angle:108, len:100, w:1.5, op:0.46},
+            {angle:122, len:110, w:1.5, op:0.52},
+            {angle:135, len:125, w:2.5, op:0.60},
+            {angle:148, len:105, w:1.5, op:0.50},
+            {angle:162, len:112, w:1.5, op:0.52},
+            {angle:175, len:95,  w:1,   op:0.40},
+            {angle:188, len:82,  w:1,   op:0.30},
+          ].map((r,i) => (
+            <div key={`ray${i}`} style={{
+              position:'absolute', right:32*S, top:32*S,
+              width:r.len*S, height:r.w*S,
+              background:`linear-gradient(to right, transparent, ${dBrd}ee)`,
+              transformOrigin:'right center',
+              transform:`rotate(${r.angle}deg)`,
+              zIndex:2, pointerEvents:'none',
+              opacity:r.op,
+            }}/>
+          ))}
+          {/* Cintilações ao redor da âncora */}
+          {[
+            {top:28, right:26, s:4.5, d:'0s'},
+            {top:14, right:48, s:3,   d:'0.55s'},
+            {top:44, right:18, s:3.5, d:'0.3s'},
+            {top:18, right:66, s:2.5, d:'0.8s'},
+            {top:50, right:42, s:2.5, d:'0.15s'},
+            {top: 8, right:30, s:2,   d:'1.1s'},
+          ].map((sp,i) => (
+            <div key={`spark${i}`} style={{
+              position:'absolute', top:sp.top*S, right:sp.right*S,
+              width:sp.s*S, height:sp.s*S, borderRadius:'50%',
+              background:`radial-gradient(circle, #ffffff, ${dGlow})`,
+              boxShadow:`0 0 ${sp.s*2*S}px ${dGlow}ee, 0 0 ${sp.s*6*S}px ${dGlow}77`,
+              zIndex:5, pointerEvents:'none',
+              animation:`lbcGem ${1.4+i*.38}s ease-in-out infinite`,
+              animationDelay:sp.d,
+            }}/>
+          ))}
+        </>
+      )}
 
       {/* ══ FOTO — z=3, estoura para fora no topo ══ */}
       {(player.photoClean||player.photo) ? (
@@ -305,63 +339,49 @@ const PlayerCard = ({ player, card, attrs, scale=1, reveal=false }) => {
             {t.lbl}
           </div>
         </div>
-        <div style={{display:'flex',flexDirection:'column',alignItems:'center'}}>
-          <img src="/logo.png" alt="" style={{width:38*S,height:38*S,objectFit:'contain',
-            filter:`drop-shadow(0 0 ${7*S}px ${effGlow}99)`}}
-            onError={e=>{e.target.style.display='none';if(e.target.nextSibling)e.target.nextSibling.style.display='block';}}/>
-          <span style={{display:'none'}}><FL1IP size={0.44*S} opacity={0.65}/></span>
-        </div>
       </div>
 
-      {/* ══ ESCUDO BADGE — z=5 ══ */}
-      {isDestaque && (
-        <div style={{
-          position:'absolute',top:-2*S,left:'50%',transform:'translateX(-50%)',
-          width:48*S,height:42*S,zIndex:5,pointerEvents:'none',
-          background:`linear-gradient(180deg,#ffe066 0%,${dBrd} 40%,#7a5806 100%)`,
-          clipPath:'polygon(8% 0%,92% 0%,100% 20%,100% 68%,50% 100%,0% 68%,0% 20%)',
-          display:'flex',alignItems:'center',justifyContent:'center',
-          boxShadow:`0 ${4*S}px ${20*S}px ${dGlow}cc,0 0 ${10*S}px ${t.glow}77`,
-        }}>
-          <span style={{fontSize:14*S,color:'#0d0500',fontWeight:900,fontFamily:FO,lineHeight:1,marginTop:-3*S}}>★</span>
-        </div>
-      )}
 
-      {/* ══ FADE + STATS — z=6/7 ══ */}
-      <div style={{position:'absolute',bottom:60*S,left:0,right:0,height:65*S,pointerEvents:'none',zIndex:6,
-        background:'linear-gradient(0deg,rgba(0,0,0,.92) 0%,transparent 100%)',
+      {/* ══ FADE — z=6 ══ */}
+      <div style={{position:'absolute',bottom:90*S,left:0,right:0,height:70*S,pointerEvents:'none',zIndex:6,
+        background:`linear-gradient(0deg,rgba(4,4,18,0.75) 0%,transparent 100%)`,
       }}/>
+      {/* ══ STATS FOOTER — z=7 — degradê baixo opaco → cima transparente ══ */}
       <div style={{position:'absolute',bottom:0,left:0,right:0,zIndex:7,
-        background:'linear-gradient(0deg,rgba(0,0,0,.97),rgba(0,0,0,.78))',
-        padding:`${8*S}px ${10*S}px ${10*S}px`,
-        borderTop:`${(isDestaque?2:1.5)*S}px solid ${effBrd}${isDestaque?'66':'28'}`,
-        backdropFilter:'blur(8px)'}}>
-        <div style={{textAlign:'center',fontSize:11.5*S,fontWeight:700,color:effTxt,
-          textTransform:'uppercase',letterSpacing:1.8*S,fontFamily:F,
-          textShadow:`0 0 ${8*S}px ${effGlow}`,
-          borderBottom:`${1*S}px solid ${effBrd}22`,
-          paddingBottom:5*S,marginBottom:5*S,
-          overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>
+        background:`linear-gradient(0deg, rgba(4,4,18,0.96) 0%, rgba(4,4,18,0.55) 55%, rgba(4,4,18,0.08) 100%)`,
+        backdropFilter:'blur(20px)', WebkitBackdropFilter:'blur(20px)',
+        borderTop:`${(isDestaque?2:1.5)*S}px solid ${effBrd}${isDestaque?'55':'28'}`,
+        padding:`${14*S}px ${8*S}px ${13*S}px`,
+      }}>
+        {/* Nick */}
+        <div style={{
+          textAlign:'center', fontSize:17*S, fontWeight:800,
+          color:'#ffffff', fontFamily:F, letterSpacing:.8*S,
+          marginBottom:6*S,
+          textShadow:`0 2px 8px rgba(0,0,0,.95), 0 0 ${16*S}px ${effGlow}55`,
+          overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap',
+        }}>
           {player.nick||'???'}
         </div>
-        <div style={{display:'flex',gap:6*S}}>
-          <div style={{flex:1}}>
-            {sa.slice(0,3).map(a=>(
-              <div key={a.id} style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:3*S}}>
-                <span style={{fontSize:7*S,color:effTxt,opacity:.6,textTransform:'uppercase',letterSpacing:.8*S,fontFamily:F}}>{a.name.slice(0,5)}</span>
-                <span style={{fontSize:13*S,fontWeight:700,color:effScore,fontFamily:FO,textShadow:`0 0 ${4*S}px ${effGlow}`}}>{Math.round(card.scores?.[a.id]??0)}</span>
+        {/* Linha separadora */}
+        <div style={{height:1,background:`linear-gradient(90deg,transparent,${effBrd}77,transparent)`,marginBottom:8*S}}/>
+        {/* 6 atributos em linha */}
+        <div style={{display:'flex',justifyContent:'space-around',alignItems:'flex-end'}}>
+          {sa.map((a,i) => (
+            <div key={a.id} style={{textAlign:'center',flex:1,
+              borderRight: i<sa.length-1 ? `1px solid ${effBrd}22` : 'none',
+            }}>
+              <div style={{fontSize:8*S,fontWeight:700,color:effTxt,opacity:.75,
+                textTransform:'uppercase',letterSpacing:.3*S,fontFamily:F,marginBottom:3*S,
+                textShadow:'0 1px 4px rgba(0,0,0,.8)'}}>
+                {a.name.slice(0,3)}
               </div>
-            ))}
-          </div>
-          <div style={{width:1,background:`${effBrd}22`,margin:`0 ${2*S}px`}}/>
-          <div style={{flex:1}}>
-            {sa.slice(3,6).map(a=>(
-              <div key={a.id} style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:3*S}}>
-                <span style={{fontSize:7*S,color:effTxt,opacity:.6,textTransform:'uppercase',letterSpacing:.8*S,fontFamily:F}}>{a.name.slice(0,5)}</span>
-                <span style={{fontSize:13*S,fontWeight:700,color:effScore,fontFamily:FO,textShadow:`0 0 ${4*S}px ${effGlow}`}}>{Math.round(card.scores?.[a.id]??0)}</span>
+              <div style={{fontSize:18*S,fontWeight:900,color:effScore,fontFamily:FO,lineHeight:1,
+                textShadow:`0 2px 6px rgba(0,0,0,.9), 0 0 ${8*S}px ${effGlow}88`}}>
+                {Math.round(card.scores?.[a.id]??0)}
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
         </div>
       </div>
     </div>
