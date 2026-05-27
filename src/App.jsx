@@ -50,12 +50,12 @@ const GCSS = `
 *{box-sizing:border-box;}
 ::-webkit-scrollbar{width:5px;height:5px}
 ::-webkit-scrollbar-track{background:transparent}
-::-webkit-scrollbar-thumb{background:#2a1515;border-radius:3px}
+::-webkit-scrollbar-thumb{background:#5a3535;border-radius:3px}
 input[type=range]{-webkit-appearance:none;height:3px;border-radius:2px;outline:none;cursor:pointer}
-input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;cursor:pointer;border:2px solid #080404}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;cursor:pointer;border:2px solid #1a0a0a}
 .lbc-nav-btn:hover{color:#e04444!important}
 .lbc-ppl-pick{transition:all .2s!important}
-.lbc-ppl-pick:hover{border-color:#cc1111!important;background:rgba(200,17,17,0.08)!important;transform:translateY(-2px);box-shadow:0 6px 20px rgba(200,17,17,0.14)!important}
+.lbc-ppl-pick:hover{border-color:#cc1111!important;background:rgba(200,17,17,0.10)!important;transform:translateY(-2px);box-shadow:0 6px 20px rgba(200,17,17,0.18)!important}
 .lbc-btn:hover:not(:disabled){filter:brightness(1.18);transform:translateY(-1px)}
 .lbc-btn:active:not(:disabled){transform:translateY(0)}
 @keyframes lbcShine{0%,100%{left:-130%}40%,60%{left:160%}}
@@ -97,24 +97,24 @@ const Btn = ({ children, onClick, v='primary', size='md', disabled, style={} }) 
 };
 const Field = ({ label, value, onChange, type='text', placeholder='' }) => (
   <div style={{marginBottom:14}}>
-    {label && <label style={{fontSize:10.5,color:'#5a3030',display:'block',marginBottom:6,textTransform:'uppercase',letterSpacing:1.8,fontFamily:F,fontWeight:700}}>{label}</label>}
+    {label && <label style={{fontSize:10.5,color:'#c09090',display:'block',marginBottom:6,textTransform:'uppercase',letterSpacing:1.8,fontFamily:F,fontWeight:700}}>{label}</label>}
     <input
       type={type} value={value} placeholder={placeholder}
       onChange={e => onChange(e.target.value)}
-      style={{background:'rgba(15,4,4,0.85)',border:'1px solid rgba(255,255,255,0.08)',borderRadius:8,padding:'9px 12px',color:'#f0e8e8',fontSize:13,fontFamily:F,width:'100%',boxSizing:'border-box',outline:'none',transition:'border-color .2s, box-shadow .2s'}}
-      onFocus={e => { e.target.style.borderColor='rgba(200,17,17,.5)'; e.target.style.boxShadow='0 0 0 3px rgba(200,17,17,.1)'; }}
-      onBlur={e  => { e.target.style.borderColor='rgba(255,255,255,0.08)'; e.target.style.boxShadow='none'; }}
+      style={{background:'rgba(30,12,12,0.88)',border:'1px solid rgba(255,255,255,0.14)',borderRadius:8,padding:'9px 12px',color:'#f0e8e8',fontSize:13,fontFamily:F,width:'100%',boxSizing:'border-box',outline:'none',transition:'border-color .2s, box-shadow .2s'}}
+      onFocus={e => { e.target.style.borderColor='rgba(200,17,17,.6)'; e.target.style.boxShadow='0 0 0 3px rgba(200,17,17,.12)'; }}
+      onBlur={e  => { e.target.style.borderColor='rgba(255,255,255,0.14)'; e.target.style.boxShadow='none'; }}
     />
   </div>
 );
 const Panel = ({ children, style={} }) => (
   <div style={{
-    background:'rgba(255,255,255,0.027)', backdropFilter:'blur(14px)', WebkitBackdropFilter:'blur(14px)',
-    border:'1px solid rgba(255,255,255,0.07)', borderTop:'1px solid rgba(255,100,100,0.1)',
-    borderRadius:14, padding:20, boxShadow:'0 8px 32px rgba(0,0,0,0.4)', ...style,
+    background:'rgba(255,255,255,0.07)', backdropFilter:'blur(14px)', WebkitBackdropFilter:'blur(14px)',
+    border:'1px solid rgba(255,255,255,0.13)', borderTop:'1px solid rgba(255,120,120,0.18)',
+    borderRadius:14, padding:20, boxShadow:'0 8px 32px rgba(0,0,0,0.35)', ...style,
   }}>{children}</div>
 );
-const SectionLabel = ({ children, color='#5a3030' }) => (
+const SectionLabel = ({ children, color='#c09090' }) => (
   <div style={{fontSize:10.5,fontWeight:700,letterSpacing:2.5,color,textTransform:'uppercase',fontFamily:F,marginBottom:12}}>{children}</div>
 );
 // ═══ PLAYER CARD ═════════════════════════════════════════════
@@ -449,7 +449,7 @@ const HomeTab = ({ players, sessions, attrs }) => {
   const total = sessions.reduce((s,ss) => s+(ss.cards?.length||0), 0);
   const Stat  = ({ v, label, c=R, icon }) => (
     <Panel style={{flex:1,minWidth:110,padding:'18px 20px'}}>
-      <div style={{fontSize:10,color:'#5a3030',textTransform:'uppercase',letterSpacing:2,fontFamily:F,fontWeight:700,marginBottom:8}}>{icon} {label}</div>
+      <div style={{fontSize:10,color:'#c09090',textTransform:'uppercase',letterSpacing:2,fontFamily:F,fontWeight:700,marginBottom:8}}>{icon} {label}</div>
       <div style={{fontSize:32,fontWeight:900,color:c,fontFamily:FO,textShadow:`0 0 20px ${c}55`}}>{v}</div>
     </Panel>
   );
@@ -475,8 +475,8 @@ const HomeTab = ({ players, sessions, attrs }) => {
       ) : (
         <Panel style={{textAlign:'center',padding:'40px 20px'}}>
           <div style={{fontSize:52,marginBottom:14}}>🎮</div>
-          <div style={{fontSize:15,color:'#6a3535',fontFamily:F,fontWeight:600}}>Nenhum domingo realizado ainda.</div>
-          <div style={{fontSize:12,color:'#3a2020',marginTop:6,fontFamily:F}}>Cadastre jogadores e inicie a primeira sessão!</div>
+          <div style={{fontSize:15,color:'#c09090',fontFamily:F,fontWeight:600}}>Nenhum domingo realizado ainda.</div>
+          <div style={{fontSize:12,color:'#907070',marginTop:6,fontFamily:F}}>Cadastre jogadores e inicie a primeira sessão!</div>
         </Panel>
       )}
     </div>
@@ -550,7 +550,7 @@ const PlayersTab = ({ players, setPlayers, apiKey }) => {
               <Field label="Nick na Live"    value={form.nick}   onChange={v => setForm(f=>({...f,nick:v}))}/>
               <Field label="Nick GamersCLub" value={form.gcNick} onChange={v => setForm(f=>({...f,gcNick:v}))} placeholder="Opcional"/>
               <div style={{marginTop:4}}>
-                <label style={{fontSize:10.5,color:'#5a3030',display:'block',marginBottom:8,textTransform:'uppercase',letterSpacing:1.8,fontFamily:F,fontWeight:700}}>Foto</label>
+                <label style={{fontSize:10.5,color:'#c09090',display:'block',marginBottom:8,textTransform:'uppercase',letterSpacing:1.8,fontFamily:F,fontWeight:700}}>Foto</label>
                 <input ref={fRef} type="file" accept="image/*" onChange={handleFile} style={{display:'none'}}/>
                 <div style={{display:'flex',gap:8,flexWrap:'wrap',alignItems:'center'}}>
                   <Btn onClick={() => fRef.current?.click()} v="ghost" size="sm">📷 Selecionar</Btn>
@@ -572,7 +572,7 @@ const PlayersTab = ({ players, setPlayers, apiKey }) => {
               <div style={{display:'flex',gap:14,alignItems:'flex-start',flexWrap:'wrap'}}>
                 {photo && (
                   <div style={{textAlign:'center'}}>
-                    <div style={{fontSize:10,color:'#5a3030',marginBottom:6,fontFamily:F,fontWeight:700,letterSpacing:1.5,textTransform:'uppercase'}}>Original</div>
+                    <div style={{fontSize:10,color:'#c09090',marginBottom:6,fontFamily:F,fontWeight:700,letterSpacing:1.5,textTransform:'uppercase'}}>Original</div>
                     <img src={photo} style={{width:90,height:120,objectFit:'cover',borderRadius:8,border:'1px solid rgba(255,255,255,0.1)'}}/>
                   </div>
                 )}
@@ -592,10 +592,10 @@ const PlayersTab = ({ players, setPlayers, apiKey }) => {
           <Panel key={p.id} style={{padding:16,textAlign:'center'}}>
             {(p.photoClean || p.photo)
               ? <img src={p.photoClean||p.photo} style={{width:70,height:92,objectFit:p.photoClean?'contain':'cover',borderRadius:8,background:'rgba(0,0,0,.4)'}}/>
-              : <div style={{width:70,height:92,borderRadius:8,background:'rgba(20,5,5,.7)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:30,margin:'0 auto',border:'1px solid rgba(255,255,255,0.06)'}}>👤</div>
+              : <div style={{width:70,height:92,borderRadius:8,background:'rgba(35,12,12,0.85)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:30,margin:'0 auto',border:'1px solid rgba(255,255,255,0.06)'}}>👤</div>
             }
             <div style={{fontWeight:700,marginTop:10,fontSize:14,color:'#f0e8e8',fontFamily:F}}>{p.nick}</div>
-            {p.gcNick && <div style={{fontSize:10.5,color:'#5a3535',marginTop:2,fontFamily:F}}>{p.gcNick}</div>}
+            {p.gcNick && <div style={{fontSize:10.5,color:'#c09090',marginTop:2,fontFamily:F}}>{p.gcNick}</div>}
             <div style={{display:'flex',gap:7,justifyContent:'center',marginTop:11}}>
               <Btn onClick={() => openForm(p)} v="ghost"  size="xs">✏️</Btn>
               <Btn onClick={() => del(p.id)}   v="danger" size="xs">🗑️</Btn>
@@ -606,7 +606,7 @@ const PlayersTab = ({ players, setPlayers, apiKey }) => {
       {!players.length && !open && (
         <Panel style={{textAlign:'center',padding:'40px 20px'}}>
           <div style={{fontSize:44,marginBottom:12}}>👥</div>
-          <div style={{fontSize:14,color:'#6a3535',fontFamily:F,fontWeight:600}}>Nenhum jogador cadastrado.</div>
+          <div style={{fontSize:14,color:'#c09090',fontFamily:F,fontWeight:600}}>Nenhum jogador cadastrado.</div>
         </Panel>
       )}
     </div>
@@ -769,13 +769,13 @@ const SundayTab = ({ players, attrs, sessions, setSessions }) => {
               {attrs.map(a => (
                 <div key={a.id} style={{marginBottom:16}}>
                   <div style={{display:'flex',justifyContent:'space-between',marginBottom:4}}>
-                    <span style={{fontSize:13,color:'#8a7070',fontFamily:F,fontWeight:600}}>{a.name}</span>
+                    <span style={{fontSize:13,color:'#c8a8a8',fontFamily:F,fontWeight:600}}>{a.name}</span>
                     <span style={{fontSize:14,fontWeight:700,color:R,fontFamily:FO}}>{Number(scores[a.id]??5).toFixed(1)}</span>
                   </div>
                   <input type="range" min="0" max="10" step="0.5" value={scores[a.id]??5}
                     onChange={e => setScores(s => ({...s,[a.id]:Number(e.target.value)}))}
                     style={{width:'100%',background:`linear-gradient(90deg,${tier.brd} ${(scores[a.id]??5)*10}%,rgba(255,255,255,.1) ${(scores[a.id]??5)*10}%)`,accentColor:tier.brd}}/>
-                  <div style={{display:'flex',justifyContent:'space-between',fontSize:9.5,color:'#3a2020',marginTop:2,fontFamily:F}}>
+                  <div style={{display:'flex',justifyContent:'space-between',fontSize:9.5,color:'#907070',marginTop:2,fontFamily:F}}>
                     <span>0</span><span>5</span><span>10</span>
                   </div>
                 </div>
@@ -801,7 +801,7 @@ const SundayTab = ({ players, attrs, sessions, setSessions }) => {
       {!players.length ? (
         <Panel style={{textAlign:'center',padding:'40px 20px'}}>
           <div style={{fontSize:44,marginBottom:12}}>👥</div>
-          <div style={{fontSize:14,color:'#6a3535',fontFamily:F,fontWeight:600}}>Cadastre jogadores primeiro.</div>
+          <div style={{fontSize:14,color:'#c09090',fontFamily:F,fontWeight:600}}>Cadastre jogadores primeiro.</div>
         </Panel>
       ) : (
         <>
@@ -853,7 +853,7 @@ const HistoryTab = ({ sessions, players, attrs }) => {
   if(!sessions.length) return (
     <Panel style={{textAlign:'center',padding:'40px 20px'}}>
       <div style={{fontSize:44,marginBottom:12}}>📊</div>
-      <div style={{fontSize:14,color:'#6a3535',fontFamily:F,fontWeight:600}}>Nenhuma sessão salva ainda.</div>
+      <div style={{fontSize:14,color:'#c09090',fontFamily:F,fontWeight:600}}>Nenhuma sessão salva ainda.</div>
     </Panel>
   );
   return (
@@ -875,7 +875,7 @@ const HistoryTab = ({ sessions, players, attrs }) => {
       </div>
       {sess && (
         <>
-          <div style={{fontSize:13,color:'#6a4040',marginBottom:18,fontFamily:F,fontWeight:600}}>
+          <div style={{fontSize:13,color:'#c09090',marginBottom:18,fontFamily:F,fontWeight:600}}>
             {new Date(sess.date+'T12:00').toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long',year:'numeric'})}
           </div>
           <div style={{display:'flex',gap:14,flexWrap:'wrap'}}>
@@ -899,7 +899,7 @@ const ConfigTab = ({ apiKey, setApiKey }) => {
       <SectionLabel>🔧 Configurações</SectionLabel>
       <Panel style={{maxWidth:500,marginBottom:16}}>
         <div style={{fontSize:14,fontWeight:700,color:'#f0dada',marginBottom:12,fontFamily:F}}>🖼️ Remove.bg — Remoção de Fundo</div>
-        <p style={{fontSize:12.5,color:'#5a3535',marginBottom:16,lineHeight:1.75,fontFamily:F}}>
+        <p style={{fontSize:12.5,color:'#c09090',marginBottom:16,lineHeight:1.75,fontFamily:F}}>
           Crie uma conta gratuita em{' '}
           <a href="https://www.remove.bg/api" target="_blank" rel="noreferrer" style={{color:R}}>remove.bg</a>
           {' '}(50 fotos/mês grátis) e cole sua API key abaixo.
@@ -913,7 +913,7 @@ const ConfigTab = ({ apiKey, setApiKey }) => {
           <div key={t.name} style={{display:'flex',alignItems:'center',gap:12,marginBottom:12}}>
             <div style={{width:10,height:10,borderRadius:'50%',background:t.brd,boxShadow:`0 0 8px ${t.glow}`,flexShrink:0}}/>
             <div style={{width:80,fontWeight:700,color:t.txt,fontSize:13.5,fontFamily:F}}>{t.name}</div>
-            <div style={{fontSize:12,color:'#5a3535',width:90,fontFamily:F}}>{t.min}–{t.max} pts</div>
+            <div style={{fontSize:12,color:'#c09090',width:90,fontFamily:F}}>{t.min}–{t.max} pts</div>
             <div style={{flex:1,height:5,background:'rgba(255,255,255,0.06)',borderRadius:3}}>
               <div style={{width:`${((t.max-t.min)/99)*100}%`,height:'100%',background:`linear-gradient(90deg,${t.glow}88,${t.brd})`,borderRadius:3,boxShadow:`0 0 6px ${t.glow}66`}}/>
             </div>
@@ -944,7 +944,7 @@ const LoginScreen = ({ onLogin }) => {
   const onKey = e => { if(e.key === 'Enter') tryLogin(); };
   return (
     <div style={{
-      background:'#070404', minHeight:'100vh',
+      background:'#130e0e', minHeight:'100vh',
       display:'flex', alignItems:'center', justifyContent:'center',
       fontFamily:F, position:'relative', overflow:'hidden',
     }}>
@@ -977,7 +977,7 @@ const LoginScreen = ({ onLogin }) => {
             WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent'}}>
             LOBBÃO CRAFT
           </div>
-          <div style={{fontSize:10,color:'#3a1515',letterSpacing:4,fontWeight:700,
+          <div style={{fontSize:10,color:'#907070',letterSpacing:4,fontWeight:700,
             textTransform:'uppercase',marginTop:6}}>
             Ranking Semanal · CS2
           </div>
@@ -992,14 +992,14 @@ const LoginScreen = ({ onLogin }) => {
           boxShadow:'0 8px 40px rgba(0,0,0,0.6)',
           animation:'lbcLoginPulse 3s ease-in-out infinite',
         }}>
-          <div style={{fontSize:11,fontWeight:700,letterSpacing:2.5,color:'#5a3030',
+          <div style={{fontSize:11,fontWeight:700,letterSpacing:2.5,color:'#c09090',
             textTransform:'uppercase',marginBottom:22,textAlign:'center'}}>
             🔐 Área Restrita
           </div>
 
           {/* Campo Login */}
           <div style={{marginBottom:14}}>
-            <label style={{fontSize:10.5,color:'#5a3030',display:'block',marginBottom:6,
+            <label style={{fontSize:10.5,color:'#c09090',display:'block',marginBottom:6,
               textTransform:'uppercase',letterSpacing:1.8,fontWeight:700}}>Login</label>
             <input
               type="text" value={user} onChange={e=>setUser(e.target.value)} onKeyDown={onKey}
@@ -1016,7 +1016,7 @@ const LoginScreen = ({ onLogin }) => {
 
           {/* Campo Senha */}
           <div style={{marginBottom:22}}>
-            <label style={{fontSize:10.5,color:'#5a3030',display:'block',marginBottom:6,
+            <label style={{fontSize:10.5,color:'#c09090',display:'block',marginBottom:6,
               textTransform:'uppercase',letterSpacing:1.8,fontWeight:700}}>Senha</label>
             <input
               type="password" value={pass} onChange={e=>setPass(e.target.value)} onKeyDown={onKey}
@@ -1048,7 +1048,7 @@ const LoginScreen = ({ onLogin }) => {
           </button>
         </div>
 
-        <div style={{textAlign:'center',marginTop:18,fontSize:10.5,color:'#2a1515',fontWeight:600,letterSpacing:1}}>
+        <div style={{textAlign:'center',marginTop:18,fontSize:10.5,color:'#806060',fontWeight:600,letterSpacing:1}}>
           FL1IP · Lobbão CS2
         </div>
       </div>
@@ -1083,7 +1083,7 @@ export default function App() {
   const ss = v => { setSessions(v); sv('lbc2_s', v); };
   const sk = v => { setApiKey(v);   sv('lbc2_k', v); };
   if(!loaded) return (
-    <div style={{background:'#070404',height:'100vh',display:'flex',alignItems:'center',justifyContent:'center'}}>
+    <div style={{background:'#130e0e',height:'100vh',display:'flex',alignItems:'center',justifyContent:'center'}}>
       <div style={{textAlign:'center'}}>
         <FL1IP size={2.2}/>
         <div style={{marginTop:16,fontSize:11,letterSpacing:4,fontWeight:900,fontFamily:FO,color:'#cc3333',textShadow:`0 0 20px ${R}`}}>
@@ -1103,10 +1103,10 @@ export default function App() {
     {id:'config',  icon:'🔧', label:'Config'},
   ];
   return (
-    <div style={{background:'#070404',minHeight:'100vh',color:'#f0e8e8',display:'flex',flexDirection:'column'}}>
+    <div style={{background:'#130e0e',minHeight:'100vh',color:'#f0e8e8',display:'flex',flexDirection:'column'}}>
       <div style={{
-        background:'linear-gradient(90deg,#050101,#0f0303,#050101)',
-        borderBottom:'1px solid rgba(255,255,255,0.05)',
+        background:'linear-gradient(90deg,#0e0404,#1a0606,#0e0404)',
+        borderBottom:'1px solid rgba(255,255,255,0.10)',
         padding:'12px 20px', display:'flex', alignItems:'center', gap:16,
         position:'relative', overflow:'hidden',
       }}>
@@ -1125,13 +1125,13 @@ export default function App() {
             WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent'}}>
             LOBBÃO CRAFT
           </div>
-          <div style={{fontSize:9.5,color:'#3a1515',letterSpacing:4,fontFamily:F,fontWeight:700,textTransform:'uppercase',marginTop:1}}>
+          <div style={{fontSize:9.5,color:'#907070',letterSpacing:4,fontFamily:F,fontWeight:700,textTransform:'uppercase',marginTop:1}}>
             Ranking Semanal · CS2
           </div>
         </div>
         <button onClick={logout} title="Sair" style={{
           background:'none',border:'1px solid rgba(200,17,17,0.15)',borderRadius:7,
-          padding:'5px 10px',cursor:'pointer',color:'#3a1515',fontSize:11,
+          padding:'5px 10px',cursor:'pointer',color:'#907070',fontSize:11,
           fontFamily:F,fontWeight:700,letterSpacing:1,textTransform:'uppercase',
           transition:'all .2s',flexShrink:0,
         }}
@@ -1139,12 +1139,12 @@ export default function App() {
           onMouseLeave={e=>{e.target.style.borderColor='rgba(200,17,17,0.15)';e.target.style.color='#3a1515';}}
         >🚪 Sair</button>
       </div>
-      <div style={{background:'rgba(8,3,3,.94)',backdropFilter:'blur(20px)',borderBottom:'1px solid rgba(200,17,17,0.08)',display:'flex',overflowX:'auto',padding:'0 8px'}}>
+      <div style={{background:'rgba(18,8,8,0.97)',backdropFilter:'blur(20px)',borderBottom:'1px solid rgba(200,17,17,0.18)',display:'flex',overflowX:'auto',padding:'0 8px'}}>
         {TABS.map(t => (
           <button key={t.id} className="lbc-nav-btn" onClick={() => setTab(t.id)} style={{
             background:'none', border:'none', cursor:'pointer',
             padding:'11px 15px', fontSize:11.5, fontWeight:700, fontFamily:F, letterSpacing:1.5,
-            color: tab===t.id ? R : '#4a2525',
+            color: tab===t.id ? R : '#a07070',
             borderBottom: tab===t.id ? `2px solid ${R}` : '2px solid transparent',
             textTransform:'uppercase', transition:'color .2s', whiteSpace:'nowrap',
             display:'flex', alignItems:'center', gap:6,
