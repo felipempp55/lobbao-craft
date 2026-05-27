@@ -223,16 +223,6 @@ const PlayerCard = ({ player, card, attrs, scale=1, reveal=false }) => {
             animation:'lbcBorderGlow 4s ease-in-out infinite',animationDelay:'.8s',
           }}/>
         )}
-        {/* Destaque: cantos azuis internos */}
-        {isDestaque && [
-          {top:0,left:0,   borderTop:`2px solid rgba(0,210,255,0.80)`,borderLeft:`2px solid rgba(0,210,255,0.80)`},
-          {top:0,right:0,  borderTop:`2px solid rgba(0,210,255,0.80)`,borderRight:`2px solid rgba(0,210,255,0.80)`},
-          {bottom:0,left:0,borderBottom:`2px solid rgba(0,210,255,0.80)`,borderLeft:`2px solid rgba(0,210,255,0.80)`},
-          {bottom:0,right:0,borderBottom:`2px solid rgba(0,210,255,0.80)`,borderRight:`2px solid rgba(0,210,255,0.80)`},
-        ].map((c,i)=>(
-          <div key={`bc${i}`} style={{position:'absolute',...c,width:36*S,height:36*S,
-            boxShadow:`0 0 ${16*S}px rgba(0,210,255,0.70), 0 0 ${8*S}px rgba(0,210,255,0.50)`}}/>
-        ))}
       </div>
 
 
@@ -314,14 +304,14 @@ const PlayerCard = ({ player, card, attrs, scale=1, reveal=false }) => {
               animationDelay:sp.d,
             }}/>
           ))}
-          {/* Cintilações AZUIS — lado esquerdo e inferior */}
+          {/* Cintilações AZUIS — lado esquerdo, altura média da carta */}
           {[
-            {top:55,  left:18, s:4,   d:'0.2s'},
-            {top:80,  left:32, s:3,   d:'0.7s'},
-            {top:38,  left:10, s:2.5, d:'1.0s'},
-            {top:100, left:55, s:3.5, d:'0.4s'},
-            {top:72,  left:70, s:2.5, d:'0.9s'},
-            {top:115, left:28, s:2,   d:'0.1s'},
+            {top:165, left:14, s:4,   d:'0.2s'},
+            {top:195, left:30, s:3,   d:'0.7s'},
+            {top:148, left:8,  s:2.5, d:'1.0s'},
+            {top:220, left:48, s:3.5, d:'0.4s'},
+            {top:242, left:18, s:2.5, d:'0.9s'},
+            {top:178, left:58, s:2,   d:'0.1s'},
           ].map((sp,i) => (
             <div key={`bspark${i}`} style={{
               position:'absolute', top:sp.top*S, left:sp.left*S,
