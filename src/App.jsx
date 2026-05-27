@@ -834,6 +834,138 @@ const ConfigTab = ({ apiKey, setApiKey }) => {
     </div>
   );
 };
+// ═══ LOGIN ═══════════════════════════════════════════════════
+const AUTH_USER = 'flip';
+const AUTH_PASS = '9975';
+const LoginScreen = ({ onLogin }) => {
+  const [user, setUser] = useState('');
+  const [pass, setPass] = useState('');
+  const [err,  setErr]  = useState('');
+  const [shake, setShake] = useState(false);
+  const tryLogin = () => {
+    if(user.trim().toLowerCase() === AUTH_USER && pass === AUTH_PASS) {
+      sv('lbc2_auth', true);
+      onLogin();
+    } else {
+      setErr('Login ou senha incorretos.');
+      setShake(true);
+      setTimeout(() => setShake(false), 600);
+    }
+  };
+  const onKey = e => { if(e.key === 'Enter') tryLogin(); };
+  return (
+    <div style={{
+      background:'#070404', minHeight:'100vh',
+      display:'flex', alignItems:'center', justifyContent:'center',
+      fontFamily:F, position:'relative', overflow:'hidden',
+    }}>
+      {/* BG glow */}
+      <div style={{position:'absolute',top:'20%',left:'50%',transform:'translateX(-50%)',
+        width:500,height:300,borderRadius:'50%',pointerEvents:'none',
+        background:`radial-gradient(ellipse, ${R}18 0%, transparent 70%)`}}/>
+      <div style={{position:'absolute',bottom:'10%',left:'20%',
+        width:200,height:200,borderRadius:'50%',pointerEvents:'none',
+        background:`radial-gradient(ellipse, rgba(0,200,255,0.07) 0%, transparent 70%)`}}/>
+
+      <div style={{
+        width:'100%', maxWidth:360, padding:'0 20px',
+        animation: shake ? 'lbcShake .5s ease' : 'none',
+      }}>
+        <style>{`
+          @keyframes lbcShake{0%,100%{transform:translateX(0)}20%{transform:translateX(-10px)}40%{transform:translateX(10px)}60%{transform:translateX(-8px)}80%{transform:translateX(8px)}}
+          @keyframes lbcLoginPulse{0%,100%{box-shadow:0 0 18px ${R}44}50%{box-shadow:0 0 36px ${R}88}}
+        `}</style>
+
+        {/* Logo */}
+        <div style={{textAlign:'center', marginBottom:36}}>
+          <div style={{marginBottom:10}}>
+            <img src="/logo.png" alt="" style={{width:64,height:64,objectFit:'contain',
+              filter:`drop-shadow(0 0 14px ${R}aa)`}}
+              onError={e=>{e.target.style.display='none';}}/>
+          </div>
+          <div style={{fontSize:26,fontWeight:900,fontFamily:FO,letterSpacing:3,
+            background:`linear-gradient(90deg,${R},#ff6644,#ffffff)`,
+            WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent'}}>
+            LOBBÃO CRAFT
+          </div>
+          <div style={{fontSize:10,color:'#3a1515',letterSpacing:4,fontWeight:700,
+            textTransform:'uppercase',marginTop:6}}>
+            Ranking Semanal · CS2
+          </div>
+        </div>
+
+        {/* Card de login */}
+        <div style={{
+          background:'rgba(255,255,255,0.027)',
+          border:'1px solid rgba(200,17,17,0.20)',
+          borderTop:'1px solid rgba(255,100,100,0.15)',
+          borderRadius:16, padding:'28px 24px',
+          boxShadow:'0 8px 40px rgba(0,0,0,0.6)',
+          animation:'lbcLoginPulse 3s ease-in-out infinite',
+        }}>
+          <div style={{fontSize:11,fontWeight:700,letterSpacing:2.5,color:'#5a3030',
+            textTransform:'uppercase',marginBottom:22,textAlign:'center'}}>
+            🔐 Área Restrita
+          </div>
+
+          {/* Campo Login */}
+          <div style={{marginBottom:14}}>
+            <label style={{fontSize:10.5,color:'#5a3030',display:'block',marginBottom:6,
+              textTransform:'uppercase',letterSpacing:1.8,fontWeight:700}}>Login</label>
+            <input
+              type="text" value={user} onChange={e=>setUser(e.target.value)} onKeyDown={onKey}
+              autoFocus autoComplete="username"
+              placeholder="seu login"
+              style={{width:'100%',background:'rgba(15,4,4,0.85)',
+                border:'1px solid rgba(255,255,255,0.08)',borderRadius:8,
+                padding:'10px 14px',color:'#f0e8e8',fontSize:14,fontFamily:F,
+                outline:'none',boxSizing:'border-box',transition:'border-color .2s'}}
+              onFocus={e=>{e.target.style.borderColor=`rgba(200,17,17,.5)`;e.target.style.boxShadow='0 0 0 3px rgba(200,17,17,.1)';}}
+              onBlur={e=>{e.target.style.borderColor='rgba(255,255,255,0.08)';e.target.style.boxShadow='none';}}
+            />
+          </div>
+
+          {/* Campo Senha */}
+          <div style={{marginBottom:22}}>
+            <label style={{fontSize:10.5,color:'#5a3030',display:'block',marginBottom:6,
+              textTransform:'uppercase',letterSpacing:1.8,fontWeight:700}}>Senha</label>
+            <input
+              type="password" value={pass} onChange={e=>setPass(e.target.value)} onKeyDown={onKey}
+              autoComplete="current-password"
+              placeholder="••••"
+              style={{width:'100%',background:'rgba(15,4,4,0.85)',
+                border:'1px solid rgba(255,255,255,0.08)',borderRadius:8,
+                padding:'10px 14px',color:'#f0e8e8',fontSize:14,fontFamily:F,
+                outline:'none',boxSizing:'border-box',transition:'border-color .2s'}}
+              onFocus={e=>{e.target.style.borderColor=`rgba(200,17,17,.5)`;e.target.style.boxShadow='0 0 0 3px rgba(200,17,17,.1)';}}
+              onBlur={e=>{e.target.style.borderColor='rgba(255,255,255,0.08)';e.target.style.boxShadow='none';}}
+            />
+          </div>
+
+          {err && (
+            <div style={{color:'#ff6655',fontSize:12.5,textAlign:'center',
+              marginBottom:16,fontWeight:600}}>⚠️ {err}</div>
+          )}
+
+          <button onClick={tryLogin} className="lbc-btn" style={{
+            width:'100%',padding:'11px',
+            background:`linear-gradient(135deg,#990000,${R})`,
+            border:'1px solid rgba(200,50,50,0.4)',
+            borderRadius:8,color:'#fff',fontSize:13.5,fontWeight:700,
+            fontFamily:F,letterSpacing:1,textTransform:'uppercase',
+            cursor:'pointer',transition:'all .15s',
+          }}>
+            Entrar
+          </button>
+        </div>
+
+        <div style={{textAlign:'center',marginTop:18,fontSize:10.5,color:'#2a1515',fontWeight:600,letterSpacing:1}}>
+          FL1IP · Lobbão CS2
+        </div>
+      </div>
+    </div>
+  );
+};
 // ═══ APP ═════════════════════════════════════════════════════
 export default function App() {
   const [tab,      setTab]      = useState('home');
@@ -842,6 +974,7 @@ export default function App() {
   const [sessions, setSessions] = useState([]);
   const [apiKey,   setApiKey]   = useState('');
   const [loaded,   setLoaded]   = useState(false);
+  const [authed,   setAuthed]   = useState(false);
   useEffect(() => {
     if(!document.getElementById('lbc-gcss')) {
       const s = document.createElement('style');
@@ -849,6 +982,7 @@ export default function App() {
       s.textContent = GCSS;
       document.head.appendChild(s);
     }
+    setAuthed(!!ld('lbc2_auth', false));
     setPlayers(ld('lbc2_p', []));
     setAttrs(ld('lbc2_a', DATTRS));
     setSessions(ld('lbc2_s', []));
@@ -869,6 +1003,8 @@ export default function App() {
       </div>
     </div>
   );
+  if(!authed) return <LoginScreen onLogin={() => setAuthed(true)}/>;
+  const logout = () => { sv('lbc2_auth', false); setAuthed(false); };
   const TABS = [
     {id:'home',    icon:'🏠', label:'Home'},
     {id:'players', icon:'👥', label:'Jogadores'},
@@ -894,7 +1030,7 @@ export default function App() {
           <FL1IP size={1.35}/>
         </div>
         <div style={{width:1,height:32,background:'rgba(200,17,17,0.2)',flexShrink:0}}/>
-        <div>
+        <div style={{flex:1}}>
           <div style={{fontSize:17,fontWeight:900,fontFamily:FO,letterSpacing:2.5,
             background:`linear-gradient(90deg,${R},#ff6644,#ffffff)`,
             WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent'}}>
@@ -904,6 +1040,15 @@ export default function App() {
             Ranking Semanal · CS2
           </div>
         </div>
+        <button onClick={logout} title="Sair" style={{
+          background:'none',border:'1px solid rgba(200,17,17,0.15)',borderRadius:7,
+          padding:'5px 10px',cursor:'pointer',color:'#3a1515',fontSize:11,
+          fontFamily:F,fontWeight:700,letterSpacing:1,textTransform:'uppercase',
+          transition:'all .2s',flexShrink:0,
+        }}
+          onMouseEnter={e=>{e.target.style.borderColor='rgba(200,17,17,.4)';e.target.style.color='#cc4444';}}
+          onMouseLeave={e=>{e.target.style.borderColor='rgba(200,17,17,0.15)';e.target.style.color='#3a1515';}}
+        >🚪 Sair</button>
       </div>
       <div style={{background:'rgba(8,3,3,.94)',backdropFilter:'blur(20px)',borderBottom:'1px solid rgba(200,17,17,0.08)',display:'flex',overflowX:'auto',padding:'0 8px'}}>
         {TABS.map(t => (
