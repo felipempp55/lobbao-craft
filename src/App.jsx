@@ -326,6 +326,43 @@ const PlayerCard = ({ player, card, attrs, scale=1, reveal=false }) => {
         </>
       )}
 
+      {/* ══ TAG ICONS — coluna esquerda, estilo FIFA ══ */}
+      {(() => {
+        const cardTags = card.tags || {};
+        const iconDefs = [
+          {id:'baiter',    emoji:'🫣', label:'Baiter',    color:'#ff4444', brd:'#cc2222'},
+          {id:'tiltado',   emoji:'😡', label:'Tiltado',   color:'#ff7700', brd:'#cc4400'},
+          {id:'mutadinho', emoji:'🔇', label:'Mutado',    color:'#99aacc', brd:'#6677aa'},
+          {id:'genteboa',  emoji:'👍', label:'Gente boa', color:'#44ee88', brd:'#22aa55'},
+          {id:'esforçado', emoji:'💪', label:'Esforçado', color:'#ffd700', brd:'#bb8800'},
+        ];
+        const active = iconDefs.filter(d => cardTags[d.id]);
+        if(!active.length) return null;
+        const sz  = 30*S;
+        const gap = 7*S;
+        const totalH = active.length * sz + (active.length-1) * gap;
+        const areaTop = (isDestaque ? 100 : 88) * S;
+        const areaBot = (isDestaque ? 90  : 80) * S;
+        const areaH   = H - areaTop - areaBot;
+        const startY  = areaTop + Math.max(0, (areaH - totalH) / 2);
+        return active.map((d, i) => (
+          <div key={`ti${i}`} style={{
+            position:'absolute',
+            left: 8*S,
+            top: startY + i*(sz+gap),
+            width:sz, height:sz,
+            zIndex:4, pointerEvents:'none',
+            borderRadius:'50%',
+            background:'radial-gradient(circle at 35% 30%, rgba(255,255,255,0.20) 0%, rgba(0,0,0,0.80) 100%)',
+            border:`${1.5*S}px solid ${d.brd}bb`,
+            display:'flex', alignItems:'center', justifyContent:'center',
+            fontSize: sz * 0.50,
+            backdropFilter:'blur(6px)',
+            boxShadow:`0 0 ${12*S}px ${d.color}88, 0 0 ${6*S}px ${d.color}55, inset 0 0 ${6*S}px rgba(0,0,0,0.55)`,
+          }}>{d.emoji}</div>
+        ));
+      })()}
+
       {/* ══ FOTO — z=3, estoura para fora no topo ══ */}
       {(player.photoClean||player.photo) ? (
         <img src={player.photoClean||player.photo} alt="" style={{
