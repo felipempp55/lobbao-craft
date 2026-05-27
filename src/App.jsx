@@ -302,16 +302,16 @@ const PlayerCard = ({ player, card, attrs, scale=1, reveal=false }) => {
       {lvl === 3 && !isDestaque && <>
         <div style={{position:'absolute',top:0,left:0,width:40*S,height:40*S,zIndex:9,pointerEvents:'none',
           borderTop:`${2.5*S}px solid ${t.score}cc`,borderLeft:`${2.5*S}px solid ${t.score}cc`,
-          borderTopLeftRadius:16*S,boxShadow:`0 0 ${14*S}px ${t.glow}66`}}/>
+          borderTopLeftRadius:16*S,filter:`drop-shadow(0 0 ${6*S}px ${t.glow}bb)`}}/>
         <div style={{position:'absolute',top:0,right:0,width:40*S,height:40*S,zIndex:9,pointerEvents:'none',
           borderTop:`${2.5*S}px solid ${t.score}cc`,borderRight:`${2.5*S}px solid ${t.score}cc`,
-          borderTopRightRadius:16*S,boxShadow:`0 0 ${14*S}px ${t.glow}66`}}/>
+          borderTopRightRadius:16*S,filter:`drop-shadow(0 0 ${6*S}px ${t.glow}bb)`}}/>
         <div style={{position:'absolute',bottom:0,left:0,width:40*S,height:40*S,zIndex:9,pointerEvents:'none',
           borderBottom:`${2.5*S}px solid ${t.score}cc`,borderLeft:`${2.5*S}px solid ${t.score}cc`,
-          borderBottomLeftRadius:16*S,boxShadow:`0 0 ${14*S}px ${t.glow}66`}}/>
+          borderBottomLeftRadius:16*S,filter:`drop-shadow(0 0 ${6*S}px ${t.glow}bb)`}}/>
         <div style={{position:'absolute',bottom:0,right:0,width:40*S,height:40*S,zIndex:9,pointerEvents:'none',
           borderBottom:`${2.5*S}px solid ${t.score}cc`,borderRight:`${2.5*S}px solid ${t.score}cc`,
-          borderBottomRightRadius:16*S,boxShadow:`0 0 ${14*S}px ${t.glow}66`}}/>
+          borderBottomRightRadius:16*S,filter:`drop-shadow(0 0 ${6*S}px ${t.glow}bb)`}}/>
       </>}
 
       {/* ══ Losangos laterais + inferior — lvl3+ ══ */}
