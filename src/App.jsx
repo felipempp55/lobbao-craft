@@ -150,8 +150,8 @@ const PlayerCard = ({ player, card, attrs, scale=1, reveal=false }) => {
     {top:'6%',left:'42%',sz:7,rot:30,op:.15},{top:'28%',right:'5%',sz:9,rot:55,op:.14},
     {top:'14%',left:'28%',sz:5,rot:15,op:.12},{top:'32%',left:'10%',sz:8,rot:40,op:.10},
   ];
-  const PHOTO_H   = [188, 200, 218, 238, 300];
-  const PHOTO_BTM = [65,  66,  68,  70,  72 ];
+  const PHOTO_H   = [195, 205, 222, 240, 270];
+  const PHOTO_BTM = [122, 124, 126, 128, 130];
   const photoH   = PHOTO_H[lvl]   * scale;
   const photoBtm = PHOTO_BTM[lvl] * scale;
   const S = scale;
@@ -411,8 +411,8 @@ const PlayerCard = ({ player, card, attrs, scale=1, reveal=false }) => {
         const sz  = 30*S;
         const gap = 7*S;
         const totalH = active.length * sz + (active.length-1) * gap;
-        const areaTop = (isDestaque ? 100 : 88) * S;
-        const areaBot = (isDestaque ? 90  : 80) * S;
+        const areaTop = (isDestaque ? 110 : 95) * S;
+        const areaBot = (isDestaque ? 145 : 135) * S;
         const areaH   = H - areaTop - areaBot;
         const startY  = areaTop + Math.max(0, (areaH - totalH) / 2);
         return active.map((d, i) => (
@@ -459,8 +459,8 @@ const PlayerCard = ({ player, card, attrs, scale=1, reveal=false }) => {
         display:'flex',justifyContent:'space-between',alignItems:'flex-start',zIndex:4}}>
         <div>
           <div style={{
-            fontSize:[48,52,56,58,62][lvl]*S,
-            fontWeight:900,lineHeight:1,color:effScore,letterSpacing:-2*S,fontFamily:FO,
+            fontSize:[54,60,64,70,76][lvl]*S,
+            fontWeight:900,lineHeight:1,color:effScore,letterSpacing:-2.5*S,fontFamily:FO,
             textShadow: lvl===0 ? 'none'
               : lvl===1 ? `0 0 ${8*S}px ${effGlow}55`
               : `0 0 ${14*S}px ${effGlow},0 0 ${28*S}px ${effGlow}66,0 0 ${55*S}px ${effGlow}22`,
@@ -477,42 +477,47 @@ const PlayerCard = ({ player, card, attrs, scale=1, reveal=false }) => {
 
 
       {/* ══ FADE — z=6 ══ */}
-      <div style={{position:'absolute',bottom:90*S,left:0,right:0,height:70*S,pointerEvents:'none',zIndex:6,
-        background:`linear-gradient(0deg,rgba(4,4,18,0.75) 0%,transparent 100%)`,
+      <div style={{position:'absolute',bottom:130*S,left:0,right:0,height:75*S,pointerEvents:'none',zIndex:6,
+        background:`linear-gradient(0deg,rgba(4,4,18,0.85) 0%,transparent 100%)`,
       }}/>
       {/* ══ STATS FOOTER — z=7 ══ */}
       <div style={{position:'absolute',bottom:0,left:0,right:0,zIndex:7,
         background: lvl===0
-          ? `linear-gradient(0deg,rgba(8,2,2,0.98) 0%,rgba(8,2,2,0.70) 55%,rgba(8,2,2,0.05) 100%)`
-          : `linear-gradient(0deg,rgba(4,4,18,0.96) 0%,rgba(4,4,18,0.55) 55%,rgba(4,4,18,0.08) 100%)`,
+          ? `linear-gradient(0deg,rgba(8,2,2,0.98) 0%,rgba(8,2,2,0.78) 55%,rgba(8,2,2,0.10) 100%)`
+          : `linear-gradient(0deg,rgba(4,4,18,0.97) 0%,rgba(4,4,18,0.65) 55%,rgba(4,4,18,0.12) 100%)`,
         backdropFilter:'blur(20px)', WebkitBackdropFilter:'blur(20px)',
         borderTop:`${[1,1.5,1.5,2,2][lvl]*S}px solid ${effBrd}${['22','33','44','55','55'][lvl]}`,
-        padding:`${14*S}px ${8*S}px ${13*S}px`,
+        padding:`${12*S}px ${12*S}px ${11*S}px`,
       }}>
         <div style={{
-          textAlign:'center', fontSize:17*S, fontWeight:800,
+          textAlign:'center', fontSize:21*S, fontWeight:900,
           color: lvl===0 ? '#cc8888' : '#ffffff',
-          fontFamily:F, letterSpacing:.8*S, marginBottom:6*S,
+          fontFamily:F, letterSpacing:1.4*S, marginBottom:6*S,
           textShadow: lvl===0 ? 'none' : `0 2px 8px rgba(0,0,0,.95), 0 0 ${16*S}px ${effGlow}${['','','44','55','55'][lvl]}`,
           overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap',
+          textTransform:'uppercase',
         }}>
           {player.nick||'???'}
         </div>
-        <div style={{height:1,background:`linear-gradient(90deg,transparent,${effBrd}${lvl>=2?'77':'44'},transparent)`,marginBottom:8*S}}/>
-        <div style={{display:'flex',justifyContent:'space-around',alignItems:'flex-end'}}>
+        <div style={{height:1,background:`linear-gradient(90deg,transparent,${effBrd}${lvl>=2?'88':'55'},transparent)`,marginBottom:8*S}}/>
+        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',columnGap:18*S,rowGap:1*S}}>
           {sa.map((a,i)=>(
-            <div key={a.id} style={{textAlign:'center',flex:1,
-              borderRight:i<sa.length-1?`1px solid ${effBrd}22`:'none',
+            <div key={a.id} style={{
+              display:'flex',
+              justifyContent:'space-between',
+              alignItems:'baseline',
+              padding:`${3*S}px ${3*S}px`,
+              borderBottom: i<4 ? `1px solid ${effBrd}22` : 'none',
             }}>
-              <div style={{fontSize:8*S,fontWeight:700,color:effTxt,opacity:.75,
-                textTransform:'uppercase',letterSpacing:.3*S,fontFamily:F,marginBottom:3*S,
-                textShadow:'0 1px 4px rgba(0,0,0,.8)'}}>
+              <span style={{fontSize:11*S,fontWeight:700,color:effTxt,opacity:.9,
+                textTransform:'uppercase',letterSpacing:.6*S,fontFamily:F,
+                textShadow:'0 1px 4px rgba(0,0,0,.85)'}}>
                 {a.name.slice(0,3)}
-              </div>
-              <div style={{fontSize:18*S,fontWeight:900,color:effScore,fontFamily:FO,lineHeight:1,
+              </span>
+              <span style={{fontSize:19*S,fontWeight:900,color:effScore,fontFamily:FO,lineHeight:1,
                 textShadow:`0 2px 6px rgba(0,0,0,.9), 0 0 ${8*S}px ${effGlow}${lvl>=2?'88':'44'}`}}>
                 {Math.round(card.scores?.[a.id]??0)}
-              </div>
+              </span>
             </div>
           ))}
         </div>
