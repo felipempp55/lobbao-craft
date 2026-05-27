@@ -632,18 +632,33 @@ const AttrsTab = ({ attrs, setAttrs }) => {
   );
 };
 // ═══ DOMINGO ═════════════════════════════════════════════════
+const TAGS = [
+  {id:'baiter',    label:'Baiter',    type:'neg'},
+  {id:'tiltado',   label:'Tiltado',   type:'neg'},
+  {id:'mutadinho', label:'Mutadinho', type:'neg'},
+  {id:'genteboa',  label:'Gente boa', type:'pos'},
+  {id:'esforçado', label:'Esforçado', type:'pos'},
+];
 const SundayTab = ({ players, attrs, sessions, setSessions }) => {
   const [date,    setDate]    = useState(new Date().toISOString().split('T')[0]);
   const [cards,   setCards]   = useState([]);
   const [scoring, setScoring] = useState(null);
   const [scores,  setScores]  = useState({});
+  const [tags,    setTags]    = useState({});
   const [preview, setPreview] = useState(null);
-  const overall = scoring ? calc(scores, attrs) : 0;
-  const tier    = getTier(overall);
-  const start = p => { setScoring(p); setScores(Object.fromEntries(attrs.map(a => [a.id,5]))); setPreview(null); };
+
+  const baseOverall = scoring ? calc(scores, attrs) : 0;
+  const negCount = TAGS.filter(t => t.type==='neg' && tags[t.id]).length;
+  const posCount = TAGS.filter(t => t.type==='pos' && tags[t.id]).length;
+  const mult = posCount > negCount ? 1.2 : negCount > posCount ? 0.9 : 1.0;
+  const overall = Math.min(99, Math.round(baseOverall * mult));
+  const tier = getTier(overall);
+
+  const toggleTag = id => setTags(t => ({...t, [id]: !t[id]}));
+  const start = p => { setScoring(p); setScores(Object.fromEntries(attrs.map(a => [a.id,5]))); setTags({}); setPreview(null); };
   const gen   = () => {
     if(!scoring) return;
-    const c  = {playerId:scoring.id, scores:{...scores}, overall:calc(scores,attrs)};
+    const c  = {playerId:scoring.id, scores:{...scores}, overall, tags:{...tags}};
     const nc = [...cards.filter(x => x.playerId!==scoring.id), c];
     setCards(nc); setPreview({card:c, player:scoring}); setScoring(null);
   };
@@ -671,11 +686,48 @@ const SundayTab = ({ players, attrs, sessions, setSessions }) => {
               <PlayerCard player={scoring} card={{scores,overall}} attrs={attrs} scale={0.88}/>
             </div>
             <div style={{flex:1,minWidth:260}}>
-              <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:18,flexWrap:'wrap',gap:8}}>
+              {/* Header: nome + overall */}
+              <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:12,flexWrap:'wrap',gap:8}}>
                 <div style={{fontSize:18,fontWeight:700,color:'#f0e8e8',fontFamily:F,letterSpacing:.5}}>{scoring.nick}</div>
-                <div style={{fontSize:28,fontWeight:900,color:tier.score,textShadow:`0 0 15px ${tier.glow}`,fontFamily:FO}}>
-                  {overall} <span style={{fontSize:12,fontWeight:600,color:tier.txt,fontFamily:F}}>{tier.lbl}</span>
+                <div style={{display:'flex',alignItems:'baseline',gap:6}}>
+                  <div style={{fontSize:28,fontWeight:900,color:tier.score,textShadow:`0 0 15px ${tier.glow}`,fontFamily:FO}}>
+                    {overall}
+                  </div>
+                  <span style={{fontSize:12,fontWeight:600,color:tier.txt,fontFamily:F}}>{tier.lbl}</span>
+                  {mult !== 1.0 && (
+                    <span style={{fontSize:11,fontWeight:700,fontFamily:F,letterSpacing:.5,
+                      color: mult > 1 ? '#44dd88' : '#ff6655',
+                      background: mult > 1 ? 'rgba(68,221,136,0.12)' : 'rgba(255,80,80,0.12)',
+                      border: `1px solid ${mult > 1 ? 'rgba(68,221,136,0.3)' : 'rgba(255,80,80,0.3)'}`,
+                      borderRadius:5, padding:'2px 6px',
+                    }}>
+                      {mult > 1 ? '▲' : '▼'} {mult > 1 ? '+20%' : '-10%'}
+                    </span>
+                  )}
                 </div>
+              </div>
+              {/* Tags comportamentais */}
+              <div style={{display:'flex',flexWrap:'wrap',gap:7,marginBottom:18}}>
+                {TAGS.map(tag => {
+                  const on = !!tags[tag.id];
+                  const neg = tag.type === 'neg';
+                  const activeColor = neg ? '#ff5555' : '#44dd88';
+                  const activeBg   = neg ? 'rgba(255,60,60,0.18)' : 'rgba(68,221,136,0.18)';
+                  const activeBrd  = neg ? 'rgba(255,60,60,0.45)' : 'rgba(68,221,136,0.45)';
+                  return (
+                    <button key={tag.id} onClick={() => toggleTag(tag.id)} style={{
+                      background: on ? activeBg : 'rgba(255,255,255,0.04)',
+                      border: `1px solid ${on ? activeBrd : 'rgba(255,255,255,0.1)'}`,
+                      borderRadius:20, padding:'4px 12px',
+                      color: on ? activeColor : '#4a3535',
+                      fontSize:11.5, fontWeight:700, fontFamily:F, letterSpacing:.6,
+                      cursor:'pointer', transition:'all .15s',
+                      boxShadow: on ? `0 0 10px ${activeColor}44` : 'none',
+                    }}>
+                      {on ? (neg ? '💀' : '✨') : (neg ? '💀' : '✨')} {tag.label}
+                    </button>
+                  );
+                })}
               </div>
               {attrs.map(a => (
                 <div key={a.id} style={{marginBottom:16}}>
