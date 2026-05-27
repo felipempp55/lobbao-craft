@@ -36,7 +36,7 @@ const ld = (k, d) => { try { const r = localStorage.getItem(k); return r ? JSON.
 // ═══ UTILS ═══════════════════════════════════════════════════
 const calc = (sc, at) => {
   let t = 0, w = 0;
-  at.forEach(a => { if(sc[a.id] !== undefined){ t += (sc[a.id]/10)*(a.weight/100); w += a.weight; } });
+  at.forEach(a => { if(sc[a.id] !== undefined){ t += (sc[a.id]/100)*(a.weight/100); w += a.weight; } });
   return w ? Math.min(99, Math.round(t*100/w*99)) : 0;
 };
 const b64Blob = d => {
@@ -770,7 +770,7 @@ const SundayTab = ({ players, attrs, sessions, setSessions }) => {
   const tier = getTier(overall);
 
   const toggleTag = id => setTags(t => ({...t, [id]: !t[id]}));
-  const start = p => { setScoring(p); setScores(Object.fromEntries(attrs.map(a => [a.id,5]))); setTags({}); setPreview(null); };
+  const start = p => { setScoring(p); setScores(Object.fromEntries(attrs.map(a => [a.id,50]))); setTags({}); setPreview(null); };
   const gen   = () => {
     if(!scoring) return;
     const c  = {playerId:scoring.id, scores:{...scores}, overall, tags:{...tags}};
@@ -848,13 +848,13 @@ const SundayTab = ({ players, attrs, sessions, setSessions }) => {
                 <div key={a.id} style={{marginBottom:16}}>
                   <div style={{display:'flex',justifyContent:'space-between',marginBottom:4}}>
                     <span style={{fontSize:13,color:'#c8a8a8',fontFamily:F,fontWeight:600}}>{a.name}</span>
-                    <span style={{fontSize:14,fontWeight:700,color:R,fontFamily:FO}}>{Number(scores[a.id]??5).toFixed(1)}</span>
+                    <span style={{fontSize:14,fontWeight:700,color:R,fontFamily:FO}}>{Math.round(scores[a.id]??50)}</span>
                   </div>
-                  <input type="range" min="0" max="10" step="0.5" value={scores[a.id]??5}
+                  <input type="range" min="0" max="100" step="1" value={scores[a.id]??50}
                     onChange={e => setScores(s => ({...s,[a.id]:Number(e.target.value)}))}
-                    style={{width:'100%',background:`linear-gradient(90deg,${tier.brd} ${(scores[a.id]??5)*10}%,rgba(255,255,255,.1) ${(scores[a.id]??5)*10}%)`,accentColor:tier.brd}}/>
+                    style={{width:'100%',background:`linear-gradient(90deg,${tier.brd} ${(scores[a.id]??50)}%,rgba(255,255,255,.1) ${(scores[a.id]??50)}%)`,accentColor:tier.brd}}/>
                   <div style={{display:'flex',justifyContent:'space-between',fontSize:9.5,color:'#907070',marginTop:2,fontFamily:F}}>
-                    <span>0</span><span>5</span><span>10</span>
+                    <span>0</span><span>50</span><span>100</span>
                   </div>
                 </div>
               ))}
