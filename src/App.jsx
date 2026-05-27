@@ -372,17 +372,34 @@ const PlayerCard = ({ player, card, attrs, scale=1, reveal=false }) => {
         ))}
       </>}
 
-      {/* ══ Dream Lobby: sparkles dourados externos ══ */}
+      {/* ══ Dream Lobby: sparkles dourados distribuídos pela carta ══ */}
       {lvl === 3 && !isDestaque && <>
-        {[{top:24,right:18,s:3,d:'0s'},{top:16,right:40,s:2,d:'0.5s'},{top:40,right:14,s:2.5,d:'0.8s'},
-          {top:10,right:56,s:2,d:'0.3s'},{top:52,right:30,s:2,d:'1.1s'},{top:20,right:64,s:1.5,d:'0.7s'},
+        {[
+          /* topo direito */
+          {top:24,right:18,s:3.0,d:'0s'},   {top:10,right:46,s:2.0,d:'0.5s'},
+          {top:44,right:12,s:2.5,d:'0.8s'}, {top:8, right:64,s:1.5,d:'0.3s'},
+          /* topo esquerdo / centro-topo */
+          {top:18,left:72, s:1.5,d:'1.0s'}, {top:38,left:108,s:2.0,d:'0.6s'},
+          {top:10,left:134,s:1.5,d:'1.4s'},
+          /* meio direito */
+          {top:105,right:18,s:2.0,d:'0.9s'},{top:148,right:44,s:1.5,d:'1.2s'},
+          {top:182,right:14,s:2.5,d:'0.7s'},{top:165,right:66,s:1.5,d:'0.2s'},
+          /* meio esquerdo */
+          {top:118,left:28,s:2.0,d:'0.4s'}, {top:158,left:52,s:1.5,d:'1.3s'},
+          {top:200,left:30,s:2.0,d:'0.1s'},
+          /* baixo-médio (acima do rodapé ~315px) */
+          {top:230,right:30,s:2.0,d:'0.95s'},{top:258,left:18,s:1.5,d:'0.35s'},
+          {top:248,right:58,s:1.5,d:'1.1s'}, {top:288,left:66,s:1.5,d:'0.75s'},
+          {top:278,right:22,s:2.0,d:'1.3s'}, {top:305,left:110,s:1.5,d:'0.5s'},
         ].map((sp,i)=>(
-          <div key={`dlsp${i}`} style={{position:'absolute',top:sp.top*S,right:sp.right*S,
-            width:sp.s*S,height:sp.s*S,borderRadius:'50%',
+          <div key={`dlsp${i}`} style={{
+            position:'absolute', top:sp.top*S,
+            ...(sp.left!==undefined ? {left:sp.left*S} : {right:sp.right*S}),
+            width:sp.s*S, height:sp.s*S, borderRadius:'50%',
             background:`radial-gradient(circle,#ffffff,${t.glow})`,
-            boxShadow:`0 0 ${sp.s*2.5*S}px ${t.glow}ee,0 0 ${sp.s*5*S}px ${t.glow}66`,
-            zIndex:5,pointerEvents:'none',
-            animation:`lbcGem ${1.6+i*.4}s ease-in-out infinite`,animationDelay:sp.d}}/>
+            boxShadow:`0 0 ${sp.s*2.5*S}px ${t.glow}ee,0 0 ${sp.s*5*S}px ${t.glow}55`,
+            zIndex:5, pointerEvents:'none',
+            animation:`lbcGem ${1.5+i*.28}s ease-in-out infinite`,animationDelay:sp.d}}/>
         ))}
       </>}
 
