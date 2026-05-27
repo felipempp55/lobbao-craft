@@ -150,7 +150,7 @@ const PlayerCard = ({ player, card, attrs, scale=1, reveal=false }) => {
     {top:'6%',left:'42%',sz:7,rot:30,op:.15},{top:'28%',right:'5%',sz:9,rot:55,op:.14},
     {top:'14%',left:'28%',sz:5,rot:15,op:.12},{top:'32%',left:'10%',sz:8,rot:40,op:.10},
   ];
-  const PHOTO_H   = [188, 200, 218, 238, 375];
+  const PHOTO_H   = [188, 200, 218, 238, 300];
   const PHOTO_BTM = [65,  66,  68,  70,  72 ];
   const photoH   = PHOTO_H[lvl]   * scale;
   const photoBtm = PHOTO_BTM[lvl] * scale;
@@ -444,8 +444,7 @@ const PlayerCard = ({ player, card, attrs, scale=1, reveal=false }) => {
           filter: lvl===0
             ? `grayscale(35%) brightness(0.85) drop-shadow(0 0 ${6*S}px ${effGlow}44)`
             : `drop-shadow(0 ${-3*S}px ${[6,10,14,18,24][lvl]*S}px ${effGlow}${['77','99','bb','cc','ee'][lvl]})`,
-          animation: lvl >= 1 ? 'lbcFloat 4s ease-in-out infinite' : 'none',
-          transform: lvl >= 1 ? undefined : 'translateX(-50%)',
+          transform: 'translateX(-50%)',
           zIndex:3,
         }}/>
       ) : (
