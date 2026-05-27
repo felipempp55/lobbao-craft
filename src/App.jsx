@@ -720,7 +720,7 @@ const SundayTab = ({ players, attrs, sessions, setSessions }) => {
           <div style={{display:'flex',gap:24,flexWrap:'wrap',alignItems:'flex-start'}}>
             <div style={{flexShrink:0}}>
               <SectionLabel color={tier.txt}>Prévia ao Vivo</SectionLabel>
-              <PlayerCard player={scoring} card={{scores,overall}} attrs={attrs} scale={0.88}/>
+              <PlayerCard player={scoring} card={{scores,overall,tags}} attrs={attrs} scale={0.88}/>
             </div>
             <div style={{flex:1,minWidth:260}}>
               {/* Header: nome + overall */}
