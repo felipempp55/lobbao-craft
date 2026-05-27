@@ -459,8 +459,8 @@ const PlayerCard = ({ player, card, attrs, scale=1, reveal=false }) => {
         display:'flex',justifyContent:'space-between',alignItems:'flex-start',zIndex:4}}>
         <div>
           <div style={{
-            fontSize:[54,60,64,70,76][lvl]*S,
-            fontWeight:900,lineHeight:1,color:effScore,letterSpacing:-2.5*S,fontFamily:FO,
+            fontSize:[40,44,48,52,56][lvl]*S,
+            fontWeight:900,lineHeight:1,color:effScore,letterSpacing:-2*S,fontFamily:FO,
             textShadow: lvl===0 ? 'none'
               : lvl===1 ? `0 0 ${8*S}px ${effGlow}55`
               : `0 0 ${14*S}px ${effGlow},0 0 ${28*S}px ${effGlow}66,0 0 ${55*S}px ${effGlow}22`,
