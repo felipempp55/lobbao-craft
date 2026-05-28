@@ -396,63 +396,98 @@ const PlayerCard = ({ player, card, attrs, scale=1, reveal=false }) => {
         ))}
       </>}
 
-      {/* ══ TAG ICONS — coluna esquerda, estilo FIFA ══ */}
+      {/* ══ TAG ICONS — coluna esquerda, estilo FIFA Playstyle (losango) ══ */}
       {(() => {
         const cardTags = card.tags || {};
         const iconDefs = [
-          {id:'baiter',    emoji:'🫣', label:'Baiter',    color:'#ff4444', brd:'#cc2222'},
-          {id:'tiltado',   emoji:'😡', label:'Tiltado',   color:'#ff7700', brd:'#cc4400'},
-          {id:'mutadinho', emoji:'🔇', label:'Mutado',    color:'#99aacc', brd:'#6677aa'},
-          {id:'genteboa',  emoji:'👍', label:'Gente boa', color:'#44ee88', brd:'#22aa55'},
-          {id:'esforçado', emoji:'💪', label:'Esforçado', color:'#ffd700', brd:'#bb8800'},
+          {id:'baiter',    img:'/isca.png',       label:'Baiter',       color:'#ff4444', brd:'#cc2222'},
+          {id:'tiltado',   img:'/bravo.png',      label:'Tiltado',      color:'#ff7700', brd:'#cc4400'},
+          {id:'mutadinho', img:'/opcao-mute.png', label:'Mutado',       color:'#99aacc', brd:'#6677aa'},
+          {id:'genteboa',  img:'/meditacao.png',  label:'Good Vibes',   color:'#44ee88', brd:'#22aa55'},
+          {id:'esforçado', img:'/biceps.png',     label:'Esforçado',    color:'#ffd700', brd:'#bb8800'},
+          {id:'deagle',    img:'/revolver.png',   label:'Desert Eagle', color:'#e0a040', brd:'#a06010'},
         ];
         const active = iconDefs.filter(d => cardTags[d.id]);
         if(!active.length) return null;
-        const sz  = 30*S;
-        const gap = 7*S;
+        // Estilo por tier — combina com a cor da carta
+        const goldIconFilter = 'brightness(0) invert(1) sepia(1) saturate(5.5) hue-rotate(-10deg) brightness(1.05) drop-shadow(0 1px 2px rgba(0,0,0,0.55))';
+        const tierStyle = [
+          // lvl 0 — Melhor Freezar (vermelho)
+          { bg:'linear-gradient(135deg, rgba(200,95,95,0.95) 0%, rgba(140,50,50,0.95) 100%)',
+            inner:'rgba(255,200,200,0.55)', iconFilter:`drop-shadow(0 ${1*S}px ${2*S}px rgba(0,0,0,0.45))` },
+          // lvl 1 — Bagre (azul-cinza)
+          { bg:'linear-gradient(135deg, rgba(170,195,225,0.95) 0%, rgba(115,145,185,0.95) 100%)',
+            inner:'rgba(255,255,255,0.55)', iconFilter:`drop-shadow(0 ${1*S}px ${2*S}px rgba(0,0,0,0.45))` },
+          // lvl 2 — Bom de jogo (verde)
+          { bg:'linear-gradient(135deg, rgba(110,205,140,0.95) 0%, rgba(55,150,90,0.95) 100%)',
+            inner:'rgba(220,255,225,0.55)', iconFilter:`drop-shadow(0 ${1*S}px ${2*S}px rgba(0,0,0,0.45))` },
+          // lvl 3 — Dream Lobby (preto + ícone dourado)
+          { bg:'linear-gradient(135deg, rgba(35,22,5,0.97) 0%, rgba(8,5,0,0.97) 100%)',
+            inner:'rgba(255,200,80,0.4)', iconFilter:goldIconFilter },
+          // lvl 4 — GOAT (azul + ícone dourado)
+          { bg:'linear-gradient(135deg, rgba(22,55,115,0.97) 0%, rgba(5,18,60,0.97) 100%)',
+            inner:'rgba(180,220,255,0.45)', iconFilter:goldIconFilter },
+        ][lvl];
+        const sz  = 28*S;          // tamanho do losango
+        const gap = 10*S;          // espaço entre losangos (maior por causa das pontas)
         const totalH = active.length * sz + (active.length-1) * gap;
-        const areaTop = (isDestaque ? 105 : 92) * S;
-        const areaBot = (isDestaque ? 110 : 100) * S;
+        const areaTop = (isDestaque ? 110 : 95) * S;
+        const areaBot = (isDestaque ? 115 : 105) * S;
         const areaH   = H - areaTop - areaBot;
         const startY  = areaTop + Math.max(0, (areaH - totalH) / 2);
         return active.map((d, i) => (
           <div key={`ti${i}`} style={{
             position:'absolute',
-            left: 8*S,
+            left: 22*S,
             top: startY + i*(sz+gap),
             width:sz, height:sz,
-            zIndex:4, pointerEvents:'none',
-            borderRadius:'50%',
-            background:'radial-gradient(circle at 35% 30%, rgba(255,255,255,0.20) 0%, rgba(0,0,0,0.80) 100%)',
-            border:`${1.5*S}px solid ${d.brd}bb`,
+            zIndex:6, pointerEvents:'none',
+            transform:'rotate(45deg)',
+            background: tierStyle.bg,
+            border:`${1.5*S}px solid ${d.brd}ee`,
             display:'flex', alignItems:'center', justifyContent:'center',
-            fontSize: sz * 0.50,
-            backdropFilter:'blur(6px)',
-            boxShadow:`0 0 ${12*S}px ${d.color}88, 0 0 ${6*S}px ${d.color}55, inset 0 0 ${6*S}px rgba(0,0,0,0.55)`,
-          }}>{d.emoji}</div>
+            boxShadow:`0 0 ${13*S}px ${d.color}99, 0 0 ${6*S}px ${d.color}66, inset 0 0 ${4*S}px ${tierStyle.inner}, inset 0 0 ${2*S}px ${d.color}44`,
+          }}>
+            <img src={d.img} alt={d.label} style={{
+              width:  sz * 0.66,
+              height: sz * 0.66,
+              transform:'rotate(-45deg)',
+              objectFit:'contain',
+              filter: tierStyle.iconFilter,
+            }}/>
+          </div>
         ));
       })()}
 
-      {/* ══ FOTO — z=3 ══ */}
-      {(player.photoClean||player.photo) ? (
-        <img src={player.photoClean||player.photo} alt="" style={{
-          position:'absolute', bottom:photoBtm, left:'56%',
-          height:photoH, maxWidth:'100%',
-          objectFit:player.photoClean?'contain':'cover',
-          objectPosition:'top center',
-          borderRadius:player.photoClean?0:8*S,
-          filter: lvl===0
-            ? `grayscale(35%) brightness(0.85) drop-shadow(0 0 ${6*S}px ${effGlow}44)`
-            : `drop-shadow(0 ${-3*S}px ${[6,10,14,18,24][lvl]*S}px ${effGlow}${['77','99','bb','cc','ee'][lvl]})`,
-          transform: 'translateX(-50%)',
-          zIndex:3,
-        }}/>
-      ) : (
-        <div style={{position:'absolute',bottom:photoBtm,left:'56%',transform:'translateX(-50%)',
-          width:100*S,height:140*S,borderRadius:8*S,
-          background:`${effBrd}0e`,border:`${1.5*S}px dashed ${effBrd}30`,
-          display:'flex',alignItems:'center',justifyContent:'center',fontSize:38*S,opacity:.3,zIndex:3}}>👤</div>
-      )}
+      {/* ══ FOTO — wrapper clipa laterais na primeira borda interna (anel em inset:5*S em lvl>=3) ══ */}
+      <div style={{
+        position:'absolute', top:-150*S,
+        left:  (lvl>=3 ? 5 : 0)*S,
+        right: (lvl>=3 ? 5 : 0)*S,
+        bottom:(lvl>=3 ? 5 : 0)*S,
+        overflow:'hidden',
+        borderRadius:(lvl>=3 ? 12 : 16)*S,
+        zIndex:3, pointerEvents:'none',
+      }}>
+        {(player.photoClean||player.photo) ? (
+          <img src={player.photoClean||player.photo} alt="" style={{
+            position:'absolute', bottom:photoBtm, left:'56%',
+            height:photoH, maxWidth:'100%',
+            objectFit:player.photoClean?'contain':'cover',
+            objectPosition:'top center',
+            borderRadius:player.photoClean?0:8*S,
+            filter: lvl===0
+              ? `grayscale(35%) brightness(0.85) drop-shadow(0 0 ${6*S}px ${effGlow}44)`
+              : `drop-shadow(0 ${-3*S}px ${[6,10,14,18,24][lvl]*S}px ${effGlow}${['77','99','bb','cc','ee'][lvl]})`,
+            transform: 'translateX(-50%)',
+          }}/>
+        ) : (
+          <div style={{position:'absolute',bottom:photoBtm,left:'56%',transform:'translateX(-50%)',
+            width:100*S,height:140*S,borderRadius:8*S,
+            background:`${effBrd}0e`,border:`${1.5*S}px dashed ${effBrd}30`,
+            display:'flex',alignItems:'center',justifyContent:'center',fontSize:38*S,opacity:.3}}>👤</div>
+        )}
+      </div>
 
       {/* ══ HEADER (overall + logo) — z=4 ══ */}
       <div style={{position:'absolute',top:[8,10,10,12,16][lvl]*S,left:13*S,right:13*S,
@@ -751,8 +786,9 @@ const TAGS = [
   {id:'baiter',    label:'Baiter',    type:'neg'},
   {id:'tiltado',   label:'Tiltado',   type:'neg'},
   {id:'mutadinho', label:'Mutadinho', type:'neg'},
-  {id:'genteboa',  label:'Gente boa', type:'pos'},
-  {id:'esforçado', label:'Esforçado', type:'pos'},
+  {id:'genteboa',  label:'Good Vibes',   type:'pos'},
+  {id:'esforçado', label:'Esforçado',    type:'pos'},
+  {id:'deagle',    label:'Desert Eagle', type:'pos'},
 ];
 const SundayTab = ({ players, attrs, sessions, setSessions }) => {
   const [date,    setDate]    = useState(new Date().toISOString().split('T')[0]);
@@ -765,7 +801,7 @@ const SundayTab = ({ players, attrs, sessions, setSessions }) => {
   const baseOverall = scoring ? calc(scores, attrs) : 0;
   const negCount = TAGS.filter(t => t.type==='neg' && tags[t.id]).length;
   const posCount = TAGS.filter(t => t.type==='pos' && tags[t.id]).length;
-  const mult = posCount > negCount ? 1.2 : negCount > posCount ? 0.9 : 1.0;
+  const mult = posCount > negCount ? 1.1 : negCount > posCount ? 0.9 : 1.0;
   const overall = Math.min(99, Math.round(baseOverall * mult));
   const tier = getTier(overall);
 
@@ -816,7 +852,7 @@ const SundayTab = ({ players, attrs, sessions, setSessions }) => {
                       border: `1px solid ${mult > 1 ? 'rgba(68,221,136,0.3)' : 'rgba(255,80,80,0.3)'}`,
                       borderRadius:5, padding:'2px 6px',
                     }}>
-                      {mult > 1 ? '▲' : '▼'} {mult > 1 ? '+20%' : '-10%'}
+                      {mult > 1 ? '▲' : '▼'} {mult > 1 ? '+10%' : '-10%'}
                     </span>
                   )}
                 </div>
