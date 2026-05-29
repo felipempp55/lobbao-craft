@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Lobbão Craft — Cartas FIFA TOTY/TOTW · 3 variações</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Saira+Condensed:wght@600;700;800;900&family=Rajdhani:wght@500;600;700&display=swap');
+
+  html, body { margin: 0; padding: 0; background: #0c0807; }
+  * { box-sizing: border-box; }
+
+  @keyframes lbcRain {
+    0%   { transform: translate(0,0) rotate(0deg); opacity: 0.95; }
+    50%  { transform: translate(-6px, 18px) rotate(140deg); opacity: 1; }
+    100% { transform: translate(-14px, 40px) rotate(280deg); opacity: 0.25; }
+  }
+  .lbc-rain { animation: lbcRain 3.6s ease-in-out infinite; }
+
+  @keyframes lbcSpark2 {
+    0%, 100% { opacity: 0.35; transform: scale(0.7); }
+    50%      { opacity: 1;    transform: scale(1.25); }
+  }
+  .lbc-spark2 { animation: lbcSpark2 2.4s ease-in-out infinite; }
+
+  @keyframes lbcBolt {
+    0%, 100% { opacity: 0.9; filter: brightness(1); }
+    25%      { opacity: 1;   filter: brightness(1.35); }
+    50%      { opacity: 0.55; filter: brightness(0.9); }
+    75%      { opacity: 1;   filter: brightness(1.5); }
+  }
+  .lbc-bolt { animation: lbcBolt 2.8s ease-in-out infinite; }
+
+  @keyframes lbcGoldPulse {
+    0%, 100% { box-shadow: inset 0 0 30px rgba(255,215,0,0.35); }
+    50%      { box-shadow: inset 0 0 65px rgba(255,215,0,0.85); }
+  }
+  .lbc-goldpulse { animation: lbcGoldPulse 2.6s ease-in-out infinite; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<template id="__bundler_thumbnail">
+  <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+    <rect width="100" height="100" fill="#0c0807"/>
+    <polygon points="47,3 50,6 53,3 90,5 99,13 99,86 86,98 14,98 1,86 1,13 10,5"
+             fill="#00041e" stroke="#ffd700" stroke-width="2.5"/>
+    <text x="50" y="56" font-family="sans-serif" font-size="22" font-weight="900" fill="#ffd700" text-anchor="middle">95</text>
+  </svg>
+</template>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="text/babel" src="../design-canvas.jsx"></script>
+<script type="text/babel" src="../site/data.jsx"></script>
+<script type="text/babel" src="../site/shell.jsx"></script>
+<script type="text/babel" src="../site/card.jsx"></script>
+<script type="text/babel" src="cards-fifa.jsx"></script>
+
+<script type="text/babel">
+  const { DesignCanvas, DCSection, DCArtboard, GoatCard, TotwCard, PlayerCard, PLAYERS, TIERS } = window;
+
+  const goat    = PLAYERS.find(p => p.nick === 'FL1IP');   // 95 · GOAT
+  const dream   = PLAYERS.find(p => p.nick === 'BRUNAO');  // 86 · Dream Lobby
+  const bom     = PLAYERS.find(p => p.nick === 'GABS');    // 76 · Bom de Jogo
+  const bagre   = PLAYERS.find(p => p.nick === 'NEGUIM');  // 67 · Bagre
+  const freezar = PLAYERS.find(p => p.nick === 'MUTADO');  // 52 · Melhor Freezar
+  const tDream = TIERS.find(x => x.id === 'dream');
+  const tBagre = TIERS.find(x => x.id === 'bagre');
+
+  function Frame({ children }) {
+    return <div style={{ width:'100%', height:'100%', display:'flex', alignItems:'center', justifyContent:'center' }}>{children}</div>;
+  }
+
+  function App() {
+    return (
+      <DesignCanvas>
+        <DCSection
+          id="atual"
+          title="Atual · TOTY Gilded"
+          subtitle="O que você curtiu. Só GOAT e Dream ganham tratamento custom; demais tiers ficam no estilo retangular atual.">
+          <DCArtboard id="a-goat"  label="GOAT · FL1IP · 95"         width={324} height={476}>
+            <Frame><GoatCard player={goat} fx="gilded" /></Frame>
+          </DCArtboard>
+          <DCArtboard id="a-dream" label="DREAM LOBBY · BRUNAO · 86" width={304} height={452}>
+            <Frame><TotwCard player={dream} t={tDream} variant="v1" /></Frame>
+          </DCArtboard>
+        </DCSection>
+
+        <DCSection
+          id="refv1"
+          title="Refinada v1 · ajustes pedidos"
+          subtitle="GOAT: leque dourado movido pro canto superior direito, ultrapassando a borda. Confete + sparkles na carta inteira mantidos. DREAM: framework dourado central (tipo a ref), shards com contorno dourado, poeira de ouro — sem a faixa diagonal.">
+          <DCArtboard id="r-goat"  label="GOAT · FL1IP · 95"         width={540} height={620}>
+            <Frame><GoatCard player={goat} fx="gildedV2" /></Frame>
+          </DCArtboard>
+          <DCArtboard id="r-dream" label="DREAM LOBBY · BRUNAO · 86" width={304} height={452}>
+            <Frame><TotwCard player={dream} t={tDream} variant="v2" /></Frame>
+          </DCArtboard>
+        </DCSection>
+        <DCSection
+          id="sistema"
+          title="Sistema completo · 5 tiers"
+          subtitle="Como o ranking todo fica lado a lado. Freezar / Bagre / Bom seguem no estilo retangular FIFA atual do site (sem customização). Dream e GOAT ganham o shield TOTY refinado.">
+          <DCArtboard id="sys-freezar" label="MELHOR FREEZAR · MUTADO · 52" width={272} height={418}>
+            <Frame><PlayerCard player={freezar} ov={freezar.ov} stats={freezar.stats} tags={freezar.tags} /></Frame>
+          </DCArtboard>
+          <DCArtboard id="sys-bagre"   label="BAGRE · NEGUIM · 67"        width={278} height={425}>
+            <Frame><PlayerCard player={bagre} ov={bagre.ov} stats={bagre.stats} tags={bagre.tags} /></Frame>
+          </DCArtboard>
+          <DCArtboard id="sys-bom"     label="BOM PLAYER · GABS · 76"      width={286} height={434}>
+            <Frame><PlayerCard player={bom} ov={bom.ov} stats={bom.stats} tags={bom.tags} /></Frame>
+          </DCArtboard>
+          <DCArtboard id="sys-dream"   label="DREAM LOBBY · BRUNAO · 86"   width={304} height={452}>
+            <Frame><TotwCard player={dream} t={tDream} variant="v2" /></Frame>
+          </DCArtboard>
+          <DCArtboard id="sys-goat"    label="GOAT · FL1IP · 95"           width={540} height={620}>
+            <Frame><GoatCard player={goat} fx="gildedV2" /></Frame>
+          </DCArtboard>
+        </DCSection>
+      </DesignCanvas>
+    );
+  }
+
+  ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>

@@ -3,6 +3,10 @@ import { useState, useEffect, useRef } from "react";
 const R  = '#cc1111';
 const RG = '#dd1100';
 const RD = 'rgba(200,17,17,0.15)';
+// ═══ SHIELD CARD PALETTES (GOAT + Dream Lobby) ═══════════════
+const G    = { hi:'#ffeeb0', mid:'#ffd700', lo:'#9c7220', deep:'#6b4a10' };
+const NAVY = { c0:'#00041e', c1:'#0c1d68', c2:'#040933' };
+const SHIELD = 'polygon(47% 1%, 50% 4.2%, 53% 1%, 91% 3%, 100% 11%, 100% 86%, 86% 100%, 14% 100%, 0 86%, 0 11%, 9% 3%)';
 // ═══ TIERS ═══════════════════════════════════════════════════
 const TIERS = [
   { name:'Melhor Freezar', min:0,  max:59, lbl:'MELHOR FREEZAR',
@@ -11,7 +15,7 @@ const TIERS = [
   { name:'Bagre',          min:60, max:69, lbl:'BAGRE',
     bg:'linear-gradient(170deg,#060a10 0%,#0f1e30 30%,#162840 55%,#0f1e30 80%,#060a10 100%)',
     brd:'#5588aa',glow:'#6699bb',txt:'#99bbcc',score:'#c0dde8',pat:'rgba(80,130,170,0.05)' },
-  { name:'Bom de jogo',    min:70, max:79, lbl:'BOM DE JOGO',
+  { name:'BOM PLAYER',     min:70, max:79, lbl:'BOM PLAYER',
     bg:'linear-gradient(170deg,#021206 0%,#082210 30%,#0d3016 55%,#082210 80%,#021206 100%)',
     brd:'#33bb55',glow:'#44cc66',txt:'#88ffaa',score:'#ccffdd',pat:'rgba(50,200,80,0.05)' },
   { name:'Dream Lobby',    min:80, max:90, lbl:'DREAM LOBBY',
@@ -49,7 +53,7 @@ const b64Blob = d => {
 };
 // ═══ GLOBAL CSS ══════════════════════════════════════════════
 const GCSS = `
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Rajdhani:wght@500;600;700&family=Permanent+Marker&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Rajdhani:wght@500;600;700&family=Permanent+Marker&family=Chakra+Petch:wght@400;500;600;700&family=Saira+Condensed:wght@600;700;800;900&display=swap');
 *{box-sizing:border-box;}
 ::-webkit-scrollbar{width:5px;height:5px}
 ::-webkit-scrollbar-track{background:transparent}
@@ -66,11 +70,17 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
 @keyframes lbcFloat{0%,100%{transform:translateX(-50%) translateY(0px)}50%{transform:translateX(-50%) translateY(-6px)}}
 @keyframes lbcHdr{0%{background-position:0% 50%}100%{background-position:200% 50%}}
 @keyframes lbcReveal{from{opacity:0;transform:scale(.88) translateY(16px)}to{opacity:1;transform:scale(1) translateY(0)}}
+@keyframes lbcRain{0%{transform:translate(0,0) rotate(0deg);opacity:.95}50%{transform:translate(-6px,18px) rotate(140deg);opacity:1}100%{transform:translate(-14px,40px) rotate(280deg);opacity:.25}}
+.lbc-rain{animation:lbcRain 3.6s ease-in-out infinite}
+@keyframes lbcSpark2{0%,100%{opacity:.35;transform:scale(.7)}50%{opacity:1;transform:scale(1.25)}}
+.lbc-spark2{animation:lbcSpark2 2.4s ease-in-out infinite}
 `;
 // ═══ FONTS ═══════════════════════════════════════════════════
 const F  = "'Rajdhani','Segoe UI',sans-serif";
 const FO = "'Orbitron','Arial Black',sans-serif";
 const FM = "'Permanent Marker','Impact',cursive";
+const FH = "'Chakra Petch','Segoe UI',sans-serif";              // HUD labels (shield cards)
+const FN = "'Saira Condensed','Arial Black',Impact,sans-serif"; // Numbers   (shield cards)
 // ═══ FL1IP LOGO ══════════════════════════════════════════════
 const FL1IP = ({ size = 1, opacity = 1 }) => (
   <span style={{fontFamily:FM, fontSize:22*size, letterSpacing:1*size, opacity}}>
@@ -120,11 +130,434 @@ const Panel = ({ children, style={} }) => (
 const SectionLabel = ({ children, color='#c09090' }) => (
   <div style={{fontSize:10.5,fontWeight:700,letterSpacing:2.5,color,textTransform:'uppercase',fontFamily:F,marginBottom:12}}>{children}</div>
 );
+// ═══ SHIELD CARD PRIMITIVES (GOAT + Dream Lobby) ═════════════
+// Frame: 4 camadas empilhadas com clip-path do escudo FIFA
+const ShieldFrameRich = ({ S, bg, children }) => (
+  <>
+    <div style={{position:'absolute',inset:0,clipPath:SHIELD,
+      background:`linear-gradient(160deg, ${G.hi} 0%, ${G.mid} 25%, ${G.lo} 50%, ${G.mid} 75%, ${G.hi} 100%)`,
+      filter:`drop-shadow(0 0 ${22*S}px ${G.mid}66)`}}/>
+    <div style={{position:'absolute',inset:5*S,clipPath:SHIELD,background:'#0d0a04'}}/>
+    <div style={{position:'absolute',inset:7*S,clipPath:SHIELD,
+      background:`linear-gradient(160deg, ${G.mid}, ${G.deep}, ${G.mid})`}}/>
+    <div style={{position:'absolute',inset:8.5*S,clipPath:SHIELD,overflow:'hidden',background:bg}}>
+      {children}
+    </div>
+  </>
+);
+const ShieldFrameThin = ({ S, bg, children }) => (
+  <>
+    <div style={{position:'absolute',inset:0,clipPath:SHIELD,
+      background:`linear-gradient(160deg, ${G.mid}, ${G.deep}, ${G.mid})`,
+      filter:`drop-shadow(0 0 ${10*S}px ${G.mid}44)`}}/>
+    <div style={{position:'absolute',inset:2.5*S,clipPath:SHIELD,background:'#000'}}/>
+    <div style={{position:'absolute',inset:4*S,clipPath:SHIELD,
+      background:`linear-gradient(160deg, ${G.lo}, ${G.mid}, ${G.lo})`}}/>
+    <div style={{position:'absolute',inset:5.5*S,clipPath:SHIELD,overflow:'hidden',background:bg}}>
+      {children}
+    </div>
+  </>
+);
+// Leque de cristais
+const CrystalFan = ({ cx, cy, count=12, a0=180, a1=360, rMin=50, rMax=130, thin, S=1, op=1 }) => {
+  const out = [];
+  for(let i=0;i<count;i++){
+    const tt = count>1 ? i/(count-1) : 0;
+    const a = a0 + (a1-a0)*tt;
+    const len = rMin + (rMax-rMin) * (0.45 + 0.55*Math.abs(Math.sin(i*1.7+0.5)));
+    const w = thin ? 2.5 : 3 + Math.abs(Math.sin(i*0.9))*2.5;
+    const o = op * (0.55 + 0.4*Math.abs(Math.sin(i*0.83+0.3)));
+    out.push(<div key={i} style={{
+      position:'absolute', left:cx, top:cy,
+      width:w*S, height:len*S,
+      transform:`translateX(-50%) rotate(${a}deg)`,
+      transformOrigin:'50% 0',
+      background:`linear-gradient(180deg, ${G.hi}, ${G.mid} 40%, ${G.lo})`,
+      clipPath:'polygon(50% 0, 100% 50%, 50% 100%, 0 50%)',
+      boxShadow:`0 0 ${5*S}px ${G.mid}aa`,
+      opacity:o,
+    }}/>);
+  }
+  return out;
+};
+// Confetti dourado caindo
+const ConfettiRain = ({ count=20, side='left', S=1, slow }) => {
+  const out = [];
+  const xR = side==='left' ? [4,42] : side==='right' ? [58,96] : [4,96];
+  for(let i=0;i<count;i++){
+    const x = xR[0] + (xR[1]-xR[0]) * (((i*37)%100)/100);
+    const y = (i*23)%55 + 3;
+    const sz = 3 + (i%3);
+    out.push(<div key={i} className="lbc-rain" style={{
+      position:'absolute', left:`${x}%`, top:`${y}%`,
+      width:sz*S, height:sz*S,
+      background:i%4===0 ? G.hi : G.mid,
+      clipPath:'polygon(50% 0, 100% 50%, 50% 100%, 0 50%)',
+      boxShadow:`0 0 ${sz*1.5*S}px ${G.mid}aa`,
+      animationDelay:`${(i*0.17)%4}s`,
+      animationDuration:`${slow ? 7 : 3 + (i%3)*0.6}s`,
+    }}/>);
+  }
+  return out;
+};
+// Sparkles pulsando
+const ShieldSparkles = ({ count=14, color, S=1, positions }) => {
+  const c = color || G.hi;
+  const N = positions ? positions.length : count;
+  const out = [];
+  for(let i=0;i<N;i++){
+    const [x,y] = positions ? positions[i] : [6 + (i*29)%88, 4 + (i*41)%72];
+    out.push(<div key={i} className="lbc-spark2" style={{
+      position:'absolute', left:`${x}%`, top:`${y}%`,
+      width:3*S, height:3*S, background:c, borderRadius:'50%',
+      boxShadow:`0 0 ${6*S}px ${c}, 0 0 ${12*S}px ${c}99`,
+      animationDelay:`${(i*0.17)%3}s`,
+    }}/>);
+  }
+  return out;
+};
+// 4 brackets em L nos cantos
+const ShieldCorners = ({ S=1, col }) => {
+  const c = col || G.hi;
+  return ['tl','tr','bl','br'].map(corner => (
+    <div key={corner} style={{
+      position:'absolute',
+      [corner[0]==='t'?'top':'bottom']: 16*S,
+      [corner[1]==='l'?'left':'right']: 16*S,
+      width:24*S, height:24*S,
+      borderColor:c, borderStyle:'solid', borderWidth:0,
+      borderTopWidth:    corner[0]==='t' ? 1.5 : 0,
+      borderBottomWidth: corner[0]==='b' ? 1.5 : 0,
+      borderLeftWidth:   corner[1]==='l' ? 1.5 : 0,
+      borderRightWidth:  corner[1]==='r' ? 1.5 : 0,
+      [`border${corner[0]==='t'?'Top':'Bottom'}${corner[1]==='l'?'Left':'Right'}Radius`]: 10*S,
+      opacity:0.85,
+      filter:`drop-shadow(0 0 ${3*S}px ${c})`,
+    }}/>
+  ));
+};
+// Chevron no topo central
+const TopChevron = ({ S=1 }) => (
+  <div style={{position:'absolute',top:10*S,left:'50%',transform:'translateX(-50%)',
+    display:'flex',flexDirection:'column',gap:1,alignItems:'center',zIndex:4}}>
+    {[0,1].map(i => (
+      <div key={i} style={{
+        width:14*S, height:7*S,
+        background:G.hi,
+        clipPath:'polygon(50% 0, 100% 100%, 75% 100%, 50% 38%, 25% 100%, 0 100%)',
+        opacity:1 - i*0.3,
+        filter:`drop-shadow(0 0 ${3*S}px ${G.mid})`,
+      }}/>
+    ))}
+  </div>
+);
+// Framework dourado central (Dream Lobby) — gema + diamante + quadrado
+const GoldFramework = ({ S=1, sz=130 }) => {
+  const W = sz*S, H = sz*1.1*S;
+  return (
+    <div style={{position:'absolute',top:'13%',left:'50%',transform:'translateX(-50%)',
+      width:W,height:H,pointerEvents:'none'}}>
+      {/* gema central */}
+      <div style={{position:'absolute',top:'22%',left:'22%',width:'56%',height:'56%',
+        background:`linear-gradient(135deg, rgba(255,235,150,0.22), rgba(40,28,8,0.55))`,
+        clipPath:'polygon(50% 0, 100% 50%, 50% 100%, 0 50%)',
+        boxShadow:`inset 0 0 ${18*S}px rgba(255,215,0,0.35), 0 ${4*S}px ${16*S}px rgba(0,0,0,0.55)`}}/>
+      {/* diamante externo (deslocado à esquerda) */}
+      <div style={{position:'absolute',inset:0,transform:'translateX(-3%)'}}>
+        <div style={{position:'absolute',top:'2%',left:'2%',width:'96%',height:'96%',
+          border:`${1.5*S}px solid ${G.mid}`,transform:'rotate(45deg)',
+          boxShadow:`0 0 ${10*S}px ${G.mid}88, inset 0 0 ${4*S}px ${G.hi}66`,opacity:0.9}}/>
+        {[[50,0],[100,50],[50,100],[0,50]].map(([x,y],i) => (
+          <div key={i} style={{position:'absolute',left:`${x}%`,top:`${y}%`,
+            width:6*S,height:6*S,background:G.hi,borderRadius:'50%',
+            transform:'translate(-50%,-50%)',
+            boxShadow:`0 0 ${8*S}px ${G.mid}, 0 0 ${3*S}px ${G.hi}`}}/>
+        ))}
+      </div>
+      {/* quadrado interno (deslocado à direita) */}
+      <div style={{position:'absolute',inset:0,transform:'translateX(22%)'}}>
+        <div style={{position:'absolute',top:'18%',left:'18%',width:'64%',height:'64%',
+          border:`1px solid ${G.hi}`,transform:'rotate(15deg)',opacity:0.7,
+          boxShadow:`0 0 ${6*S}px ${G.mid}55`}}/>
+        {[[20,30],[80,30],[20,70],[80,70]].map(([x,y],i) => (
+          <div key={`m${i}`} style={{position:'absolute',left:`${x}%`,top:`${y}%`,
+            width:3*S,height:3*S,background:G.mid,borderRadius:'50%',
+            transform:'translate(-50%,-50%)',
+            boxShadow:`0 0 ${4*S}px ${G.mid}`}}/>
+        ))}
+      </div>
+    </div>
+  );
+};
+// Tag icons reaproveitando o sistema atual, adaptado para cartas-escudo
+const ShieldTagIcons = ({ tags, lvl, H, S }) => {
+  const cardTags = tags || {};
+  const iconDefs = [
+    {id:'baiter',    img:'/isca.png',       color:'#ff4444', brd:'#cc2222'},
+    {id:'tiltado',   img:'/bravo.png',      color:'#ff7700', brd:'#cc4400'},
+    {id:'mutadinho', img:'/opcao-mute.png', color:'#99aacc', brd:'#6677aa'},
+    {id:'genteboa',  img:'/meditacao.png',  color:'#44ee88', brd:'#22aa55'},
+    {id:'esforçado', img:'/biceps.png',     color:'#ffd700', brd:'#bb8800'},
+    {id:'deagle',    img:'/revolver.png',   color:'#e0a040', brd:'#a06010'},
+  ];
+  const active = iconDefs.filter(d => cardTags[d.id]);
+  if(!active.length) return null;
+  const goldIconFilter = 'brightness(0) invert(1) sepia(1) saturate(5.5) hue-rotate(-10deg) brightness(1.05) drop-shadow(0 1px 2px rgba(0,0,0,0.55))';
+  const tierStyle = lvl === 4
+    ? { bg:'linear-gradient(135deg, rgba(22,55,115,0.97) 0%, rgba(5,18,60,0.97) 100%)',
+        inner:'rgba(180,220,255,0.45)', iconFilter:goldIconFilter }
+    : { bg:'linear-gradient(135deg, rgba(35,22,5,0.97) 0%, rgba(8,5,0,0.97) 100%)',
+        inner:'rgba(255,200,80,0.4)', iconFilter:goldIconFilter };
+  const sz  = 26*S;
+  const gap = 10*S;
+  const totalH = active.length*sz + (active.length-1)*gap;
+  const areaTop = (lvl===4 ? 130 : 120) * S;
+  const areaBot = (lvl===4 ? 145 : 135) * S;
+  const areaH   = H - areaTop - areaBot;
+  const startY  = areaTop + Math.max(0, (areaH - totalH) / 2);
+  return active.map((d, i) => (
+    <div key={`ti${i}`} style={{
+      position:'absolute', left:28*S,
+      top: startY + i*(sz+gap),
+      width:sz, height:sz, zIndex:6, pointerEvents:'none',
+      transform:'rotate(45deg)',
+      background:tierStyle.bg,
+      border:`${1.5*S}px solid ${d.brd}ee`,
+      display:'flex', alignItems:'center', justifyContent:'center',
+      boxShadow:`0 0 ${12*S}px ${d.color}99, 0 0 ${5*S}px ${d.color}66, inset 0 0 ${4*S}px ${tierStyle.inner}, inset 0 0 ${2*S}px ${d.color}44`,
+    }}>
+      <img src={d.img} alt="" style={{
+        width:sz*0.62, height:sz*0.62,
+        transform:'rotate(-45deg)', objectFit:'contain',
+        filter:tierStyle.iconFilter,
+      }}/>
+    </div>
+  ));
+};
+// Foto no slot do escudo (centralizada)
+const ShieldPhoto = ({ player, S, gray }) => {
+  if(player.photoClean || player.photo){
+    return (
+      <img src={player.photoClean || player.photo} alt="" style={{
+        position:'absolute', top:0, left:'50%',
+        height:'100%', maxWidth:'100%',
+        transform:'translateX(-50%)',
+        objectFit:player.photoClean ? 'contain' : 'cover',
+        objectPosition:'top center',
+        filter: gray ? 'grayscale(.4) brightness(.85)' : 'none',
+      }}/>
+    );
+  }
+  const ini = (player.nick || '').slice(0,2).toUpperCase();
+  return (
+    <div style={{position:'absolute',inset:0,overflow:'hidden'}}>
+      <div style={{position:'absolute',left:'50%',top:'48%',transform:'translate(-50%,-50%)',
+        fontFamily:FN, fontWeight:900, fontSize:120*S, color:'rgba(255,255,255,0.06)',
+        letterSpacing:-4, lineHeight:1, pointerEvents:'none'}}>{ini}</div>
+    </div>
+  );
+};
+
+// ═══ GOAT CARD ═══════════════════════════════════════════════
+const GoatCard = ({ player, card, attrs, scale=1, reveal=false }) => {
+  const S = scale;
+  const W = 290 * S, H = 432 * S;
+  const sa = attrs.slice(0, 6);
+  const navyBg = `linear-gradient(165deg, ${NAVY.c0} 0%, ${NAVY.c1} 50%, ${NAVY.c2} 100%)`;
+  return (
+    <div style={{
+      position:'relative', width:W, height:H, flexShrink:0, overflow:'visible',
+      filter:`drop-shadow(0 ${18*S}px ${40*S}px rgba(0,0,0,0.7))`,
+      animation: reveal ? 'lbcReveal .5s cubic-bezier(.34,1.56,.64,1) forwards' : 'none',
+    }}>
+      <ShieldFrameRich S={S} bg={navyBg}>
+        <div style={{position:'absolute',inset:0,background:`radial-gradient(120% 70% at 50% 0%, ${G.mid}22, transparent 60%)`}}/>
+        <div style={{position:'absolute',inset:0,background:`radial-gradient(70% 55% at 50% 28%, ${G.mid}3a, transparent 60%)`}}/>
+        <ConfettiRain count={30} side="even" S={S} slow/>
+        <ShieldSparkles count={32} S={S}/>
+        <ShieldCorners S={S}/>
+        <TopChevron S={S}/>
+        {/* foto */}
+        <div style={{position:'absolute',top:'9%',left:0,right:0,height:'58%'}}>
+          <ShieldPhoto player={player} S={S}/>
+        </div>
+        {/* fade silk navy */}
+        <div style={{position:'absolute',bottom:'-6%',left:'-10%',right:'-10%',height:'46%',
+          background:`radial-gradient(55% 80% at 50% 30%, ${NAVY.c1}cc, transparent 60%)`,
+          filter:`blur(${8*S}px)`}}/>
+        {/* fade footer */}
+        <div style={{position:'absolute',bottom:0,left:0,right:0,height:'40%',
+          background:`linear-gradient(to top, ${NAVY.c0}f5 38%, transparent)`}}/>
+        {/* HEADER */}
+        <div style={{position:'absolute',top:22*S,left:24*S,lineHeight:0.82,zIndex:5}}>
+          <div style={{fontFamily:FN,fontWeight:900,fontSize:50*S,color:G.hi,letterSpacing:-1*S,
+            textShadow:`0 ${2*S}px ${14*S}px ${G.mid}cc, 0 0 ${22*S}px ${G.mid}55`}}>
+            {card.overall}
+          </div>
+          <div style={{fontFamily:FH,fontWeight:700,fontSize:9*S,letterSpacing:2.4*S,color:G.hi,
+            marginTop:4*S,textTransform:'uppercase',whiteSpace:'nowrap',
+            textShadow:`0 1px ${6*S}px ${G.deep}`}}>GOAT</div>
+          <img src="/logo.png" alt="" style={{width:42*S,marginTop:6*S,opacity:0.9,
+            filter:`drop-shadow(0 0 ${6*S}px ${G.hi}99)`}}
+            onError={e => { e.target.style.display='none'; }}/>
+        </div>
+        {/* TAG ICONS */}
+        <ShieldTagIcons tags={card.tags} lvl={4} H={H} S={S}/>
+        {/* FOOTER */}
+        <div style={{position:'absolute',bottom:0,left:0,right:0,padding:`0 ${18*S}px ${16*S}px`,zIndex:5}}>
+          <div style={{fontFamily:FN,fontWeight:900,fontSize:23*S,color:'#fff',textAlign:'center',
+            letterSpacing:1.5*S,textShadow:`0 ${2*S}px ${10*S}px ${G.mid}88`}}>
+            {player.nick || '???'}
+          </div>
+          <div style={{height:1.5,margin:`${8*S}px 0`,
+            background:`linear-gradient(90deg, transparent, ${G.mid}, transparent)`}}/>
+          <div style={{display:'grid',gridTemplateColumns:'repeat(6,1fr)',gap:2*S}}>
+            {sa.map(a => (
+              <div key={a.id} style={{textAlign:'center'}}>
+                <div style={{fontFamily:FH,fontWeight:700,fontSize:8.5*S,color:G.mid,opacity:0.92,
+                  letterSpacing:0.3*S,textTransform:'uppercase'}}>
+                  {a.name.slice(0,3)}
+                </div>
+                <div style={{fontFamily:FN,fontWeight:800,fontSize:18*S,color:'#fff'}}>
+                  {Math.round(card.scores?.[a.id] ?? 0)}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </ShieldFrameRich>
+      {/* Crystal fan transbordando (FORA do escudo) */}
+      <CrystalFan cx="86%" cy="20%" count={18} a0={50} a1={270} rMin={40} rMax={110} thin S={S} op={0.92}/>
+    </div>
+  );
+};
+
+// ═══ TOTW CARD (Dream Lobby) ═════════════════════════════════
+const TotwCard = ({ player, card, attrs, scale=1, reveal=false }) => {
+  const S = scale;
+  const W = 270 * S, H = 408 * S;
+  const sa = attrs.slice(0, 6);
+  const blackBg = `linear-gradient(165deg, #0a0a0e 0%, #14141a 50%, #0a0a0e 100%)`;
+  const tierCol = '#ffd700', tierGlow = '#ffaa00';
+  const shards = [
+    {left:'6%',  top:'10%', w:34, h:42, rot: 8,  op:0.16},
+    {left:'76%', top:'12%', w:38, h:48, rot:-10, op:0.18},
+    {left:'4%',  top:'62%', w:32, h:40, rot:-12, op:0.14},
+    {left:'78%', top:'66%', w:36, h:44, rot: 10, op:0.16},
+  ];
+  const v2Sparkles = [
+    [12,10],[30,18],[48,8], [66,14],[82,22],
+    [8,32], [22,42],[40,36],[58,30],[74,44],[90,36],
+    [14,56],[32,64],[50,58],[68,70],[84,62],
+    [22,78],[60,78],
+  ];
+  const v2Streaks = [
+    [18,6], [38,12],[56,4], [72,16],[88,8],
+    [4,26], [26,36],[44,28],[62,38],[78,30],[96,38],
+    [16,50],[34,60],[52,52],[70,60],[86,54],
+    [10,76],[44,74],
+  ];
+  return (
+    <div style={{
+      position:'relative', width:W, height:H, flexShrink:0,
+      filter:`drop-shadow(0 ${14*S}px ${32*S}px rgba(0,0,0,0.7))`,
+      animation: reveal ? 'lbcReveal .5s cubic-bezier(.34,1.56,.64,1) forwards' : 'none',
+    }}>
+      <ShieldFrameThin S={S} bg={blackBg}>
+        {/* base lighting (sem diagonais) */}
+        <div style={{position:'absolute',inset:0,opacity:0.65,backgroundImage:`
+          radial-gradient(80% 60% at 50% 18%, rgba(255,215,0,0.07), transparent 60%),
+          radial-gradient(60% 70% at 50% 100%, rgba(0,0,0,0.4), transparent 60%)
+        `}}/>
+        {/* shards de canto */}
+        {shards.map((p, i) => (
+          <div key={i} style={{
+            position:'absolute', left:p.left, top:p.top,
+            width:p.w*S, height:p.h*S,
+            transform:`rotate(${p.rot}deg)`,
+            background:`linear-gradient(135deg, ${G.mid}77, ${G.deep}44)`,
+            clipPath:'polygon(20% 0, 100% 25%, 80% 100%, 0 70%)',
+            opacity:p.op,
+            border:`1px solid ${G.mid}88`,
+            boxShadow:`0 0 ${6*S}px ${G.mid}55`,
+          }}/>
+        ))}
+        {/* halo do tier */}
+        <div style={{position:'absolute',inset:0,
+          background:`radial-gradient(60% 40% at 50% 28%, ${tierGlow}33, transparent 60%)`,
+          mixBlendMode:'screen'}}/>
+        {/* GoldFramework centerpiece */}
+        <GoldFramework S={S} sz={130}/>
+        {/* Sparkles + streaks (hand-picked, sem diagonais) */}
+        <ShieldSparkles positions={v2Sparkles} S={S}/>
+        {v2Streaks.map(([x, y], i) => (
+          <div key={`str${i}`} className="lbc-spark2" style={{
+            position:'absolute', left:`${x}%`, top:`${y}%`,
+            width:2*S, height:(4 + i%4)*S,
+            background:tierCol, opacity:0.7,
+            clipPath:'polygon(50% 0, 100% 100%, 0 100%)',
+            boxShadow:`0 0 ${4*S}px ${tierCol}`,
+            animationDelay:`${(i*0.13)%2}s`,
+          }}/>
+        ))}
+        {/* foto */}
+        <div style={{position:'absolute',top:'9%',left:0,right:0,height:'58%'}}>
+          <ShieldPhoto player={player} S={S}/>
+        </div>
+        {/* fade footer */}
+        <div style={{position:'absolute',bottom:0,left:0,right:0,height:'42%',
+          background:`linear-gradient(to top, #000 38%, transparent)`}}/>
+        {/* HEADER */}
+        <div style={{position:'absolute',top:22*S,left:24*S,lineHeight:0.82,zIndex:5}}>
+          <div style={{fontFamily:FN,fontWeight:900,fontSize:50*S,color:'#fff',letterSpacing:-1*S,
+            textShadow:`0 ${2*S}px ${12*S}px ${tierGlow}99`}}>
+            {card.overall}
+          </div>
+          <div style={{fontFamily:FH,fontWeight:700,fontSize:9*S,letterSpacing:2.4*S,color:tierCol,
+            marginTop:4*S,textTransform:'uppercase',whiteSpace:'nowrap'}}>
+            DREAM LOBBY
+          </div>
+          <img src="/logo.png" alt="" style={{width:42*S,marginTop:6*S,opacity:0.9,
+            filter:`drop-shadow(0 0 ${6*S}px ${tierCol}99)`}}
+            onError={e => { e.target.style.display='none'; }}/>
+        </div>
+        {/* TAG ICONS */}
+        <ShieldTagIcons tags={card.tags} lvl={3} H={H} S={S}/>
+        {/* FOOTER */}
+        <div style={{position:'absolute',bottom:0,left:0,right:0,padding:`0 ${18*S}px ${16*S}px`,zIndex:5}}>
+          <div style={{fontFamily:FN,fontWeight:900,fontSize:23*S,color:'#fff',textAlign:'center',
+            letterSpacing:1.5*S,textShadow:`0 ${2*S}px ${10*S}px ${tierCol}88`}}>
+            {player.nick || '???'}
+          </div>
+          <div style={{height:1.5,margin:`${8*S}px 0`,
+            background:`linear-gradient(90deg, transparent, ${tierCol}, transparent)`}}/>
+          <div style={{display:'grid',gridTemplateColumns:'repeat(6,1fr)',gap:2*S}}>
+            {sa.map(a => (
+              <div key={a.id} style={{textAlign:'center'}}>
+                <div style={{fontFamily:FH,fontWeight:700,fontSize:8.5*S,color:tierCol,opacity:0.92,
+                  letterSpacing:0.3*S,textTransform:'uppercase'}}>
+                  {a.name.slice(0,3)}
+                </div>
+                <div style={{fontFamily:FN,fontWeight:800,fontSize:18*S,color:'#fff'}}>
+                  {Math.round(card.scores?.[a.id] ?? 0)}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </ShieldFrameThin>
+    </div>
+  );
+};
+
 // ═══ PLAYER CARD ═════════════════════════════════════════════
-const TIER_LEVEL = {'Melhor Freezar':0,'Bagre':1,'Bom de jogo':2,'Dream Lobby':3,'GOAT':4};
+const TIER_LEVEL = {'Melhor Freezar':0,'Bagre':1,'BOM PLAYER':2,'Dream Lobby':3,'GOAT':4};
 const PlayerCard = ({ player, card, attrs, scale=1, reveal=false }) => {
   const t = getTier(card.overall);
   const lvl = TIER_LEVEL[t.name] ?? 0;
+  // ROUTING: tiers premium usam cartas-escudo FIFA TOTY/TOTW
+  if (lvl === 4) return <GoatCard player={player} card={card} attrs={attrs} scale={scale} reveal={reveal}/>;
+  if (lvl === 3) return <TotwCard player={player} card={card} attrs={attrs} scale={scale} reveal={reveal}/>;
   const isDestaque = lvl === 4;
   const CARD_W = [248,254,260,268,278];
   const CARD_H = [382,390,400,408,418];
