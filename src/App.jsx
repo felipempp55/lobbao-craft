@@ -1641,9 +1641,16 @@ const SundayTab = ({ players, attrs, sessions, setSessions }) => {
   );
 };
 // ═══ HISTÓRICO ═══════════════════════════════════════════════
-const HistoryTab = ({ sessions, players, attrs }) => {
+const HistoryTab = ({ sessions, players, attrs, onDelete }) => {
   const sorted = [...sessions].sort((a,b) => b.date.localeCompare(a.date));
   const [openId, setOpenId] = useState(sorted[0]?.id || null);
+  const handleDelete = (s) => {
+    const dateLabel = new Date(s.date+'T12:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'});
+    if(confirm(`Apagar a sessão de ${dateLabel}? (${s.cards?.length||0} cartas) — não dá pra desfazer.`)) {
+      onDelete?.(s.id);
+      if(openId === s.id) setOpenId(null);
+    }
+  };
   if(!sessions.length) return (
     <div style={{maxWidth:1180,margin:'0 auto',padding:'14px 6px 70px'}}>
       <div style={{marginBottom:28}}>
@@ -1676,18 +1683,31 @@ const HistoryTab = ({ sessions, players, attrs }) => {
           return (
             <div key={s.id} className="lbc-pop" style={{animationDelay:`${i*0.05}s`}}>
               <Panel accent={topTier?.brd || R} style={{padding:0}}>
-                <button onClick={()=>setOpenId(isOpen?null:s.id)} style={{
-                  width:'100%',display:'flex',alignItems:'center',gap:18,padding:'18px 24px',
-                  background:'transparent',border:'none',cursor:'pointer',textAlign:'left',color:'inherit',
-                }}>
-                  <div style={{flex:1,minWidth:0}}>
-                    <div style={{fontFamily:FO,fontWeight:900,fontSize:22,color:'#f0e8e8',letterSpacing:.5}}>{dateLong}</div>
-                    <div style={{fontFamily:FHUD,fontWeight:600,fontSize:10.5,letterSpacing:1.5,color:'#907070',textTransform:'uppercase',marginTop:3}}>
-                      {weekday} · {ranked.length} cart{ranked.length===1?'a':'as'}{topPlayer && top ? ` · top: ${topPlayer.nick} (${top.overall})` : ''}
+                <div style={{display:'flex',alignItems:'center'}}>
+                  <button onClick={()=>setOpenId(isOpen?null:s.id)} style={{
+                    flex:1,display:'flex',alignItems:'center',gap:18,padding:'18px 24px',
+                    background:'transparent',border:'none',cursor:'pointer',textAlign:'left',color:'inherit',
+                  }}>
+                    <div style={{flex:1,minWidth:0}}>
+                      <div style={{fontFamily:FO,fontWeight:900,fontSize:22,color:'#f0e8e8',letterSpacing:.5}}>{dateLong}</div>
+                      <div style={{fontFamily:FHUD,fontWeight:600,fontSize:10.5,letterSpacing:1.5,color:'#907070',textTransform:'uppercase',marginTop:3}}>
+                        {weekday} · {ranked.length} cart{ranked.length===1?'a':'as'}{topPlayer && top ? ` · top: ${topPlayer.nick} (${top.overall})` : ''}
+                      </div>
                     </div>
-                  </div>
-                  <div style={{fontFamily:FHUD,fontWeight:700,fontSize:18,color:R,transform:isOpen?'rotate(90deg)':'none',transition:'transform .2s'}}>▸</div>
-                </button>
+                    <div style={{fontFamily:FHUD,fontWeight:700,fontSize:18,color:R,transform:isOpen?'rotate(90deg)':'none',transition:'transform .2s'}}>▸</div>
+                  </button>
+                  {onDelete && (
+                    <button onClick={()=>handleDelete(s)} title="Apagar sessão" style={{
+                      background:'rgba(255,80,80,0.08)',border:'1px solid rgba(255,80,80,0.25)',
+                      borderRadius:8,padding:'10px 14px',marginRight:18,cursor:'pointer',
+                      fontSize:16,color:'#ff7755',transition:'all .15s',
+                    }}
+                      onMouseEnter={e=>{e.currentTarget.style.background='rgba(255,80,80,0.18)';e.currentTarget.style.borderColor='rgba(255,80,80,0.5)';}}
+                      onMouseLeave={e=>{e.currentTarget.style.background='rgba(255,80,80,0.08)';e.currentTarget.style.borderColor='rgba(255,80,80,0.25)';}}>
+                      🗑️
+                    </button>
+                  )}
+                </div>
                 {isOpen && (
                   <div style={{padding:'0 24px 26px'}}>
                     <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(220px,1fr))',gap:18,justifyItems:'center',paddingTop:6}}>
@@ -2186,7 +2206,7 @@ export default function App() {
           {tab==='players' && <PlayersTab players={players} setPlayers={sp} apiKey={apiKey}/>}
           {tab==='attrs'   && <AttrsTab   attrs={attrs} setAttrs={sa}/>}
           {tab==='sunday'  && <SundayTab  players={players} attrs={attrs} sessions={sessions} setSessions={ss}/>}
-          {tab==='history' && <HistoryTab sessions={sessions} players={players} attrs={attrs}/>}
+          {tab==='history' && <HistoryTab sessions={sessions} players={players} attrs={attrs} onDelete={id => ss(sessions.filter(s => s.id !== id))}/>}
           {tab==='config'  && <ConfigTab  apiKey={apiKey} setApiKey={sk} onLogout={logout}/>}
         </div>
       </div>
