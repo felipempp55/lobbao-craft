@@ -260,9 +260,11 @@ const TopChevron = ({ S=1 }) => (
 );
 const GoldFramework = ({ S=1, sz=140 }) => {
   const W=sz*S, H=sz*1.1*S;
+  const fade='linear-gradient(to bottom, #000 0%, #000 42%, rgba(0,0,0,0.25) 78%, transparent 100%)';
   return (
-    <div style={{position:'absolute',top:'13%',left:'50%',transform:'translateX(-50%)',
-      width:W,height:H,pointerEvents:'none'}}>
+    <div style={{position:'absolute',top:'10%',left:'50%',transform:'translateX(-50%)',
+      width:W,height:H,pointerEvents:'none',
+      maskImage:fade,WebkitMaskImage:fade}}>
       <div style={{position:'absolute',top:'22%',left:'22%',width:'56%',height:'56%',
         background:`linear-gradient(135deg,rgba(255,235,150,0.22),rgba(40,28,8,0.55))`,
         clipPath:'polygon(50% 0, 100% 50%, 50% 100%, 0 50%)',
@@ -384,12 +386,12 @@ const GoatCard = ({ player, card, attrs, scale=1 }) => {
           <div style={{fontFamily:FO,fontWeight:900,fontSize:23*S,color:'#fff',textAlign:'center',
             letterSpacing:1.5*S,textShadow:`0 2px 10px ${G_GOLD.mid}88`}}>{player.nick||'???'}</div>
           {/* FL1IP logo destacada entre o nome e os stats */}
-          <div style={{display:'flex',alignItems:'center',gap:10*S,margin:`${6*S}px 0 ${4*S}px`}}>
-            <div style={{flex:1,height:1,background:`linear-gradient(90deg,transparent,${G_GOLD.mid}88)`}}/>
-            <img src="/logo.png" alt="" style={{height:30*S,opacity:.95,display:'block',
-              filter:`drop-shadow(0 0 10px ${G_GOLD.hi}bb)`}}
+          <div style={{display:'flex',alignItems:'center',gap:10*S,margin:`${4*S}px 0 ${2*S}px`}}>
+            <div style={{flex:1,height:1,background:`linear-gradient(90deg,transparent,${G_GOLD.mid}77)`}}/>
+            <img src="/logo.png" alt="" style={{height:46*S,opacity:.96,display:'block',
+              filter:`drop-shadow(0 0 14px ${G_GOLD.hi}cc)`}}
               onError={e=>{e.target.style.display='none'}}/>
-            <div style={{flex:1,height:1,background:`linear-gradient(90deg,${G_GOLD.mid}88,transparent)`}}/>
+            <div style={{flex:1,height:1,background:`linear-gradient(90deg,${G_GOLD.mid}77,transparent)`}}/>
           </div>
           <div style={{display:'grid',gridTemplateColumns:'repeat(6,1fr)',gap:2*S}}>
             {sa.map((a,i)=>(
@@ -438,7 +440,7 @@ const TotwCard = ({ player, card, attrs, scale=1 }) => {
         <div style={{position:'absolute',inset:0,
           background:`radial-gradient(60% 40% at 50% 28%,${t.glow}33,transparent 60%)`,
           mixBlendMode:'screen'}}/>
-        <GoldFramework S={S} sz={130}/>
+        <GoldFramework S={S} sz={115}/>
         {v2Sparkles.map(([x,y],i)=>(
           <div key={`sp${i}`} className="lbc-spark2" style={{position:'absolute',left:`${x}%`,top:`${y}%`,
             width:3*S,height:3*S,background:G_GOLD.hi,borderRadius:'50%',
@@ -482,12 +484,12 @@ const TotwCard = ({ player, card, attrs, scale=1 }) => {
           <div style={{fontFamily:FO,fontWeight:900,fontSize:23*S,color:'#fff',textAlign:'center',
             letterSpacing:1.5*S,textShadow:`0 2px 10px ${t.glow}88`}}>{player.nick||'???'}</div>
           {/* FL1IP logo destacada entre o nome e os stats */}
-          <div style={{display:'flex',alignItems:'center',gap:10*S,margin:`${6*S}px 0 ${4*S}px`}}>
-            <div style={{flex:1,height:1,background:`linear-gradient(90deg,transparent,${G_GOLD.mid}88)`}}/>
-            <img src="/logo.png" alt="" style={{height:30*S,opacity:.95,display:'block',
-              filter:`drop-shadow(0 0 10px ${t.glow}bb)`}}
+          <div style={{display:'flex',alignItems:'center',gap:10*S,margin:`${4*S}px 0 ${2*S}px`}}>
+            <div style={{flex:1,height:1,background:`linear-gradient(90deg,transparent,${G_GOLD.mid}77)`}}/>
+            <img src="/logo.png" alt="" style={{height:46*S,opacity:.96,display:'block',
+              filter:`drop-shadow(0 0 14px ${t.glow}cc)`}}
               onError={e=>{e.target.style.display='none'}}/>
-            <div style={{flex:1,height:1,background:`linear-gradient(90deg,${G_GOLD.mid}88,transparent)`}}/>
+            <div style={{flex:1,height:1,background:`linear-gradient(90deg,${G_GOLD.mid}77,transparent)`}}/>
           </div>
           <div style={{display:'grid',gridTemplateColumns:'repeat(6,1fr)',gap:2*S}}>
             {sa.map((a,i)=>(
