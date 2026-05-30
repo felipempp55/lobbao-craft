@@ -454,12 +454,15 @@ const GoatCard = ({ player, card, attrs, scale=1 }) => {
         <TagIcons tags={card?.tags} lvl={4} S={S} cardH={H-17*S} areaTop={100} areaBot={150} leftPx={14}/>
         {/* photo — solid top, dissolves into the footer at the bottom */}
         <div style={{position:'absolute',top:'14%',left:0,right:0,bottom:'18%',overflow:'hidden'}}>
+          {/* radial glow backdrop — brilho "no ar" em volta, sem traçar a silhueta */}
+          <div style={{position:'absolute',inset:0,pointerEvents:'none',
+            background:`radial-gradient(55% 65% at 50% 58%, ${G_GOLD.mid}3a, ${G_GOLD.mid}14 45%, transparent 78%)`,
+            filter:'blur(10px)'}}/>
           {(player.photoClean||player.photo) ?
             <img src={player.photoClean||player.photo} alt="" style={{position:'absolute',bottom:0,left:'50%',
               transform:'translateX(-50%)',height:'100%',objectFit:'contain',objectPosition:'center bottom',
               maskImage:'linear-gradient(to bottom, #000 0%, #000 75%, transparent 100%)',
-              WebkitMaskImage:'linear-gradient(to bottom, #000 0%, #000 75%, transparent 100%)',
-              filter:`drop-shadow(0 0 6px ${G_GOLD.mid}22)`}}/> :
+              WebkitMaskImage:'linear-gradient(to bottom, #000 0%, #000 75%, transparent 100%)'}}/> :
             <div style={{position:'absolute',inset:0,display:'flex',alignItems:'center',justifyContent:'center',
               fontFamily:FO,fontWeight:900,fontSize:80*S,color:'rgba(255,255,255,0.045)'}}>{(player.nick||'').slice(0,2)}</div>
           }
@@ -556,12 +559,15 @@ const TotwCard = ({ player, card, attrs, scale=1 }) => {
         <TagIcons tags={card?.tags} lvl={3} S={S} cardH={H-11*S} areaTop={95} areaBot={140} leftPx={14}/>
         {/* photo — extends to the footer, top + bottom mask fade so it rises from below */}
         <div style={{position:'absolute',top:'14%',left:0,right:0,bottom:'18%',overflow:'hidden'}}>
+          {/* radial glow backdrop — brilho "no ar" em volta, sem traçar a silhueta */}
+          <div style={{position:'absolute',inset:0,pointerEvents:'none',
+            background:`radial-gradient(55% 65% at 50% 58%, ${t.glow}3a, ${t.glow}14 45%, transparent 78%)`,
+            filter:'blur(10px)'}}/>
           {(player.photoClean||player.photo) ?
             <img src={player.photoClean||player.photo} alt="" style={{position:'absolute',bottom:0,left:'50%',
               transform:'translateX(-50%)',height:'100%',objectFit:'contain',objectPosition:'center bottom',
               maskImage:'linear-gradient(to bottom, #000 0%, #000 75%, transparent 100%)',
-              WebkitMaskImage:'linear-gradient(to bottom, #000 0%, #000 75%, transparent 100%)',
-              filter:`drop-shadow(0 -4px 18px ${t.glow}55)`}}/> :
+              WebkitMaskImage:'linear-gradient(to bottom, #000 0%, #000 75%, transparent 100%)'}}/> :
             <div style={{position:'absolute',inset:0,display:'flex',alignItems:'center',justifyContent:'center',
               fontFamily:FO,fontWeight:900,fontSize:80*S,color:'rgba(255,255,255,0.045)'}}>{(player.nick||'').slice(0,2)}</div>
           }
