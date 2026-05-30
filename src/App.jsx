@@ -11,7 +11,7 @@ const TIERS = [
   { name:'Bagre',          min:60, max:69, lbl:'BAGRE',
     bg:'linear-gradient(170deg,#060a10 0%,#0f1e30 30%,#162840 55%,#0f1e30 80%,#060a10 100%)',
     brd:'#5588aa',glow:'#6699bb',txt:'#99bbcc',score:'#c0dde8',pat:'rgba(80,130,170,0.05)' },
-  { name:'Bom de jogo',    min:70, max:79, lbl:'BOM DE JOGO',
+  { name:'Bom Player',     min:70, max:79, lbl:'BOM PLAYER',
     bg:'linear-gradient(170deg,#021206 0%,#082210 30%,#0d3016 55%,#082210 80%,#021206 100%)',
     brd:'#33bb55',glow:'#44cc66',txt:'#88ffaa',score:'#ccffdd',pat:'rgba(50,200,80,0.05)' },
   { name:'Dream Lobby',    min:80, max:90, lbl:'DREAM LOBBY',
@@ -101,6 +101,9 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:15px;heigh
 .twk-field{appearance:none;box-sizing:border-box;width:100%;min-width:0;height:26px;padding:0 8px;border:.5px solid rgba(0,0,0,.1);border-radius:7px;background:rgba(255,255,255,.6);color:inherit;font:inherit;outline:none}
 .twk-field:focus{border-color:rgba(0,0,0,.25);background:rgba(255,255,255,.85)}
 /* ── atmosphere: vibe ── */
+.lbc-vibe-overlay{background:transparent;transition:background .6s ease}
+[data-vibe="estadio"] .lbc-vibe-overlay{background:radial-gradient(70% 50% at 60% 18%,rgba(255,215,0,0.10),transparent 60%)}
+[data-vibe="tatico"]  .lbc-vibe-overlay{background:linear-gradient(180deg,rgba(0,200,230,0.05),transparent 45%)}
 [data-vibe="estadio"] .lbc-page-bg{background:radial-gradient(120% 80% at 50% -10%,#1a2a78,#050a30 55%,#00041e 100%)!important}
 [data-vibe="estadio"] header>div:first-child{background:linear-gradient(180deg,#06122c,#0a1c52 55%,#06122c)!important}
 [data-vibe="estadio"] .lbc-hdr-line{background:linear-gradient(90deg,transparent,#ffd700 30%,#ffeeb0 50%,#ffd700 70%,transparent)!important;background-size:200% 100%!important}
@@ -179,7 +182,7 @@ const SectionLabel = ({ children, color='#c09090' }) => (
   <div style={{fontSize:10.5,fontWeight:700,letterSpacing:2.5,color,textTransform:'uppercase',fontFamily:F,marginBottom:12}}>{children}</div>
 );
 // ═══ SHIELD CARDS (GOAT + DREAM LOBBY) ══════════════════════
-const TIER_LEVEL = {'Melhor Freezar':0,'Bagre':1,'Bom de jogo':2,'Dream Lobby':3,'GOAT':4};
+const TIER_LEVEL = {'Melhor Freezar':0,'Bagre':1,'Bom Player':2,'Dream Lobby':3,'GOAT':4};
 const G_GOLD = { hi:'#ffeeb0', mid:'#ffd700', lo:'#9c7220', deep:'#6b4a10' };
 const NAVY   = { c0:'#00041e', c1:'#0c1d68', c2:'#040933' };
 const SHIELD = 'polygon(47% 1%, 50% 4.2%, 53% 1%, 91% 3%, 100% 11%, 100% 86%, 86% 100%, 14% 100%, 0 86%, 0 11%, 9% 3%)';
@@ -771,7 +774,7 @@ const PlayerCard = ({ player, card, attrs, scale=1, reveal=false }) => {
           // lvl 1 — Bagre (azul-cinza)
           { bg:'linear-gradient(135deg, rgba(170,195,225,0.95) 0%, rgba(115,145,185,0.95) 100%)',
             inner:'rgba(255,255,255,0.55)', iconFilter:`drop-shadow(0 ${1*S}px ${2*S}px rgba(0,0,0,0.45))` },
-          // lvl 2 — Bom de jogo (verde)
+          // lvl 2 — Bom Player (verde)
           { bg:'linear-gradient(135deg, rgba(110,205,140,0.95) 0%, rgba(55,150,90,0.95) 100%)',
             inner:'rgba(220,255,225,0.55)', iconFilter:`drop-shadow(0 ${1*S}px ${2*S}px rgba(0,0,0,0.45))` },
           // lvl 3 — Dream Lobby (preto + ícone dourado)
@@ -1831,11 +1834,13 @@ export default function App() {
         <div className="lbc-smoke" style={{position:'absolute',inset:0,
           backgroundImage:'url(/smoke-red.png)',backgroundSize:'80%',backgroundPosition:'30% 20%',
           opacity:.32,mixBlendMode:'screen'}}/>
-        <div style={{position:'absolute',inset:0,
+        <div className="lbc-smoke" style={{position:'absolute',inset:0,
           backgroundImage:'url(/smoke-red.png)',backgroundSize:'120%',backgroundPosition:'70% 80%',
-          opacity:.22,mixBlendMode:'screen'}}/>
+          opacity:.22,mixBlendMode:'screen',animationDelay:'-7s'}}/>
         <div style={{position:'absolute',left:0,bottom:0,width:'40%',height:'40%',
           background:'radial-gradient(circle at 0% 100%,rgba(0,180,220,0.06),transparent 60%)'}}/>
+        {/* vibe accent overlay — driven by [data-vibe] CSS */}
+        <div className="lbc-vibe-overlay" style={{position:'absolute',inset:0,mixBlendMode:'screen',pointerEvents:'none'}}/>
       </div>
       {/* ── Header ── */}
       <header style={{position:'relative',overflow:'hidden',borderBottom:'1px solid rgba(255,255,255,0.07)',zIndex:10,flexShrink:0}}>
@@ -1843,10 +1848,16 @@ export default function App() {
         <div className="lbc-smoke" style={{position:'absolute',inset:0,
           backgroundImage:'url(/smoke-red.png)',backgroundSize:'60%',backgroundPosition:'10% 20%',
           opacity:.5,mixBlendMode:'screen'}}/>
+        <div style={{position:'absolute',inset:0,
+          backgroundImage:'url(/smoke-red.png)',backgroundSize:'100%',backgroundPosition:'80% 80%',
+          opacity:.35,mixBlendMode:'screen'}}/>
         <div style={{position:'absolute',top:-60,right:-60,width:280,height:280,
           background:'radial-gradient(circle,rgba(204,17,17,0.35),transparent 70%)',pointerEvents:'none'}}/>
         <img src="/paint-swoosh.png" alt="" style={{position:'absolute',top:-20,right:-60,width:360,
           transform:'rotate(8deg)',opacity:.10,pointerEvents:'none'}}
+          onError={e=>{e.target.style.display='none'}}/>
+        <img src="/paint-swoosh.png" alt="" style={{position:'absolute',bottom:-40,left:-40,width:240,
+          transform:'rotate(-12deg) scaleX(-1)',opacity:.08,pointerEvents:'none'}}
           onError={e=>{e.target.style.display='none'}}/>
         <div style={{position:'relative',display:'flex',alignItems:'center',gap:20,padding:'14px 24px'}}>
           <img src="/logo.png" alt="FL1IP" style={{height:48,filter:`drop-shadow(0 0 12px ${R}bb)`}}
@@ -1856,7 +1867,7 @@ export default function App() {
               background:`linear-gradient(90deg,${R},#ff6644 45%,#ffffff)`,
               WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent'}}>LOBBÃO CRAFT</div>
             <div style={{fontFamily:FHUD,fontWeight:500,fontSize:10,letterSpacing:3,color:'rgba(255,255,255,0.45)',marginTop:3}}>
-              RANKING SEMANAL · CS2
+              RANKING SEMANAL · CS2 · LIVE TODOS OS DIAS ÀS 20H
             </div>
           </div>
           <button onClick={logout} style={{
