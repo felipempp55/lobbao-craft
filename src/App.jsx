@@ -431,25 +431,31 @@ const TotwCard = ({ player, card, attrs, scale=1 }) => {
             boxShadow:`0 0 4px ${t.glow}`,
             animationDelay:`${(i*0.13)%2}s`}}/>
         ))}
-        {/* photo */}
-        <div style={{position:'absolute',top:'9%',left:0,right:0,height:'58%',overflow:'hidden'}}>
+        {/* photo — extends to the footer, top + bottom mask fade so it rises from below */}
+        <div style={{position:'absolute',top:'14%',left:0,right:0,bottom:'18%',overflow:'hidden'}}>
           {(player.photoClean||player.photo) ?
             <img src={player.photoClean||player.photo} alt="" style={{position:'absolute',bottom:0,left:'50%',
-              transform:'translateX(-50%)',height:'100%',objectFit:'contain',
-              filter:`drop-shadow(0 -4px 16px ${t.glow}55)`}}/> :
+              transform:'translateX(-50%)',height:'100%',objectFit:'contain',objectPosition:'center bottom',
+              maskImage:'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.35) 6%, #000 22%, #000 78%, transparent 100%)',
+              WebkitMaskImage:'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.35) 6%, #000 22%, #000 78%, transparent 100%)',
+              filter:`drop-shadow(0 -4px 18px ${t.glow}55)`}}/> :
             <div style={{position:'absolute',inset:0,display:'flex',alignItems:'center',justifyContent:'center',
               fontFamily:FO,fontWeight:900,fontSize:80*S,color:'rgba(255,255,255,0.045)'}}>{(player.nick||'').slice(0,2)}</div>
           }
         </div>
-        <div style={{position:'absolute',bottom:0,left:0,right:0,height:'42%',
-          background:`linear-gradient(to top,#000 38%,transparent)`}}/>
+        {/* dark footer fade — stronger black floor so the photo dissolves into it */}
+        <div style={{position:'absolute',bottom:0,left:0,right:0,height:'38%',
+          background:`linear-gradient(to top,#000 52%,rgba(0,0,0,0.55) 78%,transparent)`}}/>
         {/* header */}
         <div style={{position:'absolute',top:22*S,left:24*S,lineHeight:.82,zIndex:5}}>
           <div style={{fontFamily:FO,fontWeight:900,fontSize:50*S,color:'#fff',
             textShadow:`0 2px 12px ${t.glow}99`,letterSpacing:-1}}>{card?.overall??0}</div>
-          <div style={{fontFamily:FHUD,fontWeight:700,fontSize:9*S,letterSpacing:2.4*S,color:t.score,
-            marginTop:4*S,textTransform:'uppercase',whiteSpace:'nowrap'}}>DREAM LOBBY</div>
-          <img src="/logo.png" alt="" style={{width:42*S,marginTop:6*S,opacity:.9,
+          <div style={{fontFamily:FHUD,fontWeight:700,fontSize:10*S,letterSpacing:2.4*S,color:t.score,
+            marginTop:5*S,textTransform:'uppercase',lineHeight:1.1}}>
+            <div>DREAM</div>
+            <div>LOBBY</div>
+          </div>
+          <img src="/logo.png" alt="" style={{width:42*S,marginTop:8*S,opacity:.9,
             filter:`drop-shadow(0 0 6px ${t.glow}99)`}}
             onError={e=>{e.target.style.display='none'}}/>
         </div>
