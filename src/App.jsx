@@ -177,22 +177,6 @@ const NAVY   = { c0:'#00041e', c1:'#0c1d68', c2:'#040933' };
 const SHIELD = 'polygon(47% 1%, 50% 4.2%, 53% 1%, 91% 3%, 100% 11%, 100% 86%, 86% 100%, 14% 100%, 0 86%, 0 11%, 9% 3%)';
 
 // ── helpers ──
-const CrystalFan = ({ cx, cy, count=12, a0=180, a1=360, rMin=50, rMax=130, thin, S=1, op=1 }) => {
-  const out = [];
-  for(let i=0;i<count;i++){
-    const t=count>1?i/(count-1):0;
-    const a=a0+(a1-a0)*t;
-    const len=rMin+(rMax-rMin)*(0.45+0.55*Math.abs(Math.sin(i*1.7+0.5)));
-    const w=thin?2.5:3+Math.abs(Math.sin(i*0.9))*2.5;
-    const o=op*(0.55+0.4*Math.abs(Math.sin(i*0.83+0.3)));
-    out.push(<div key={i} style={{position:'absolute',left:cx,top:cy,width:w*S,height:len*S,
-      transform:`translateX(-50%) rotate(${a}deg)`,transformOrigin:'50% 0',
-      background:`linear-gradient(180deg,${G_GOLD.hi},${G_GOLD.mid} 40%,${G_GOLD.lo})`,
-      clipPath:'polygon(50% 0, 100% 50%, 50% 100%, 0 50%)',
-      boxShadow:`0 0 5px ${G_GOLD.mid}aa`,opacity:o}}/>);
-  }
-  return out;
-};
 const ConfettiRain = ({ count=20, side='left', S=1, slow }) => {
   const out=[];
   const xR=side==='left'?[4,42]:side==='right'?[58,96]:[4,96];
@@ -375,15 +359,32 @@ const GoatCard = ({ player, card, attrs, scale=1 }) => {
       <div style={{position:'absolute',inset:8.5*S,clipPath:SHIELD,overflow:'hidden',background:navyBg}}>
         <div style={{position:'absolute',inset:0,
           background:`radial-gradient(70% 55% at 50% 28%,${G_GOLD.mid}3a,transparent 60%)`}}/>
-        {/* ── Camada A: feixes diagonais de fundo (background panels) ── */}
-        <div style={{position:'absolute',top:'12%',left:'-6%',
-          width:48*S,height:240*S,transform:'rotate(-22deg)',
-          background:`linear-gradient(180deg,${G_GOLD.mid}66 0%,${G_GOLD.deep}44 50%,transparent 100%)`,
-          borderRight:`1px solid ${G_GOLD.hi}55`,opacity:.28,filter:'blur(0.5px)'}}/>
-        <div style={{position:'absolute',top:'38%',right:'-8%',
-          width:44*S,height:230*S,transform:'rotate(20deg)',
-          background:`linear-gradient(180deg,${G_GOLD.mid}66 0%,${G_GOLD.deep}44 50%,transparent 100%)`,
-          borderLeft:`1px solid ${G_GOLD.hi}55`,opacity:.22,filter:'blur(0.5px)'}}/>
+        {/* ── Camada A: cluster de feixes dourados — tamanhos/rotações/posições aleatórias ── */}
+        {[
+          // big edge beams
+          {pos:{top:'12%', left:'-8%' }, w:52, h:260, rot:-26, op:.34, dir:180},
+          {pos:{top:'36%', right:'-10%'},w:48, h:240, rot: 24, op:.30, dir:180},
+          // medium interior beams
+          {pos:{top:'4%',  left:'28%' }, w:34, h:180, rot:-16, op:.24, dir:180},
+          {pos:{top:'46%', left:'46%' }, w:38, h:200, rot: 32, op:.26, dir:180},
+          {pos:{top:'16%', right:'18%'}, w:30, h:160, rot:-38, op:.22, dir:0  },
+          {pos:{top:'58%', left:'6%'  }, w:36, h:170, rot: 14, op:.24, dir:180},
+          // shorter accents
+          {pos:{top:'24%', left:'22%' }, w:24, h:120, rot: 44, op:.20, dir:180},
+          {pos:{top:'70%', left:'58%' }, w:28, h:140, rot:-20, op:.22, dir:0  },
+          {pos:{top:'6%',  left:'56%' }, w:26, h:110, rot:- 8, op:.18, dir:180},
+          {pos:{top:'62%', right:'28%'}, w:30, h:150, rot: 36, op:.22, dir:180},
+          {pos:{top:'72%', left:'28%' }, w:22, h:100, rot:-28, op:.18, dir:0  },
+          {pos:{top:'14%', left:'46%' }, w:20, h: 90, rot: 18, op:.16, dir:180},
+        ].map((r,i)=>(
+          <div key={`ba${i}`} style={{
+            position:'absolute', ...r.pos,
+            width:r.w*S, height:r.h*S, transform:`rotate(${r.rot}deg)`,
+            background:`linear-gradient(${r.dir}deg, ${G_GOLD.mid}66 0%, ${G_GOLD.deep}44 50%, transparent 100%)`,
+            border:`1px solid ${G_GOLD.hi}55`, borderTop:'none', borderBottom:'none',
+            opacity:r.op, filter:'blur(0.5px)',
+          }}/>
+        ))}
 
         {/* ── Camada B: diamantes médios preenchidos com gradient (TOTY shards) ── */}
         {[
@@ -428,14 +429,11 @@ const GoatCard = ({ player, card, attrs, scale=1 }) => {
         <TopChevron S={S}/>
       </div>
 
-      {/* ── Crystal fan — spills over border, painted ABOVE bg/decoratives ── */}
-      <CrystalFan cx="86%" cy="20%" count={18} a0={50} a1={270} rMin={40} rMax={110} thin S={S} op={0.92}/>
-
-      {/* ── Top layer: photo (over fan) + fades + header + footer, clipped to inner shield ── */}
+      {/* ── Top layer: photo + fades + header + footer, clipped to inner shield ── */}
       <div style={{position:'absolute',inset:8.5*S,clipPath:SHIELD,overflow:'hidden',pointerEvents:'none'}}>
         {/* tag icons — coluna esquerda */}
         <TagIcons tags={card?.tags} lvl={4} S={S} cardH={H-17*S} areaTop={100} areaBot={150} leftPx={14}/>
-        {/* photo — rises from below with mask fade at top & bottom (covers the fan rays) */}
+        {/* photo — solid top, dissolves into the footer at the bottom */}
         <div style={{position:'absolute',top:'14%',left:0,right:0,bottom:'18%',overflow:'hidden'}}>
           {(player.photoClean||player.photo) ?
             <img src={player.photoClean||player.photo} alt="" style={{position:'absolute',bottom:0,left:'50%',
