@@ -375,33 +375,53 @@ const GoatCard = ({ player, card, attrs, scale=1 }) => {
       <div style={{position:'absolute',inset:8.5*S,clipPath:SHIELD,overflow:'hidden',background:navyBg}}>
         <div style={{position:'absolute',inset:0,
           background:`radial-gradient(70% 55% at 50% 28%,${G_GOLD.mid}3a,transparent 60%)`}}/>
-        {/* gold shards espalhados — adiciona presença dourada além do leque */}
+        {/* ── Camada A: feixes diagonais de fundo (background panels) ── */}
+        <div style={{position:'absolute',top:'12%',left:'-6%',
+          width:48*S,height:240*S,transform:'rotate(-22deg)',
+          background:`linear-gradient(180deg,${G_GOLD.mid}66 0%,${G_GOLD.deep}44 50%,transparent 100%)`,
+          borderRight:`1px solid ${G_GOLD.hi}55`,opacity:.28,filter:'blur(0.5px)'}}/>
+        <div style={{position:'absolute',top:'38%',right:'-8%',
+          width:44*S,height:230*S,transform:'rotate(20deg)',
+          background:`linear-gradient(180deg,${G_GOLD.mid}66 0%,${G_GOLD.deep}44 50%,transparent 100%)`,
+          borderLeft:`1px solid ${G_GOLD.hi}55`,opacity:.22,filter:'blur(0.5px)'}}/>
+
+        {/* ── Camada B: diamantes médios preenchidos com gradient (TOTY shards) ── */}
         {[
-          {left:'6%',  top:'12%', w:32,h:40, rot: 10, op:.22},
-          {left:'4%',  top:'52%', w:28,h:34, rot:-14, op:.18},
-          {left:'78%', top:'70%', w:34,h:42, rot: 8,  op:.22},
-          {left:'38%', top:'80%', w:26,h:32, rot:-6,  op:.18},
+          {left:'8%',  top:'18%', w:42, h:54, rot: 14, op:.45},
+          {left:'72%', top:'62%', w:46, h:58, rot:-12, op:.48},
+          {left:'4%',  top:'58%', w:32, h:42, rot:-22, op:.36},
+          {left:'34%', top:'82%', w:30, h:38, rot:  8, op:.34},
+          {left:'78%', top:'80%', w:26, h:34, rot: 20, op:.32},
         ].map((p,i)=>(
-          <div key={`gs${i}`} style={{position:'absolute',left:p.left,top:p.top,
-            width:p.w*S,height:p.h*S,transform:`rotate(${p.rot}deg)`,
-            background:`linear-gradient(135deg,${G_GOLD.mid}88,${G_GOLD.deep}55)`,
+          <div key={`mfd${i}`} style={{
+            position:'absolute', left:p.left, top:p.top,
+            width:p.w*S, height:p.h*S, transform:`rotate(${p.rot}deg)`,
+            background:`linear-gradient(135deg,${G_GOLD.hi}dd 0%,${G_GOLD.mid}aa 35%,${G_GOLD.deep}66 75%,transparent 100%)`,
             clipPath:'polygon(20% 0, 100% 25%, 80% 100%, 0 70%)',
-            opacity:p.op,border:`1px solid ${G_GOLD.mid}aa`,
-            boxShadow:`0 0 8px ${G_GOLD.mid}66`}}/>
+            border:`1px solid ${G_GOLD.mid}cc`, opacity:p.op,
+            boxShadow:`0 0 ${p.w*0.3*S}px ${G_GOLD.mid}77, inset 0 0 ${p.w*0.2*S}px ${G_GOLD.hi}55`,
+          }}/>
         ))}
-        {/* mini gold framework no lado esquerdo — contrabalança o leque da direita */}
-        <div style={{position:'absolute',top:'34%',left:'14%',
-          width:78*S,height:85*S,pointerEvents:'none'}}>
-          <div style={{position:'absolute',top:'4%',left:'4%',width:'92%',height:'92%',
-            border:`1.5px solid ${G_GOLD.mid}`,transform:'rotate(45deg)',
-            boxShadow:`0 0 10px ${G_GOLD.mid}77`,opacity:.75}}/>
-          {[[50,0],[100,50],[50,100],[0,50]].map(([x,y],i)=>(
-            <div key={`mfd${i}`} style={{position:'absolute',left:`${x}%`,top:`${y}%`,
-              width:5*S,height:5*S,background:G_GOLD.hi,borderRadius:'50%',
-              transform:'translate(-50%,-50%)',
-              boxShadow:`0 0 7px ${G_GOLD.mid},0 0 3px ${G_GOLD.hi}`}}/>
-          ))}
-        </div>
+
+        {/* ── Camada C: gems pequenas brilhantes ── */}
+        {[
+          {left:'22%', top:'8%',  s:7,  op:.75},
+          {left:'58%', top:'10%', s:6,  op:.65},
+          {left:'40%', top:'14%', s:7,  op:.70},
+          {left:'14%', top:'48%', s:6,  op:.60},
+          {left:'18%', top:'76%', s:7,  op:.65},
+          {left:'52%', top:'92%', s:5,  op:.55},
+          {left:'88%', top:'88%', s:6,  op:.60},
+          {left:'30%', top:'30%', s:5,  op:.50},
+        ].map((p,i)=>(
+          <div key={`gg${i}`} style={{
+            position:'absolute', left:p.left, top:p.top,
+            width:p.s*S, height:p.s*S, transform:'rotate(45deg)',
+            background:`linear-gradient(135deg,${G_GOLD.hi},${G_GOLD.mid} 60%,${G_GOLD.deep})`,
+            border:`0.5px solid ${G_GOLD.hi}cc`, opacity:p.op,
+            boxShadow:`0 0 ${p.s*1.5*S}px ${G_GOLD.mid}99, 0 0 ${p.s*3*S}px ${G_GOLD.mid}44`,
+          }}/>
+        ))}
         <ConfettiRain count={30} side="even" S={S} slow/>
         <ShieldSparkles count={32} S={S}/>
         <ShieldCorners S={S}/>
