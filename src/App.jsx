@@ -445,8 +445,8 @@ const GoatCard = ({ player, card, attrs, scale=1 }) => {
         <TopChevron S={S}/>
       </div>
 
-      {/* ── Leque dourado sutil no canto superior direito — vaza pra fora da carta ── */}
-      <CrystalFan cx="86%" cy="20%" count={16} a0={50} a1={260} rMin={35} rMax={95} thin S={S} op={0.45}/>
+      {/* ── Leque dourado sutil no canto superior direito — só pra cima e pra direita ── */}
+      <CrystalFan cx="86%" cy="20%" count={9} a0={170} a1={278} rMin={35} rMax={95} thin S={S} op={0.45}/>
 
       {/* ── Top layer: photo + fades + header + footer, clipped to inner shield ── */}
       <div style={{position:'absolute',inset:8.5*S,clipPath:SHIELD,overflow:'hidden',pointerEvents:'none'}}>
@@ -459,7 +459,7 @@ const GoatCard = ({ player, card, attrs, scale=1 }) => {
               transform:'translateX(-50%)',height:'100%',objectFit:'contain',objectPosition:'center bottom',
               maskImage:'linear-gradient(to bottom, #000 0%, #000 75%, transparent 100%)',
               WebkitMaskImage:'linear-gradient(to bottom, #000 0%, #000 75%, transparent 100%)',
-              filter:`drop-shadow(0 -4px 22px ${G_GOLD.mid}66)`}}/> :
+              filter:`drop-shadow(0 0 14px ${G_GOLD.mid}44)`}}/> :
             <div style={{position:'absolute',inset:0,display:'flex',alignItems:'center',justifyContent:'center',
               fontFamily:FO,fontWeight:900,fontSize:80*S,color:'rgba(255,255,255,0.045)'}}>{(player.nick||'').slice(0,2)}</div>
           }
