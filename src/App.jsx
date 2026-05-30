@@ -304,6 +304,55 @@ const ShieldFrameThin = ({ S=1, bg, children }) => (
   </>
 );
 
+// ── tag icons (FIFA Playstyle losangos) — usado em PlayerCard, TotwCard e GoatCard ──
+const TAG_ICONS = [
+  {id:'baiter',    img:'/isca.png',       label:'Baiter',       color:'#ff4444', brd:'#cc2222'},
+  {id:'tiltado',   img:'/bravo.png',      label:'Tiltado',      color:'#ff7700', brd:'#cc4400'},
+  {id:'mutadinho', img:'/opcao-mute.png', label:'Mutado',       color:'#99aacc', brd:'#6677aa'},
+  {id:'genteboa',  img:'/meditacao.png',  label:'Good Vibes',   color:'#44ee88', brd:'#22aa55'},
+  {id:'esforçado', img:'/biceps.png',     label:'Esforçado',    color:'#ffd700', brd:'#bb8800'},
+  {id:'deagle',    img:'/revolver.png',   label:'Desert Eagle', color:'#e0a040', brd:'#a06010'},
+];
+const GOLD_ICON_FILTER = 'brightness(0) invert(1) sepia(1) saturate(5.5) hue-rotate(-10deg) brightness(1.05) drop-shadow(0 1px 2px rgba(0,0,0,0.55))';
+const TAG_TIER_STYLES = [
+  // lvl 0 — Melhor Freezar (vermelho)
+  { bg:'linear-gradient(135deg, rgba(200,95,95,0.95) 0%, rgba(140,50,50,0.95) 100%)', inner:'rgba(255,200,200,0.55)', gold:false },
+  // lvl 1 — Bagre (azul-cinza)
+  { bg:'linear-gradient(135deg, rgba(170,195,225,0.95) 0%, rgba(115,145,185,0.95) 100%)', inner:'rgba(255,255,255,0.55)', gold:false },
+  // lvl 2 — Bom Player (verde)
+  { bg:'linear-gradient(135deg, rgba(110,205,140,0.95) 0%, rgba(55,150,90,0.95) 100%)', inner:'rgba(220,255,225,0.55)', gold:false },
+  // lvl 3 — Dream Lobby (preto + ícone dourado)
+  { bg:'linear-gradient(135deg, rgba(35,22,5,0.97) 0%, rgba(8,5,0,0.97) 100%)', inner:'rgba(255,200,80,0.4)', gold:true },
+  // lvl 4 — GOAT (azul + ícone dourado)
+  { bg:'linear-gradient(135deg, rgba(22,55,115,0.97) 0%, rgba(5,18,60,0.97) 100%)', inner:'rgba(180,220,255,0.45)', gold:true },
+];
+const TagIcons = ({ tags, lvl, S=1, cardH, areaTop=95, areaBot=105, leftPx=22 }) => {
+  const active = TAG_ICONS.filter(d => (tags||{})[d.id]);
+  if(!active.length) return null;
+  const ts = TAG_TIER_STYLES[lvl] || TAG_TIER_STYLES[0];
+  const iconFilter = ts.gold ? GOLD_ICON_FILTER : `drop-shadow(0 ${1*S}px ${2*S}px rgba(0,0,0,0.45))`;
+  const sz = 28*S, gap = 10*S;
+  const totalH = active.length * sz + (active.length-1) * gap;
+  const areaH  = cardH - (areaTop+areaBot)*S;
+  const startY = areaTop*S + Math.max(0, (areaH - totalH) / 2);
+  return active.map((d, i) => (
+    <div key={`ti${i}`} style={{
+      position:'absolute', left: leftPx*S, top: startY + i*(sz+gap),
+      width:sz, height:sz, zIndex:6, pointerEvents:'none',
+      transform:'rotate(45deg)',
+      background: ts.bg,
+      border:`${1.5*S}px solid ${d.brd}ee`,
+      display:'flex', alignItems:'center', justifyContent:'center',
+      boxShadow:`0 0 ${13*S}px ${d.color}99, 0 0 ${6*S}px ${d.color}66, inset 0 0 ${4*S}px ${ts.inner}, inset 0 0 ${2*S}px ${d.color}44`,
+    }}>
+      <img src={d.img} alt={d.label} style={{
+        width:sz*0.66, height:sz*0.66, transform:'rotate(-45deg)',
+        objectFit:'contain', filter: iconFilter,
+      }}/>
+    </div>
+  ));
+};
+
 // ── GoatCard ──
 const GoatCard = ({ player, card, attrs, scale=1 }) => {
   const S=scale;
@@ -337,6 +386,8 @@ const GoatCard = ({ player, card, attrs, scale=1 }) => {
 
       {/* ── Top layer: photo (over fan) + fades + header + footer, clipped to inner shield ── */}
       <div style={{position:'absolute',inset:8.5*S,clipPath:SHIELD,overflow:'hidden',pointerEvents:'none'}}>
+        {/* tag icons — coluna esquerda */}
+        <TagIcons tags={card?.tags} lvl={4} S={S} cardH={H-17*S} areaTop={100} areaBot={150} leftPx={14}/>
         {/* photo — rises from below with mask fade at top & bottom (covers the fan rays) */}
         <div style={{position:'absolute',top:'14%',left:0,right:0,bottom:'18%',overflow:'hidden'}}>
           {(player.photoClean||player.photo) ?
@@ -437,6 +488,8 @@ const TotwCard = ({ player, card, attrs, scale=1 }) => {
             boxShadow:`0 0 4px ${t.glow}`,
             animationDelay:`${(i*0.13)%2}s`}}/>
         ))}
+        {/* tag icons — coluna esquerda */}
+        <TagIcons tags={card?.tags} lvl={3} S={S} cardH={H-11*S} areaTop={95} areaBot={140} leftPx={14}/>
         {/* photo — extends to the footer, top + bottom mask fade so it rises from below */}
         <div style={{position:'absolute',top:'14%',left:0,right:0,bottom:'18%',overflow:'hidden'}}>
           {(player.photoClean||player.photo) ?
@@ -767,67 +820,7 @@ const PlayerCard = ({ player, card, attrs, scale=1, reveal=false }) => {
       </>}
 
       {/* ══ TAG ICONS — coluna esquerda, estilo FIFA Playstyle (losango) ══ */}
-      {(() => {
-        const cardTags = card.tags || {};
-        const iconDefs = [
-          {id:'baiter',    img:'/isca.png',       label:'Baiter',       color:'#ff4444', brd:'#cc2222'},
-          {id:'tiltado',   img:'/bravo.png',      label:'Tiltado',      color:'#ff7700', brd:'#cc4400'},
-          {id:'mutadinho', img:'/opcao-mute.png', label:'Mutado',       color:'#99aacc', brd:'#6677aa'},
-          {id:'genteboa',  img:'/meditacao.png',  label:'Good Vibes',   color:'#44ee88', brd:'#22aa55'},
-          {id:'esforçado', img:'/biceps.png',     label:'Esforçado',    color:'#ffd700', brd:'#bb8800'},
-          {id:'deagle',    img:'/revolver.png',   label:'Desert Eagle', color:'#e0a040', brd:'#a06010'},
-        ];
-        const active = iconDefs.filter(d => cardTags[d.id]);
-        if(!active.length) return null;
-        // Estilo por tier — combina com a cor da carta
-        const goldIconFilter = 'brightness(0) invert(1) sepia(1) saturate(5.5) hue-rotate(-10deg) brightness(1.05) drop-shadow(0 1px 2px rgba(0,0,0,0.55))';
-        const tierStyle = [
-          // lvl 0 — Melhor Freezar (vermelho)
-          { bg:'linear-gradient(135deg, rgba(200,95,95,0.95) 0%, rgba(140,50,50,0.95) 100%)',
-            inner:'rgba(255,200,200,0.55)', iconFilter:`drop-shadow(0 ${1*S}px ${2*S}px rgba(0,0,0,0.45))` },
-          // lvl 1 — Bagre (azul-cinza)
-          { bg:'linear-gradient(135deg, rgba(170,195,225,0.95) 0%, rgba(115,145,185,0.95) 100%)',
-            inner:'rgba(255,255,255,0.55)', iconFilter:`drop-shadow(0 ${1*S}px ${2*S}px rgba(0,0,0,0.45))` },
-          // lvl 2 — Bom Player (verde)
-          { bg:'linear-gradient(135deg, rgba(110,205,140,0.95) 0%, rgba(55,150,90,0.95) 100%)',
-            inner:'rgba(220,255,225,0.55)', iconFilter:`drop-shadow(0 ${1*S}px ${2*S}px rgba(0,0,0,0.45))` },
-          // lvl 3 — Dream Lobby (preto + ícone dourado)
-          { bg:'linear-gradient(135deg, rgba(35,22,5,0.97) 0%, rgba(8,5,0,0.97) 100%)',
-            inner:'rgba(255,200,80,0.4)', iconFilter:goldIconFilter },
-          // lvl 4 — GOAT (azul + ícone dourado)
-          { bg:'linear-gradient(135deg, rgba(22,55,115,0.97) 0%, rgba(5,18,60,0.97) 100%)',
-            inner:'rgba(180,220,255,0.45)', iconFilter:goldIconFilter },
-        ][lvl];
-        const sz  = 28*S;          // tamanho do losango
-        const gap = 10*S;          // espaço entre losangos (maior por causa das pontas)
-        const totalH = active.length * sz + (active.length-1) * gap;
-        const areaTop = (isDestaque ? 110 : 95) * S;
-        const areaBot = (isDestaque ? 115 : 105) * S;
-        const areaH   = H - areaTop - areaBot;
-        const startY  = areaTop + Math.max(0, (areaH - totalH) / 2);
-        return active.map((d, i) => (
-          <div key={`ti${i}`} style={{
-            position:'absolute',
-            left: 22*S,
-            top: startY + i*(sz+gap),
-            width:sz, height:sz,
-            zIndex:6, pointerEvents:'none',
-            transform:'rotate(45deg)',
-            background: tierStyle.bg,
-            border:`${1.5*S}px solid ${d.brd}ee`,
-            display:'flex', alignItems:'center', justifyContent:'center',
-            boxShadow:`0 0 ${13*S}px ${d.color}99, 0 0 ${6*S}px ${d.color}66, inset 0 0 ${4*S}px ${tierStyle.inner}, inset 0 0 ${2*S}px ${d.color}44`,
-          }}>
-            <img src={d.img} alt={d.label} style={{
-              width:  sz * 0.66,
-              height: sz * 0.66,
-              transform:'rotate(-45deg)',
-              objectFit:'contain',
-              filter: tierStyle.iconFilter,
-            }}/>
-          </div>
-        ));
-      })()}
+      <TagIcons tags={card.tags} lvl={lvl} S={S} cardH={H} areaTop={isDestaque?110:95} areaBot={isDestaque?115:105}/>
 
       {/* ══ FOTO — wrapper clipa laterais na primeira borda interna (anel em inset:5*S em lvl>=3) ══ */}
       <div style={{
