@@ -904,7 +904,7 @@ const PlayerCard = ({ player, card, attrs, scale=1, reveal=false }) => {
       }}>
         {(player.photoClean||player.photo) ? (
           <img src={player.photoClean||player.photo} alt="" style={{
-            position:'absolute', bottom:photoBtm, left:'56%',
+            position:'absolute', bottom:photoBtm, left:'50%',
             height:photoH, maxWidth:'100%',
             objectFit:player.photoClean?'contain':'cover',
             objectPosition:'top center',
@@ -915,7 +915,7 @@ const PlayerCard = ({ player, card, attrs, scale=1, reveal=false }) => {
             transform: 'translateX(-50%)',
           }}/>
         ) : (
-          <div style={{position:'absolute',bottom:photoBtm,left:'56%',transform:'translateX(-50%)',
+          <div style={{position:'absolute',bottom:photoBtm,left:'50%',transform:'translateX(-50%)',
             width:100*S,height:140*S,borderRadius:8*S,
             background:`${effBrd}0e`,border:`${1.5*S}px dashed ${effBrd}30`,
             display:'flex',alignItems:'center',justifyContent:'center',fontSize:38*S,opacity:.3}}>👤</div>
