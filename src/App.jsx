@@ -375,6 +375,33 @@ const GoatCard = ({ player, card, attrs, scale=1 }) => {
       <div style={{position:'absolute',inset:8.5*S,clipPath:SHIELD,overflow:'hidden',background:navyBg}}>
         <div style={{position:'absolute',inset:0,
           background:`radial-gradient(70% 55% at 50% 28%,${G_GOLD.mid}3a,transparent 60%)`}}/>
+        {/* gold shards espalhados — adiciona presença dourada além do leque */}
+        {[
+          {left:'6%',  top:'12%', w:32,h:40, rot: 10, op:.22},
+          {left:'4%',  top:'52%', w:28,h:34, rot:-14, op:.18},
+          {left:'78%', top:'70%', w:34,h:42, rot: 8,  op:.22},
+          {left:'38%', top:'80%', w:26,h:32, rot:-6,  op:.18},
+        ].map((p,i)=>(
+          <div key={`gs${i}`} style={{position:'absolute',left:p.left,top:p.top,
+            width:p.w*S,height:p.h*S,transform:`rotate(${p.rot}deg)`,
+            background:`linear-gradient(135deg,${G_GOLD.mid}88,${G_GOLD.deep}55)`,
+            clipPath:'polygon(20% 0, 100% 25%, 80% 100%, 0 70%)',
+            opacity:p.op,border:`1px solid ${G_GOLD.mid}aa`,
+            boxShadow:`0 0 8px ${G_GOLD.mid}66`}}/>
+        ))}
+        {/* mini gold framework no lado esquerdo — contrabalança o leque da direita */}
+        <div style={{position:'absolute',top:'34%',left:'14%',
+          width:78*S,height:85*S,pointerEvents:'none'}}>
+          <div style={{position:'absolute',top:'4%',left:'4%',width:'92%',height:'92%',
+            border:`1.5px solid ${G_GOLD.mid}`,transform:'rotate(45deg)',
+            boxShadow:`0 0 10px ${G_GOLD.mid}77`,opacity:.75}}/>
+          {[[50,0],[100,50],[50,100],[0,50]].map(([x,y],i)=>(
+            <div key={`mfd${i}`} style={{position:'absolute',left:`${x}%`,top:`${y}%`,
+              width:5*S,height:5*S,background:G_GOLD.hi,borderRadius:'50%',
+              transform:'translate(-50%,-50%)',
+              boxShadow:`0 0 7px ${G_GOLD.mid},0 0 3px ${G_GOLD.hi}`}}/>
+          ))}
+        </div>
         <ConfettiRain count={30} side="even" S={S} slow/>
         <ShieldSparkles count={32} S={S}/>
         <ShieldCorners S={S}/>
@@ -393,8 +420,8 @@ const GoatCard = ({ player, card, attrs, scale=1 }) => {
           {(player.photoClean||player.photo) ?
             <img src={player.photoClean||player.photo} alt="" style={{position:'absolute',bottom:0,left:'50%',
               transform:'translateX(-50%)',height:'100%',objectFit:'contain',objectPosition:'center bottom',
-              maskImage:'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.35) 6%, #000 22%, #000 78%, transparent 100%)',
-              WebkitMaskImage:'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.35) 6%, #000 22%, #000 78%, transparent 100%)',
+              maskImage:'linear-gradient(to bottom, #000 0%, #000 75%, transparent 100%)',
+              WebkitMaskImage:'linear-gradient(to bottom, #000 0%, #000 75%, transparent 100%)',
               filter:`drop-shadow(0 -4px 22px ${G_GOLD.mid}66)`}}/> :
             <div style={{position:'absolute',inset:0,display:'flex',alignItems:'center',justifyContent:'center',
               fontFamily:FO,fontWeight:900,fontSize:80*S,color:'rgba(255,255,255,0.045)'}}>{(player.nick||'').slice(0,2)}</div>
@@ -495,8 +522,8 @@ const TotwCard = ({ player, card, attrs, scale=1 }) => {
           {(player.photoClean||player.photo) ?
             <img src={player.photoClean||player.photo} alt="" style={{position:'absolute',bottom:0,left:'50%',
               transform:'translateX(-50%)',height:'100%',objectFit:'contain',objectPosition:'center bottom',
-              maskImage:'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.7) 2%, #000 8%, #000 78%, transparent 100%)',
-              WebkitMaskImage:'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.7) 2%, #000 8%, #000 78%, transparent 100%)',
+              maskImage:'linear-gradient(to bottom, #000 0%, #000 75%, transparent 100%)',
+              WebkitMaskImage:'linear-gradient(to bottom, #000 0%, #000 75%, transparent 100%)',
               filter:`drop-shadow(0 -4px 18px ${t.glow}55)`}}/> :
             <div style={{position:'absolute',inset:0,display:'flex',alignItems:'center',justifyContent:'center',
               fontFamily:FO,fontWeight:900,fontSize:80*S,color:'rgba(255,255,255,0.045)'}}>{(player.nick||'').slice(0,2)}</div>
