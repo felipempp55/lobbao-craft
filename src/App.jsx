@@ -429,6 +429,39 @@ const GoatCard = ({ player, card, attrs, scale=1 }) => {
         <TopChevron S={S}/>
       </div>
 
+      {/* ── Burst dourado no canto superior direito — vaza pra fora da carta ── */}
+      {/* glow point na origem */}
+      <div style={{position:'absolute',top:-12*S,right:-12*S,
+        width:90*S,height:90*S,borderRadius:'50%',
+        background:`radial-gradient(circle,${G_GOLD.hi}aa 0%,${G_GOLD.mid}66 28%,${G_GOLD.mid}22 55%,transparent 75%)`,
+        pointerEvents:'none',filter:'blur(2px)'}}/>
+      {[
+        // beams altos (vazam pra cima)
+        {top:-46*S, right:18*S,  w:6*S, h:175*S, rot: 10, op:.96},
+        {top:-36*S, right:42*S,  w:5*S, h:152*S, rot: -2, op:.86},
+        {top:-30*S, right:66*S,  w:7*S, h:158*S, rot: 16, op:.82},
+        // beams médios
+        {top:-16*S, right:22*S,  w:4*S, h:118*S, rot: 22, op:.72},
+        {top:-12*S, right:90*S,  w:5*S, h:122*S, rot: -6, op:.76},
+        // acentos finos
+        {top: -6*S, right:54*S,  w:3*S, h: 88*S, rot:  6, op:.62},
+        {top: -8*S, right:112*S, w:4*S, h: 82*S, rot:-12, op:.55},
+        {top: -3*S, right:34*S,  w:3*S, h: 70*S, rot: 30, op:.50},
+        // spill pra direita (mais horizontais)
+        {top: 18*S, right:-18*S, w:5*S, h: 95*S, rot: 65, op:.72},
+        {top: 38*S, right:-26*S, w:4*S, h: 82*S, rot: 78, op:.58},
+      ].map((b,i)=>(
+        <div key={`brs${i}`} style={{
+          position:'absolute', top:b.top, right:b.right,
+          width:b.w, height:b.h,
+          transform:`rotate(${b.rot}deg)`, transformOrigin:'50% 0%',
+          background:`linear-gradient(180deg,${G_GOLD.hi} 0%,${G_GOLD.mid} 35%,${G_GOLD.deep} 75%,transparent 100%)`,
+          boxShadow:`0 0 8px ${G_GOLD.hi}aa, 0 0 18px ${G_GOLD.mid}88`,
+          opacity:b.op,
+          pointerEvents:'none',
+        }}/>
+      ))}
+
       {/* ── Top layer: photo + fades + header + footer, clipped to inner shield ── */}
       <div style={{position:'absolute',inset:8.5*S,clipPath:SHIELD,overflow:'hidden',pointerEvents:'none'}}>
         {/* tag icons — coluna esquerda */}
