@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 // ═══ BRAND COLORS ════════════════════════════════════════════
 const R  = '#cc1111';
 const RG = '#dd1100';
@@ -82,6 +82,47 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:15px;heigh
 .lbc-spark2{animation:lbcSpark2 2.4s ease-in-out infinite}
 .lbc-pop{animation:lbcPop .5s cubic-bezier(.2,.7,.3,1) backwards}
 .lbc-screen{animation:lbcScreen .35s ease-out}
+/* ── range slider HUD ── */
+.lbc-range{-webkit-appearance:none;appearance:none;width:100%;height:6px;border-radius:3px;outline:none;cursor:pointer;background:linear-gradient(90deg,var(--c,#cc1111) var(--p,50%),rgba(255,255,255,0.09) var(--p,50%))}
+.lbc-range::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:18px;height:18px;border-radius:50%;background:#fff;border:3px solid var(--c,#cc1111);box-shadow:0 0 10px var(--c,#cc1111),0 2px 6px rgba(0,0,0,.5);cursor:pointer;transition:transform .1s}
+.lbc-range::-webkit-slider-thumb:hover{transform:scale(1.18)}
+.lbc-range::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:#fff;border:3px solid var(--c,#cc1111);box-shadow:0 0 10px var(--c,#cc1111);cursor:pointer}
+/* ── tweaks panel ── */
+.twk-panel{position:fixed;right:16px;bottom:16px;z-index:2147483646;width:280px;max-height:calc(100vh - 32px);display:flex;flex-direction:column;background:rgba(250,249,247,.92);color:#29261b;-webkit-backdrop-filter:blur(24px) saturate(160%);backdrop-filter:blur(24px) saturate(160%);border:.5px solid rgba(255,255,255,.6);border-radius:14px;box-shadow:0 1px 0 rgba(255,255,255,.5) inset,0 12px 40px rgba(0,0,0,.28);font:11.5px/1.4 ui-sans-serif,system-ui,-apple-system,sans-serif;overflow:hidden}
+.twk-hd{display:flex;align-items:center;justify-content:space-between;padding:10px 8px 10px 14px;cursor:move;user-select:none}
+.twk-hd b{font-size:12px;font-weight:600;letter-spacing:.01em}
+.twk-x{appearance:none;border:0;background:transparent;color:rgba(41,38,27,.55);width:22px;height:22px;border-radius:6px;cursor:default;font-size:13px;line-height:1}
+.twk-x:hover{background:rgba(0,0,0,.06);color:#29261b}
+.twk-body{padding:2px 14px 14px;display:flex;flex-direction:column;gap:10px;overflow-y:auto;overflow-x:hidden;min-height:0}
+.twk-seg{position:relative;display:flex;padding:2px;border-radius:8px;background:rgba(0,0,0,.06);user-select:none}
+.twk-seg-thumb{position:absolute;top:2px;bottom:2px;border-radius:6px;background:rgba(255,255,255,.9);box-shadow:0 1px 2px rgba(0,0,0,.12);transition:left .15s cubic-bezier(.3,.7,.4,1),width .15s}
+.twk-seg.dragging .twk-seg-thumb{transition:none}
+.twk-seg button{appearance:none;position:relative;z-index:1;flex:1;border:0;background:transparent;color:inherit;font:inherit;font-weight:500;min-height:22px;border-radius:6px;cursor:default;padding:4px 6px;line-height:1.2}
+.twk-field{appearance:none;box-sizing:border-box;width:100%;min-width:0;height:26px;padding:0 8px;border:.5px solid rgba(0,0,0,.1);border-radius:7px;background:rgba(255,255,255,.6);color:inherit;font:inherit;outline:none}
+.twk-field:focus{border-color:rgba(0,0,0,.25);background:rgba(255,255,255,.85)}
+/* ── atmosphere: vibe ── */
+[data-vibe="estadio"] .lbc-page-bg{background:radial-gradient(120% 80% at 50% -10%,#1a2a78,#050a30 55%,#00041e 100%)!important}
+[data-vibe="estadio"] header>div:first-child{background:linear-gradient(180deg,#06122c,#0a1c52 55%,#06122c)!important}
+[data-vibe="estadio"] .lbc-hdr-line{background:linear-gradient(90deg,transparent,#ffd700 30%,#ffeeb0 50%,#ffd700 70%,transparent)!important;background-size:200% 100%!important}
+[data-vibe="estadio"] div[style*="smoke-red"]{filter:hue-rotate(34deg) saturate(0.9)!important}
+[data-vibe="tatico"] .lbc-page-bg{background:radial-gradient(120% 80% at 50% -10%,#0c1820,#050c12 55%,#02060a 100%)!important}
+[data-vibe="tatico"] header>div:first-child{background:linear-gradient(180deg,#050a0e,#0a1218 55%,#050a0e)!important}
+[data-vibe="tatico"] .lbc-hdr-line{background:linear-gradient(90deg,transparent,#00c8e6 30%,#ffffff 50%,#00c8e6 70%,transparent)!important;background-size:200% 100%!important}
+[data-vibe="tatico"] div[style*="smoke-red"]{filter:hue-rotate(180deg) saturate(0.35) brightness(0.85)!important}
+/* ── atmosphere: fumaça ── */
+[data-fumaca="limpo"] div[style*="smoke-red"]{opacity:0.08!important}
+[data-fumaca="cinema"] div[style*="smoke-red"]{filter:saturate(1.35) brightness(1.1)}
+[data-fumaca="cinema"] header{box-shadow:0 4px 28px rgba(204,17,17,0.35)}
+[data-vibe="estadio"][data-fumaca="cinema"] header{box-shadow:0 4px 28px rgba(255,215,0,0.30)}
+[data-vibe="tatico"][data-fumaca="cinema"] header{box-shadow:0 4px 28px rgba(0,200,230,0.30)}
+/* ── atmosphere: pulso ── */
+[data-pulso="parado"] .lbc-smoke,[data-pulso="parado"] .lbc-rain,[data-pulso="parado"] .lbc-spark2,[data-pulso="parado"] .lbc-hdr-line{animation:none!important}
+[data-pulso="parado"] .lbc-pop,[data-pulso="parado"] .lbc-screen{animation-duration:0.001s!important}
+[data-pulso="hype"] .lbc-smoke{animation-duration:6s!important}
+[data-pulso="hype"] .lbc-rain{animation-duration:1.8s!important}
+[data-pulso="hype"] .lbc-spark2{animation-duration:1.2s!important}
+[data-pulso="hype"] .lbc-hdr-line{animation-duration:2.4s!important}
+[data-pulso="hype"] .lbc-pop{animation-duration:0.35s!important}
 `;
 // ═══ FONTS ═══════════════════════════════════════════════════
 const F    = "'Rajdhani','Segoe UI',sans-serif";
@@ -891,9 +932,13 @@ const HomeTab = ({ players, sessions, attrs }) => {
         <div>
           <SectionLabel>🏆 Último Domingo — {new Date(last.date+'T12:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'})}</SectionLabel>
           <div style={{display:'flex',gap:14,flexWrap:'wrap'}}>
-            {[...(last.cards||[])].sort((a,b) => b.overall-a.overall).map(c => {
+            {[...(last.cards||[])].sort((a,b) => b.overall-a.overall).map((c,i) => {
               const p = players.find(pl => pl.id===c.playerId);
-              return p ? <PlayerCard key={c.playerId} player={p} card={c} attrs={attrs} scale={0.72}/> : null;
+              return p ? (
+                <div key={c.playerId} className="lbc-pop" style={{animationDelay:`${i*0.06}s`}}>
+                  <AnyCard player={p} card={c} attrs={attrs} scale={0.72}/>
+                </div>
+              ) : null;
             })}
           </div>
         </div>
@@ -1302,9 +1347,9 @@ const SundayTab = ({ players, attrs, sessions, setSessions }) => {
                     <span style={{fontSize:13,color:'#c8a8a8',fontFamily:F,fontWeight:600}}>{a.name}</span>
                     <span style={{fontSize:14,fontWeight:700,color:R,fontFamily:FO}}>{Math.round(scores[a.id]??50)}</span>
                   </div>
-                  <input type="range" min="0" max="100" step="1" value={scores[a.id]??50}
+                  <input type="range" className="lbc-range" min="0" max="100" step="1" value={scores[a.id]??50}
                     onChange={e => setScores(s => ({...s,[a.id]:Number(e.target.value)}))}
-                    style={{width:'100%',background:`linear-gradient(90deg,${tier.brd} ${(scores[a.id]??50)}%,rgba(255,255,255,.1) ${(scores[a.id]??50)}%)`,accentColor:tier.brd}}/>
+                    style={{'--c':tier.brd,'--p':`${scores[a.id]??50}%`,width:'100%'}}/>
                   <div style={{display:'flex',justifyContent:'space-between',fontSize:9.5,color:'#907070',marginTop:2,fontFamily:F}}>
                     <span>0</span><span>50</span><span>100</span>
                   </div>
@@ -1589,6 +1634,141 @@ const LoginScreen = ({ onLogin }) => {
     </div>
   );
 };
+// ═══ TWEAKS PANEL ════════════════════════════════════════════
+function useTweaks(defaults) {
+  const [values, setValues] = useState(defaults);
+  const setTweak = useCallback((keyOrEdits, val) => {
+    const edits = typeof keyOrEdits === 'object' && keyOrEdits !== null
+      ? keyOrEdits : { [keyOrEdits]: val };
+    setValues(prev => ({ ...prev, ...edits }));
+  }, []);
+  return [values, setTweak];
+}
+function TweakRow({ label, children }) {
+  return (
+    <div style={{display:'flex',flexDirection:'column',gap:5}}>
+      {label && <div style={{fontSize:11,fontWeight:500,color:'rgba(41,38,27,.72)'}}>{label}</div>}
+      {children}
+    </div>
+  );
+}
+function TweakSection({ label }) {
+  return <div style={{fontSize:10,fontWeight:600,letterSpacing:'.06em',textTransform:'uppercase',color:'rgba(41,38,27,.45)',padding:'8px 0 0'}}>{label}</div>;
+}
+function TweakSelect({ label, value, options, onChange }) {
+  return (
+    <TweakRow label={label}>
+      <select className="twk-field" value={value} onChange={e => onChange(e.target.value)}>
+        {options.map(o => {
+          const v = typeof o === 'object' ? o.value : o;
+          const l = typeof o === 'object' ? o.label : o;
+          return <option key={v} value={v}>{l}</option>;
+        })}
+      </select>
+    </TweakRow>
+  );
+}
+function TweakRadio({ label, value, options, onChange }) {
+  const trackRef = useRef(null);
+  const [dragging, setDragging] = useState(false);
+  const valueRef = useRef(value);
+  valueRef.current = value;
+  const opts = options.map(o => typeof o === 'object' ? o : { value: o, label: o });
+  const maxLen = opts.reduce((m, o) => Math.max(m, String(o.label).length), 0);
+  const fitsAsSegs = maxLen <= ({ 2: 16, 3: 10 }[opts.length] ?? 0);
+  if (!fitsAsSegs) return <TweakSelect label={label} value={value} options={opts} onChange={onChange}/>;
+  const idx = Math.max(0, opts.findIndex(o => o.value === value));
+  const n = opts.length;
+  const segAt = clientX => {
+    const r = trackRef.current.getBoundingClientRect();
+    const i = Math.floor(((clientX - r.left - 2) / (r.width - 4)) * n);
+    return opts[Math.max(0, Math.min(n - 1, i))].value;
+  };
+  const onPointerDown = e => {
+    setDragging(true);
+    const v0 = segAt(e.clientX);
+    if (v0 !== valueRef.current) onChange(v0);
+    const move = ev => { if (!trackRef.current) return; const v = segAt(ev.clientX); if (v !== valueRef.current) onChange(v); };
+    const up   = () => { setDragging(false); window.removeEventListener('pointermove', move); window.removeEventListener('pointerup', up); };
+    window.addEventListener('pointermove', move);
+    window.addEventListener('pointerup',   up);
+  };
+  return (
+    <TweakRow label={label}>
+      <div ref={trackRef} role="radiogroup" onPointerDown={onPointerDown}
+           className={dragging ? 'twk-seg dragging' : 'twk-seg'}>
+        <div className="twk-seg-thumb"
+             style={{left:`calc(2px + ${idx} * (100% - 4px) / ${n})`,width:`calc((100% - 4px) / ${n})`}}/>
+        {opts.map(o => (
+          <button key={o.value} type="button" role="radio" aria-checked={o.value === value}>{o.label}</button>
+        ))}
+      </div>
+    </TweakRow>
+  );
+}
+function TweaksPanel({ title = 'Atmosfera', children }) {
+  const [open, setOpen] = useState(false);
+  const dragRef  = useRef(null);
+  const offRef   = useRef({ x: 16, y: 16 });
+  const PAD = 16;
+  const clamp = useCallback(() => {
+    const el = dragRef.current; if (!el) return;
+    const maxR = Math.max(PAD, window.innerWidth  - el.offsetWidth  - PAD);
+    const maxB = Math.max(PAD, window.innerHeight - el.offsetHeight - PAD);
+    offRef.current = { x: Math.min(maxR, Math.max(PAD, offRef.current.x)), y: Math.min(maxB, Math.max(PAD, offRef.current.y)) };
+    el.style.right  = offRef.current.x + 'px';
+    el.style.bottom = offRef.current.y + 'px';
+  }, []);
+  useEffect(() => {
+    if (!open) return;
+    clamp();
+    if (typeof ResizeObserver !== 'undefined') {
+      const ro = new ResizeObserver(clamp);
+      ro.observe(document.documentElement);
+      return () => ro.disconnect();
+    }
+    window.addEventListener('resize', clamp);
+    return () => window.removeEventListener('resize', clamp);
+  }, [open, clamp]);
+  const onDrag = e => {
+    const el = dragRef.current; if (!el) return;
+    const r  = el.getBoundingClientRect();
+    const sx = e.clientX, sy = e.clientY;
+    const startR = window.innerWidth  - r.right;
+    const startB = window.innerHeight - r.bottom;
+    const move = ev => { offRef.current = { x: startR - (ev.clientX - sx), y: startB - (ev.clientY - sy) }; clamp(); };
+    const up   = () => { window.removeEventListener('mousemove', move); window.removeEventListener('mouseup', up); };
+    window.addEventListener('mousemove', move);
+    window.addEventListener('mouseup',   up);
+  };
+  return (
+    <>
+      {!open && (
+        <button onClick={() => setOpen(true)} title="Atmosfera" style={{
+          position:'fixed',right:16,bottom:16,zIndex:2147483646,
+          width:44,height:44,borderRadius:'50%',
+          border:'1px solid rgba(255,255,255,0.15)',
+          background:'rgba(10,4,4,0.92)',backdropFilter:'blur(14px)',
+          cursor:'pointer',fontSize:18,display:'flex',alignItems:'center',justifyContent:'center',
+          boxShadow:`0 0 18px rgba(204,17,17,0.22),0 2px 8px rgba(0,0,0,0.6)`,transition:'all .2s',
+        }}
+          onMouseEnter={e=>{e.currentTarget.style.background='rgba(204,17,17,0.18)';e.currentTarget.style.borderColor='rgba(204,17,17,0.45)';e.currentTarget.style.boxShadow='0 0 22px rgba(204,17,17,0.45)';}}
+          onMouseLeave={e=>{e.currentTarget.style.background='rgba(10,4,4,0.92)';e.currentTarget.style.borderColor='rgba(255,255,255,0.15)';e.currentTarget.style.boxShadow='0 0 18px rgba(204,17,17,0.22)';}}>
+          🌫️
+        </button>
+      )}
+      {open && (
+        <div ref={dragRef} className="twk-panel" style={{right:offRef.current.x,bottom:offRef.current.y}}>
+          <div className="twk-hd" onMouseDown={onDrag}>
+            <b>{title}</b>
+            <button className="twk-x" type="button" onMouseDown={e=>e.stopPropagation()} onClick={()=>setOpen(false)}>✕</button>
+          </div>
+          <div className="twk-body">{children}</div>
+        </div>
+      )}
+    </>
+  );
+}
 // ═══ APP ═════════════════════════════════════════════════════
 export default function App() {
   const [tab,      setTab]      = useState('home');
@@ -1598,6 +1778,7 @@ export default function App() {
   const [apiKey,   setApiKey]   = useState('');
   const [loaded,   setLoaded]   = useState(false);
   const [authed,   setAuthed]   = useState(false);
+  const [tweak,    setTweak]    = useTweaks({vibe:'live',fumaca:'padrao',pulso:'vivo'});
   useEffect(() => {
     if(!document.getElementById('lbc-gcss')) {
       const s = document.createElement('style');
@@ -1612,6 +1793,12 @@ export default function App() {
     setApiKey(ld('lbc2_k', ''));
     setLoaded(true);
   }, []);
+  useEffect(() => {
+    const r = document.documentElement;
+    r.setAttribute('data-vibe',   tweak.vibe);
+    r.setAttribute('data-fumaca', tweak.fumaca);
+    r.setAttribute('data-pulso',  tweak.pulso);
+  }, [tweak.vibe, tweak.fumaca, tweak.pulso]);
   const sp = v => { setPlayers(v);  sv('lbc2_p', v); };
   const sa = v => { setAttrs(v);    sv('lbc2_a', v); };
   const ss = v => { setSessions(v); sv('lbc2_s', v); };
@@ -1640,7 +1827,7 @@ export default function App() {
     <div style={{background:'#0a0606',minHeight:'100vh',color:'#f0e8e8',display:'flex',flexDirection:'column',position:'relative'}}>
       {/* ── PageBg fumaça ── */}
       <div style={{position:'fixed',inset:0,zIndex:0,pointerEvents:'none'}}>
-        <div style={{position:'absolute',inset:0,background:`radial-gradient(120% 80% at 50% -10%,#2a0808,#16110f 55%,#0a0606 100%)`}}/>
+        <div className="lbc-page-bg" style={{position:'absolute',inset:0,background:`radial-gradient(120% 80% at 50% -10%,#2a0808,#16110f 55%,#0a0606 100%)`}}/>
         <div className="lbc-smoke" style={{position:'absolute',inset:0,
           backgroundImage:'url(/smoke-red.png)',backgroundSize:'80%',backgroundPosition:'30% 20%',
           opacity:.32,mixBlendMode:'screen'}}/>
@@ -1713,13 +1900,27 @@ export default function App() {
         </div>
       </nav>
       <div style={{flex:1,padding:20,overflowY:'auto',position:'relative',zIndex:1}}>
-        {tab==='home'    && <HomeTab    players={players} sessions={sessions} attrs={attrs}/>}
-        {tab==='players' && <PlayersTab players={players} setPlayers={sp} apiKey={apiKey}/>}
-        {tab==='attrs'   && <AttrsTab   attrs={attrs} setAttrs={sa}/>}
-        {tab==='sunday'  && <SundayTab  players={players} attrs={attrs} sessions={sessions} setSessions={ss}/>}
-        {tab==='history' && <HistoryTab sessions={sessions} players={players} attrs={attrs}/>}
-        {tab==='config'  && <ConfigTab  apiKey={apiKey} setApiKey={sk}/>}
+        <div key={tab} className="lbc-screen">
+          {tab==='home'    && <HomeTab    players={players} sessions={sessions} attrs={attrs}/>}
+          {tab==='players' && <PlayersTab players={players} setPlayers={sp} apiKey={apiKey}/>}
+          {tab==='attrs'   && <AttrsTab   attrs={attrs} setAttrs={sa}/>}
+          {tab==='sunday'  && <SundayTab  players={players} attrs={attrs} sessions={sessions} setSessions={ss}/>}
+          {tab==='history' && <HistoryTab sessions={sessions} players={players} attrs={attrs}/>}
+          {tab==='config'  && <ConfigTab  apiKey={apiKey} setApiKey={sk}/>}
+        </div>
       </div>
+      <TweaksPanel>
+        <TweakSection label="Atmosfera"/>
+        <TweakRadio label="Vibe" value={tweak.vibe}
+          options={[{value:'live',label:'Lobbão'},{value:'estadio',label:'Estádio'},{value:'tatico',label:'Tático'}]}
+          onChange={v=>setTweak('vibe',v)}/>
+        <TweakRadio label="Fumaça" value={tweak.fumaca}
+          options={[{value:'limpo',label:'Limpo'},{value:'padrao',label:'Padrão'},{value:'cinema',label:'Cinema'}]}
+          onChange={v=>setTweak('fumaca',v)}/>
+        <TweakRadio label="Pulso" value={tweak.pulso}
+          options={[{value:'parado',label:'Parado'},{value:'vivo',label:'Vivo'},{value:'hype',label:'Hype'}]}
+          onChange={v=>setTweak('pulso',v)}/>
+      </TweaksPanel>
     </div>
   );
 }
