@@ -459,7 +459,7 @@ const GoatCard = ({ player, card, attrs, scale=1 }) => {
               transform:'translateX(-50%)',height:'100%',objectFit:'contain',objectPosition:'center bottom',
               maskImage:'linear-gradient(to bottom, #000 0%, #000 75%, transparent 100%)',
               WebkitMaskImage:'linear-gradient(to bottom, #000 0%, #000 75%, transparent 100%)',
-              filter:`drop-shadow(0 0 14px ${G_GOLD.mid}44)`}}/> :
+              filter:`drop-shadow(0 0 6px ${G_GOLD.mid}22)`}}/> :
             <div style={{position:'absolute',inset:0,display:'flex',alignItems:'center',justifyContent:'center',
               fontFamily:FO,fontWeight:900,fontSize:80*S,color:'rgba(255,255,255,0.045)'}}>{(player.nick||'').slice(0,2)}</div>
           }
