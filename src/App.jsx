@@ -261,7 +261,7 @@ const TopChevron = ({ S=1 }) => (
 const GoldFramework = ({ S=1, sz=140 }) => {
   const W=sz*S, H=sz*1.1*S;
   return (
-    <div style={{position:'absolute',top:'9%',left:'50%',transform:'translateX(-50%)',
+    <div style={{position:'absolute',top:'9%',left:'56%',transform:'translateX(-50%)',
       width:W,height:H,pointerEvents:'none'}}>
       <div style={{position:'absolute',top:'22%',left:'22%',width:'56%',height:'56%',
         background:`linear-gradient(135deg,rgba(255,235,150,0.22),rgba(40,28,8,0.55))`,
@@ -380,11 +380,11 @@ const GoatCard = ({ player, card, attrs, scale=1 }) => {
             textShadow:`0 1px 6px ${G_GOLD.deep}`}}>GOAT</div>
         </div>
         {/* footer */}
-        <div style={{position:'absolute',bottom:0,left:0,right:0,padding:`0 ${18*S}px ${14*S}px`,zIndex:5}}>
+        <div style={{position:'absolute',bottom:0,left:0,right:0,padding:`0 ${18*S}px ${20*S}px`,zIndex:5}}>
           <div style={{fontFamily:FO,fontWeight:900,fontSize:23*S,color:'#fff',textAlign:'center',
             letterSpacing:1.5*S,textShadow:`0 2px 10px ${G_GOLD.mid}88`}}>{player.nick||'???'}</div>
           {/* FL1IP logo destacada entre o nome e os stats */}
-          <div style={{display:'flex',alignItems:'center',gap:10*S,margin:`${4*S}px 0 ${2*S}px`}}>
+          <div style={{display:'flex',alignItems:'center',gap:10*S,margin:`${4*S}px 0 ${-6*S}px`}}>
             <div style={{flex:1,height:1,background:`linear-gradient(90deg,transparent,${G_GOLD.mid}77)`}}/>
             <img src="/logo.png" alt="" style={{height:46*S,opacity:.96,display:'block',
               filter:`drop-shadow(0 0 14px ${G_GOLD.hi}cc)`}}
@@ -478,11 +478,11 @@ const TotwCard = ({ player, card, attrs, scale=1 }) => {
           </div>
         </div>
         {/* footer */}
-        <div style={{position:'absolute',bottom:0,left:0,right:0,padding:`0 ${18*S}px ${14*S}px`,zIndex:5}}>
+        <div style={{position:'absolute',bottom:0,left:0,right:0,padding:`0 ${18*S}px ${20*S}px`,zIndex:5}}>
           <div style={{fontFamily:FO,fontWeight:900,fontSize:23*S,color:'#fff',textAlign:'center',
             letterSpacing:1.5*S,textShadow:`0 2px 10px ${t.glow}88`}}>{player.nick||'???'}</div>
           {/* FL1IP logo destacada entre o nome e os stats */}
-          <div style={{display:'flex',alignItems:'center',gap:10*S,margin:`${4*S}px 0 ${2*S}px`}}>
+          <div style={{display:'flex',alignItems:'center',gap:10*S,margin:`${4*S}px 0 ${-6*S}px`}}>
             <div style={{flex:1,height:1,background:`linear-gradient(90deg,transparent,${G_GOLD.mid}77)`}}/>
             <img src="/logo.png" alt="" style={{height:46*S,opacity:.96,display:'block',
               filter:`drop-shadow(0 0 14px ${t.glow}cc)`}}
@@ -912,19 +912,26 @@ const PlayerCard = ({ player, card, attrs, scale=1, reveal=false }) => {
           : `linear-gradient(0deg,rgba(4,4,18,0.97) 0%,rgba(4,4,18,0.65) 55%,rgba(4,4,18,0.12) 100%)`,
         backdropFilter:'blur(20px)', WebkitBackdropFilter:'blur(20px)',
         borderTop:`${[1,1.5,1.5,2,2][lvl]*S}px solid ${effBrd}${['22','33','44','55','55'][lvl]}`,
-        padding:`${12*S}px ${10*S}px ${11*S}px`,
+        padding:`${10*S}px ${10*S}px ${18*S}px`,
       }}>
         <div style={{
           textAlign:'center', fontSize:21*S, fontWeight:900,
           color: lvl===0 ? '#cc8888' : '#ffffff',
-          fontFamily:F, letterSpacing:1.4*S, marginBottom:7*S,
+          fontFamily:F, letterSpacing:1.4*S,
           textShadow: lvl===0 ? 'none' : `0 2px 8px rgba(0,0,0,.95), 0 0 ${16*S}px ${effGlow}${['','','44','55','55'][lvl]}`,
           overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap',
           textTransform:'uppercase',
         }}>
           {player.nick||'???'}
         </div>
-        <div style={{height:1,background:`linear-gradient(90deg,transparent,${effBrd}${lvl>=2?'88':'55'},transparent)`,marginBottom:9*S}}/>
+        {/* FL1IP logo destacada entre o nome e os stats */}
+        <div style={{display:'flex',alignItems:'center',gap:10*S,margin:`${3*S}px 0 ${-6*S}px`}}>
+          <div style={{flex:1,height:1,background:`linear-gradient(90deg,transparent,${effBrd}88)`}}/>
+          <img src="/logo.png" alt="" style={{height:38*S,opacity:.93,display:'block',
+            filter:`drop-shadow(0 0 10px ${effGlow}aa)`}}
+            onError={e=>{e.target.style.display='none'}}/>
+          <div style={{flex:1,height:1,background:`linear-gradient(90deg,${effBrd}88,transparent)`}}/>
+        </div>
         <div style={{display:'flex',justifyContent:'space-around',alignItems:'flex-end'}}>
           {sa.map((a,i)=>(
             <div key={a.id} style={{textAlign:'center',flex:1,
