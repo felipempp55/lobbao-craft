@@ -152,8 +152,8 @@ const Btn = ({ children, onClick, v='primary', size='md', disabled, style={} }) 
   return (
     <button className="lbc-btn" onClick={onClick} disabled={disabled} style={{
       ...s, borderRadius:8, cursor:disabled?'not-allowed':'pointer', opacity:disabled?.5:1,
-      padding:size==='xs'?'4px 10px':size==='sm'?'6px 14px':'9px 20px',
-      fontSize:size==='xs'?11:size==='sm'?12:13.5,
+      padding:size==='xs'?'4px 10px':size==='sm'?'6px 14px':size==='lg'?'14px 28px':'9px 20px',
+      fontSize:size==='xs'?11:size==='sm'?12:size==='lg'?15:13.5,
       fontWeight:700, fontFamily:F, letterSpacing:.8, textTransform:'uppercase',
       transition:'all .15s', ...style,
     }}>{children}</button>
@@ -171,15 +171,19 @@ const Field = ({ label, value, onChange, type='text', placeholder='' }) => (
     />
   </div>
 );
-const Panel = ({ children, style={} }) => (
+const Panel = ({ children, style={}, accent }) => (
   <div style={{
+    position:'relative',
     background:'rgba(255,255,255,0.07)', backdropFilter:'blur(14px)', WebkitBackdropFilter:'blur(14px)',
     border:'1px solid rgba(255,255,255,0.13)', borderTop:'1px solid rgba(255,120,120,0.18)',
-    borderRadius:14, padding:20, boxShadow:'0 8px 32px rgba(0,0,0,0.35)', ...style,
-  }}>{children}</div>
+    borderRadius:14, padding:20, boxShadow:'0 8px 32px rgba(0,0,0,0.35)', overflow:'hidden', ...style,
+  }}>
+    {accent && <div style={{position:'absolute',top:0,left:0,width:3,height:'100%',background:accent,boxShadow:`0 0 10px ${accent}66`}}/>}
+    {children}
+  </div>
 );
-const SectionLabel = ({ children, color='#c09090' }) => (
-  <div style={{fontSize:10.5,fontWeight:700,letterSpacing:2.5,color,textTransform:'uppercase',fontFamily:F,marginBottom:12}}>{children}</div>
+const SectionLabel = ({ children, color='#c09090', style={} }) => (
+  <div style={{fontSize:10.5,fontWeight:700,letterSpacing:2.5,color,textTransform:'uppercase',fontFamily:F,marginBottom:12,...style}}>{children}</div>
 );
 // ═══ SHIELD CARDS (GOAT + DREAM LOBBY) ══════════════════════
 const TIER_LEVEL = {'Melhor Freezar':0,'Bagre':1,'Bom Player':2,'Dream Lobby':3,'GOAT':4};
@@ -913,45 +917,107 @@ const PlayerCard = ({ player, card, attrs, scale=1, reveal=false }) => {
   );
 };
 // ═══ HOME ════════════════════════════════════════════════════
-const HomeTab = ({ players, sessions, attrs }) => {
-  const last  = [...sessions].sort((a,b) => b.date.localeCompare(a.date))[0];
-  const total = sessions.reduce((s,ss) => s+(ss.cards?.length||0), 0);
-  const Stat  = ({ v, label, c=R, icon }) => (
-    <Panel style={{flex:1,minWidth:110,padding:'18px 20px'}}>
-      <div style={{fontSize:10,color:'#c09090',textTransform:'uppercase',letterSpacing:2,fontFamily:F,fontWeight:700,marginBottom:8}}>{icon} {label}</div>
-      <div style={{fontSize:32,fontWeight:900,color:c,fontFamily:FO,textShadow:`0 0 20px ${c}55`}}>{v}</div>
+const StatHud = ({ value, label, col=R }) => (
+  <Panel accent={col} style={{padding:'18px 18px 14px'}}>
+    <div style={{fontFamily:FHUD,fontWeight:700,fontSize:10.5,letterSpacing:2.5,color:col,textTransform:'uppercase',marginBottom:6}}>{label}</div>
+    <div style={{fontFamily:FO,fontWeight:900,fontSize:38,color:'#f0e8e8',lineHeight:1,letterSpacing:-1,textShadow:`0 0 14px ${col}55`}}>{value}</div>
+  </Panel>
+);
+
+const HomeTab = ({ players, sessions, attrs, onGoSunday }) => {
+  const last = [...sessions].sort((a,b) => b.date.localeCompare(a.date))[0];
+  if(!last) return (
+    <Panel style={{textAlign:'center',padding:'40px 20px',maxWidth:540,margin:'40px auto'}}>
+      <div style={{fontSize:52,marginBottom:14}}>🎮</div>
+      <div style={{fontSize:15,color:'#c09090',fontFamily:F,fontWeight:600}}>Nenhum domingo realizado ainda.</div>
+      <div style={{fontSize:12,color:'#907070',marginTop:6,fontFamily:F}}>Cadastre jogadores e inicie a primeira sessão!</div>
     </Panel>
   );
+  const ranked = [...(last.cards||[])].sort((a,b) => b.overall - a.overall);
+  const top = ranked[0];
+  const topPlayer = top ? players.find(p => p.id === top.playerId) : null;
+  const avg = ranked.length ? Math.round(ranked.reduce((s,c) => s + c.overall, 0) / ranked.length) : 0;
+  const tierCount = TIERS.map(t => ({ t, n: ranked.filter(c => getTier(c.overall).name === t.name).length }));
+  const dateLabel = new Date(last.date+'T12:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'});
   return (
-    <div>
-      <SectionLabel>📊 Visão Geral</SectionLabel>
-      <div style={{display:'flex',gap:12,flexWrap:'wrap',marginBottom:28}}>
-        <Stat v={players.length}  label="Jogadores" icon="👥"/>
-        <Stat v={sessions.length} label="Domingos"  c="#ffd700" icon="🎮"/>
-        <Stat v={total}           label="Cartinhas" c="#ff8c00" icon="🃏"/>
-        <Stat v={attrs.length}    label="Atributos" c="#44dd88" icon="⚙️"/>
+    <div style={{maxWidth:1180,margin:'0 auto',padding:'14px 6px 70px'}}>
+      {/* hero */}
+      <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',flexWrap:'wrap',gap:20,marginBottom:28}}>
+        <div style={{flex:1,minWidth:280}}>
+          <div style={{fontFamily:FHUD,fontWeight:700,fontSize:10.5,letterSpacing:2.5,color:'#c09090',textTransform:'uppercase'}}>
+            RANKING DA SEMANA · {dateLabel}
+          </div>
+          <h1 style={{fontFamily:FO,fontWeight:900,fontSize:52,color:'#f0e8e8',margin:'6px 0 0',letterSpacing:-1,lineHeight:1}}>
+            O LOBBÃO <span style={{color:R}}>FALOU.</span>
+          </h1>
+          <div style={{fontFamily:F,fontSize:16,color:'#c09090',marginTop:8}}>
+            {ranked.length} cartas reveladas no último domingo. Confere quem mandou bem (e quem freezou).
+          </div>
+        </div>
+        {onGoSunday && <Btn size="lg" onClick={onGoSunday}>▲ AVALIAR DOMINGO</Btn>}
       </div>
-      {last ? (
+      {/* stat HUD row */}
+      <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(160px,1fr))',gap:14,marginBottom:32}}>
+        <StatHud label="JOGADORES"     value={ranked.length}                              col={R}/>
+        <StatHud label="MÉDIA GERAL"   value={avg}                                        col="#33bb55"/>
+        <StatHud label="MAIOR OVERALL" value={top?.overall ?? 0}                          col={top ? getTier(top.overall).brd : R}/>
+        <StatHud label="DOMINGOS"      value={sessions.length}                            col="#ffd700"/>
+      </div>
+      {/* destaque: top card + ranking list */}
+      <div style={{display:'grid',gridTemplateColumns:'minmax(260px,300px) 1fr',gap:30,alignItems:'start'}}>
+        <div className="lbc-pop">
+          <SectionLabel style={{marginBottom:14}}>★ CARTA DA SEMANA</SectionLabel>
+          <div style={{display:'flex',justifyContent:'center'}}>
+            {topPlayer && <AnyCard player={topPlayer} card={top} attrs={attrs} scale={1.0}/>}
+          </div>
+        </div>
         <div>
-          <SectionLabel>🏆 Último Domingo — {new Date(last.date+'T12:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'})}</SectionLabel>
-          <div style={{display:'flex',gap:14,flexWrap:'wrap'}}>
-            {[...(last.cards||[])].sort((a,b) => b.overall-a.overall).map((c,i) => {
-              const p = players.find(pl => pl.id===c.playerId);
-              return p ? (
+          <SectionLabel style={{marginBottom:14}}>CLASSIFICAÇÃO COMPLETA</SectionLabel>
+          <div style={{display:'flex',flexDirection:'column',gap:8}}>
+            {ranked.map((c, i) => {
+              const p = players.find(pl => pl.id === c.playerId);
+              const t = getTier(c.overall);
+              if(!p) return null;
+              return (
                 <div key={c.playerId} className="lbc-pop" style={{animationDelay:`${i*0.06}s`}}>
-                  <AnyCard player={p} card={c} attrs={attrs} scale={0.72}/>
+                  <Panel accent={t.brd} style={{display:'flex',alignItems:'center',gap:16,padding:'12px 18px'}}>
+                    <div style={{fontFamily:FO,fontWeight:900,fontSize:22,color:'#907070',width:30,flexShrink:0}}>{String(i+1).padStart(2,'0')}</div>
+                    <div style={{flex:1,minWidth:0}}>
+                      <div style={{fontFamily:FO,fontWeight:800,fontSize:20,color:'#f0e8e8',letterSpacing:.5}}>{p.nick}</div>
+                      <div style={{fontFamily:FHUD,fontWeight:600,fontSize:9.5,letterSpacing:2,color:t.brd,textTransform:'uppercase',marginTop:2}}>{t.lbl}</div>
+                    </div>
+                    <div style={{display:'flex',gap:3,alignItems:'flex-end',height:26,flexShrink:0}}>
+                      {(attrs||[]).slice(0,6).map((a) => {
+                        const v = c.scores?.[a.id] ?? 0;
+                        return <div key={a.id} title={`${a.name}: ${Math.round(v)}`} style={{width:5,height:`${Math.max(8,v)}%`,background:`linear-gradient(${t.glow},${t.brd})`,opacity:.85,borderRadius:1}}/>;
+                      })}
+                    </div>
+                    <div style={{fontFamily:FO,fontWeight:900,fontSize:32,color:t.score,width:52,textAlign:'right',textShadow:`0 0 12px ${t.glow}66`,flexShrink:0}}>{c.overall}</div>
+                  </Panel>
                 </div>
-              ) : null;
+              );
             })}
           </div>
         </div>
-      ) : (
-        <Panel style={{textAlign:'center',padding:'40px 20px'}}>
-          <div style={{fontSize:52,marginBottom:14}}>🎮</div>
-          <div style={{fontSize:15,color:'#c09090',fontFamily:F,fontWeight:600}}>Nenhum domingo realizado ainda.</div>
-          <div style={{fontSize:12,color:'#907070',marginTop:6,fontFamily:F}}>Cadastre jogadores e inicie a primeira sessão!</div>
-        </Panel>
-      )}
+      </div>
+      {/* distribuição por tier */}
+      <div style={{marginTop:36}}>
+        <SectionLabel style={{marginBottom:14}}>DISTRIBUIÇÃO POR TIER</SectionLabel>
+        <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(150px,1fr))',gap:12}}>
+          {tierCount.map(({t,n}, i) => (
+            <div key={t.name} className="lbc-pop" style={{animationDelay:`${i*0.05}s`}}>
+              <Panel style={{padding:'16px 14px',textAlign:'center'}}>
+                <div style={{position:'absolute',inset:0,background:`linear-gradient(180deg,${t.brd}22,transparent)`,pointerEvents:'none'}}/>
+                <div style={{position:'relative'}}>
+                  <div style={{fontFamily:FO,fontWeight:900,fontSize:40,color:t.score,textShadow:`0 0 14px ${t.glow}66`,lineHeight:1}}>{n}</div>
+                  <div style={{fontFamily:FHUD,fontWeight:700,fontSize:9.5,letterSpacing:1.5,color:t.brd,marginTop:5,textTransform:'uppercase'}}>{t.lbl}</div>
+                  <div style={{fontFamily:FHUD,fontWeight:500,fontSize:8.5,letterSpacing:1,color:'#806060',marginTop:3}}>{t.min}–{t.max}</div>
+                </div>
+              </Panel>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 };
@@ -1912,7 +1978,7 @@ export default function App() {
       </nav>
       <div style={{flex:1,padding:20,overflowY:'auto',position:'relative',zIndex:1}}>
         <div key={tab} className="lbc-screen">
-          {tab==='home'    && <HomeTab    players={players} sessions={sessions} attrs={attrs}/>}
+          {tab==='home'    && <HomeTab    players={players} sessions={sessions} attrs={attrs} onGoSunday={()=>setTab('sunday')}/>}
           {tab==='players' && <PlayersTab players={players} setPlayers={sp} apiKey={apiKey}/>}
           {tab==='attrs'   && <AttrsTab   attrs={attrs} setAttrs={sa}/>}
           {tab==='sunday'  && <SundayTab  players={players} attrs={attrs} sessions={sessions} setSessions={ss}/>}
