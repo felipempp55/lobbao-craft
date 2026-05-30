@@ -49,13 +49,13 @@ const b64Blob = d => {
 };
 // ═══ GLOBAL CSS ══════════════════════════════════════════════
 const GCSS = `
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Rajdhani:wght@500;600;700&family=Permanent+Marker&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Saira+Condensed:wght@600;700;800;900&family=Rajdhani:wght@500;600;700&family=Permanent+Marker&display=swap');
 *{box-sizing:border-box;}
 ::-webkit-scrollbar{width:5px;height:5px}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:#5a3535;border-radius:3px}
-input[type=range]{-webkit-appearance:none;height:3px;border-radius:2px;outline:none;cursor:pointer}
-input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;cursor:pointer;border:2px solid #1a0a0a}
+input[type=range]{-webkit-appearance:none;height:4px;border-radius:2px;outline:none;cursor:pointer;background:linear-gradient(90deg,var(--c,#cc1111) var(--p,50%),rgba(255,255,255,0.12) var(--p,50%))}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:15px;height:15px;border-radius:50%;cursor:pointer;background:var(--c,#cc1111);border:2px solid rgba(0,0,0,0.5);box-shadow:0 0 8px var(--c,#cc1111)}
 .lbc-nav-btn:hover{color:#e04444!important}
 .lbc-ppl-pick{transition:all .2s!important}
 .lbc-ppl-pick:hover{border-color:#cc1111!important;background:rgba(200,17,17,0.10)!important;transform:translateY(-2px);box-shadow:0 6px 20px rgba(200,17,17,0.18)!important}
@@ -66,11 +66,28 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
 @keyframes lbcFloat{0%,100%{transform:translateX(-50%) translateY(0px)}50%{transform:translateX(-50%) translateY(-6px)}}
 @keyframes lbcHdr{0%{background-position:0% 50%}100%{background-position:200% 50%}}
 @keyframes lbcReveal{from{opacity:0;transform:scale(.88) translateY(16px)}to{opacity:1;transform:scale(1) translateY(0)}}
+@keyframes lbcRain{0%{transform:translate(0,0) rotate(0deg);opacity:.95}50%{transform:translate(-6px,18px) rotate(140deg);opacity:1}100%{transform:translate(-14px,40px) rotate(280deg);opacity:.25}}
+@keyframes lbcSpark2{0%,100%{opacity:.35;transform:scale(.7)}50%{opacity:1;transform:scale(1.25)}}
+@keyframes lbcSmokeDrift{0%{background-position:20% 10%}50%{background-position:26% 16%}100%{background-position:20% 10%}}
+@keyframes lbcHdrLine{0%{background-position:0% 0}100%{background-position:200% 0}}
+@keyframes lbcPop{0%{opacity:0;transform:translateY(24px) scale(.94)}100%{opacity:1;transform:none}}
+@keyframes lbcScreen{0%{opacity:0;transform:translateY(10px)}100%{opacity:1;transform:none}}
+@keyframes lbcPackSwipe{0%{transform:translateY(-50%) rotate(-7deg) translateX(-110%);opacity:.9}100%{transform:translateY(-50%) rotate(-7deg) translateX(110%);opacity:0}}
+@keyframes lbcPackCardIn{0%{opacity:0;transform:translate(-50%,-50%) scale(.7) rotateY(45deg)}100%{opacity:1;transform:translate(-50%,-50%) scale(1) rotateY(0deg)}}
+@keyframes lbcPackBurst{0%{transform:translate(-50%,-50%) scale(0);opacity:1}100%{transform:translate(-50%,-50%) scale(8);opacity:0}}
+@keyframes lbcPackTierIn{0%{opacity:0;letter-spacing:40px}100%{opacity:1;letter-spacing:14px}}
+@keyframes lbcPackCue{0%,100%{opacity:.5}50%{opacity:1}}
+.lbc-smoke{animation:lbcSmokeDrift 16s ease-in-out infinite}
+.lbc-rain{animation:lbcRain 3.6s ease-in-out infinite}
+.lbc-spark2{animation:lbcSpark2 2.4s ease-in-out infinite}
+.lbc-pop{animation:lbcPop .5s cubic-bezier(.2,.7,.3,1) backwards}
+.lbc-screen{animation:lbcScreen .35s ease-out}
 `;
 // ═══ FONTS ═══════════════════════════════════════════════════
-const F  = "'Rajdhani','Segoe UI',sans-serif";
-const FO = "'Orbitron','Arial Black',sans-serif";
-const FM = "'Permanent Marker','Impact',cursive";
+const F    = "'Rajdhani','Segoe UI',sans-serif";
+const FO   = "'Saira Condensed','Arial Black',Impact,sans-serif";
+const FHUD = "'Chakra Petch','Segoe UI',sans-serif";
+const FM   = "'Permanent Marker','Impact',cursive";
 // ═══ FL1IP LOGO ══════════════════════════════════════════════
 const FL1IP = ({ size = 1, opacity = 1 }) => (
   <span style={{fontFamily:FM, fontSize:22*size, letterSpacing:1*size, opacity}}>
@@ -120,8 +137,303 @@ const Panel = ({ children, style={} }) => (
 const SectionLabel = ({ children, color='#c09090' }) => (
   <div style={{fontSize:10.5,fontWeight:700,letterSpacing:2.5,color,textTransform:'uppercase',fontFamily:F,marginBottom:12}}>{children}</div>
 );
-// ═══ PLAYER CARD ═════════════════════════════════════════════
+// ═══ SHIELD CARDS (GOAT + DREAM LOBBY) ══════════════════════
 const TIER_LEVEL = {'Melhor Freezar':0,'Bagre':1,'Bom de jogo':2,'Dream Lobby':3,'GOAT':4};
+const G_GOLD = { hi:'#ffeeb0', mid:'#ffd700', lo:'#9c7220', deep:'#6b4a10' };
+const NAVY   = { c0:'#00041e', c1:'#0c1d68', c2:'#040933' };
+const SHIELD = 'polygon(47% 1%, 50% 4.2%, 53% 1%, 91% 3%, 100% 11%, 100% 86%, 86% 100%, 14% 100%, 0 86%, 0 11%, 9% 3%)';
+
+// ── helpers ──
+const CrystalFan = ({ cx, cy, count=12, a0=180, a1=360, rMin=50, rMax=130, thin, S=1, op=1 }) => {
+  const out = [];
+  for(let i=0;i<count;i++){
+    const t=count>1?i/(count-1):0;
+    const a=a0+(a1-a0)*t;
+    const len=rMin+(rMax-rMin)*(0.45+0.55*Math.abs(Math.sin(i*1.7+0.5)));
+    const w=thin?2.5:3+Math.abs(Math.sin(i*0.9))*2.5;
+    const o=op*(0.55+0.4*Math.abs(Math.sin(i*0.83+0.3)));
+    out.push(<div key={i} style={{position:'absolute',left:cx,top:cy,width:w*S,height:len*S,
+      transform:`translateX(-50%) rotate(${a}deg)`,transformOrigin:'50% 0',
+      background:`linear-gradient(180deg,${G_GOLD.hi},${G_GOLD.mid} 40%,${G_GOLD.lo})`,
+      clipPath:'polygon(50% 0, 100% 50%, 50% 100%, 0 50%)',
+      boxShadow:`0 0 5px ${G_GOLD.mid}aa`,opacity:o}}/>);
+  }
+  return out;
+};
+const ConfettiRain = ({ count=20, side='left', S=1, slow }) => {
+  const out=[];
+  const xR=side==='left'?[4,42]:side==='right'?[58,96]:[4,96];
+  for(let i=0;i<count;i++){
+    const x=xR[0]+(xR[1]-xR[0])*(((i*37)%100)/100);
+    const y=(i*23)%55+3;
+    const sz=3+(i%3);
+    out.push(<div key={i} className="lbc-rain" style={{position:'absolute',left:`${x}%`,top:`${y}%`,
+      width:sz*S,height:sz*S,
+      background:i%4===0?G_GOLD.hi:G_GOLD.mid,
+      clipPath:'polygon(50% 0, 100% 50%, 50% 100%, 0 50%)',
+      boxShadow:`0 0 ${sz*1.5}px ${G_GOLD.mid}aa`,
+      animationDelay:`${(i*0.17)%4}s`,animationDuration:`${slow?7:3+(i%3)*0.6}s`}}/>);
+  }
+  return out;
+};
+const ShieldSparkles = ({ count=14, color, S=1 }) => {
+  const col=color||G_GOLD.hi;
+  const out=[];
+  for(let i=0;i<count;i++){
+    const x=6+(i*29)%88; const y=4+(i*41)%72;
+    out.push(<div key={i} className="lbc-spark2" style={{position:'absolute',left:`${x}%`,top:`${y}%`,
+      width:3*S,height:3*S,background:col,borderRadius:'50%',
+      boxShadow:`0 0 6px ${col},0 0 12px ${col}99`,
+      animationDelay:`${(i*0.17)%3}s`}}/>);
+  }
+  return out;
+};
+const ShieldCorners = ({ S=1, col }) => {
+  const c=col||G_GOLD.hi;
+  return ['tl','tr','bl','br'].map(k=>(
+    <div key={k} style={{position:'absolute',
+      [k[0]==='t'?'top':'bottom']:16*S,[k[1]==='l'?'left':'right']:16*S,
+      width:24*S,height:24*S,borderColor:c,borderStyle:'solid',borderWidth:0,
+      borderTopWidth:k[0]==='t'?1.5:0,borderBottomWidth:k[0]==='b'?1.5:0,
+      borderLeftWidth:k[1]==='l'?1.5:0,borderRightWidth:k[1]==='r'?1.5:0,
+      [`border${k[0]==='t'?'Top':'Bottom'}${k[1]==='l'?'Left':'Right'}Radius`]:10*S,
+      opacity:.85,filter:`drop-shadow(0 0 3px ${c})`}}/>
+  ));
+};
+const TopChevron = ({ S=1 }) => (
+  <div style={{position:'absolute',top:10*S,left:'50%',transform:'translateX(-50%)',
+    display:'flex',flexDirection:'column',gap:1,alignItems:'center',zIndex:4}}>
+    {[0,1].map(i=>(
+      <div key={i} style={{width:14*S,height:7*S,background:G_GOLD.hi,
+        clipPath:'polygon(50% 0, 100% 100%, 75% 100%, 50% 38%, 25% 100%, 0 100%)',
+        opacity:1-i*0.3,filter:`drop-shadow(0 0 3px ${G_GOLD.mid})`}}/>
+    ))}
+  </div>
+);
+const GoldFramework = ({ S=1, sz=140 }) => {
+  const W=sz*S, H=sz*1.1*S;
+  return (
+    <div style={{position:'absolute',top:'13%',left:'50%',transform:'translateX(-50%)',
+      width:W,height:H,pointerEvents:'none'}}>
+      <div style={{position:'absolute',top:'22%',left:'22%',width:'56%',height:'56%',
+        background:`linear-gradient(135deg,rgba(255,235,150,0.22),rgba(40,28,8,0.55))`,
+        clipPath:'polygon(50% 0, 100% 50%, 50% 100%, 0 50%)',
+        boxShadow:`inset 0 0 18px rgba(255,215,0,0.35),0 4px 16px rgba(0,0,0,0.55)`}}/>
+      <div style={{position:'absolute',inset:0,transform:'translateX(-3%)'}}>
+        <div style={{position:'absolute',top:'2%',left:'2%',width:'96%',height:'96%',
+          border:`1.5px solid ${G_GOLD.mid}`,transform:'rotate(45deg)',
+          boxShadow:`0 0 10px ${G_GOLD.mid}88,inset 0 0 4px ${G_GOLD.hi}66`,opacity:.9}}/>
+        {[[50,0],[100,50],[50,100],[0,50]].map(([x,y],i)=>(
+          <div key={i} style={{position:'absolute',left:`${x}%`,top:`${y}%`,
+            width:6*S,height:6*S,background:G_GOLD.hi,borderRadius:'50%',
+            transform:'translate(-50%,-50%)',
+            boxShadow:`0 0 8px ${G_GOLD.mid},0 0 3px ${G_GOLD.hi}`}}/>
+        ))}
+      </div>
+      <div style={{position:'absolute',inset:0,transform:'translateX(22%)'}}>
+        <div style={{position:'absolute',top:'18%',left:'18%',width:'64%',height:'64%',
+          border:`1px solid ${G_GOLD.hi}`,transform:'rotate(15deg)',opacity:.7,
+          boxShadow:`0 0 6px ${G_GOLD.mid}55`}}/>
+        {[[20,30],[80,30],[20,70],[80,70]].map(([x,y],i)=>(
+          <div key={`m${i}`} style={{position:'absolute',left:`${x}%`,top:`${y}%`,
+            width:3*S,height:3*S,background:G_GOLD.mid,borderRadius:'50%',
+            transform:'translate(-50%,-50%)',
+            boxShadow:`0 0 4px ${G_GOLD.mid}`}}/>
+        ))}
+      </div>
+    </div>
+  );
+};
+const ShieldFrameRich = ({ S=1, bg, children }) => (
+  <>
+    <div style={{position:'absolute',inset:0,clipPath:SHIELD,
+      background:`linear-gradient(160deg,${G_GOLD.hi} 0%,${G_GOLD.mid} 25%,${G_GOLD.lo} 50%,${G_GOLD.mid} 75%,${G_GOLD.hi} 100%)`,
+      filter:`drop-shadow(0 0 22px ${G_GOLD.mid}66)`}}/>
+    <div style={{position:'absolute',inset:5*S,clipPath:SHIELD,background:'#0d0a04'}}/>
+    <div style={{position:'absolute',inset:7*S,clipPath:SHIELD,
+      background:`linear-gradient(160deg,${G_GOLD.mid},${G_GOLD.deep},${G_GOLD.mid})`}}/>
+    <div style={{position:'absolute',inset:8.5*S,clipPath:SHIELD,overflow:'hidden',background:bg}}>
+      {children}
+    </div>
+  </>
+);
+const ShieldFrameThin = ({ S=1, bg, children }) => (
+  <>
+    <div style={{position:'absolute',inset:0,clipPath:SHIELD,
+      background:`linear-gradient(160deg,${G_GOLD.mid},${G_GOLD.deep},${G_GOLD.mid})`,
+      filter:`drop-shadow(0 0 10px ${G_GOLD.mid}44)`}}/>
+    <div style={{position:'absolute',inset:2.5*S,clipPath:SHIELD,background:'#000'}}/>
+    <div style={{position:'absolute',inset:4*S,clipPath:SHIELD,
+      background:`linear-gradient(160deg,${G_GOLD.lo},${G_GOLD.mid},${G_GOLD.lo})`}}/>
+    <div style={{position:'absolute',inset:5.5*S,clipPath:SHIELD,overflow:'hidden',background:bg}}>
+      {children}
+    </div>
+  </>
+);
+
+// ── GoatCard ──
+const GoatCard = ({ player, card, attrs, scale=1 }) => {
+  const S=scale;
+  const W=290*S, H=432*S;
+  const navyBg=`linear-gradient(165deg,${NAVY.c0} 0%,${NAVY.c1} 50%,${NAVY.c2} 100%)`;
+  const sa=(attrs||[]).slice(0,6);
+  const scores=card?.scores||{};
+  return (
+    <div style={{position:'relative',width:W,height:H,
+      filter:'drop-shadow(0 18px 40px rgba(0,0,0,0.7))',flexShrink:0}}>
+      <ShieldFrameRich S={S} bg={navyBg}>
+        <div style={{position:'absolute',inset:0,
+          background:`radial-gradient(70% 55% at 50% 28%,${G_GOLD.mid}3a,transparent 60%)`}}/>
+        <ConfettiRain count={30} side="even" S={S} slow/>
+        <ShieldSparkles count={32} S={S}/>
+        <ShieldCorners S={S}/>
+        <TopChevron S={S}/>
+        {/* photo */}
+        <div style={{position:'absolute',top:'9%',left:0,right:0,height:'58%',overflow:'hidden'}}>
+          {(player.photoClean||player.photo) ?
+            <img src={player.photoClean||player.photo} alt="" style={{position:'absolute',bottom:0,left:'50%',
+              transform:'translateX(-50%)',height:'100%',objectFit:'contain',
+              filter:`drop-shadow(0 -4px 20px ${G_GOLD.mid}66)`}}/> :
+            <div style={{position:'absolute',inset:0,display:'flex',alignItems:'center',justifyContent:'center',
+              fontFamily:FO,fontWeight:900,fontSize:80*S,color:'rgba(255,255,255,0.045)'}}>{(player.nick||'').slice(0,2)}</div>
+          }
+        </div>
+        {/* silk fade */}
+        <div style={{position:'absolute',bottom:'-6%',left:'-10%',right:'-10%',height:'46%',
+          background:`radial-gradient(55% 80% at 50% 30%,${NAVY.c1}cc,transparent 60%)`,filter:'blur(8px)'}}/>
+        <div style={{position:'absolute',bottom:0,left:0,right:0,height:'40%',
+          background:`linear-gradient(to top,${NAVY.c0}f5 38%,transparent)`}}/>
+        {/* header */}
+        <div style={{position:'absolute',top:22*S,left:24*S,lineHeight:.82,zIndex:5}}>
+          <div style={{fontFamily:FO,fontWeight:900,fontSize:50*S,color:G_GOLD.hi,
+            textShadow:`0 2px 14px ${G_GOLD.mid}cc,0 0 22px ${G_GOLD.mid}55`,letterSpacing:-1}}>{card?.overall??0}</div>
+          <div style={{fontFamily:FHUD,fontWeight:700,fontSize:9*S,letterSpacing:2.4*S,color:G_GOLD.hi,
+            marginTop:4*S,textTransform:'uppercase',whiteSpace:'nowrap',
+            textShadow:`0 1px 6px ${G_GOLD.deep}`}}>GOAT</div>
+          <img src="/logo.png" alt="" style={{width:42*S,marginTop:6*S,opacity:.9,
+            filter:`drop-shadow(0 0 6px ${G_GOLD.hi}99)`}}
+            onError={e=>{e.target.style.display='none'}}/>
+        </div>
+        {/* footer */}
+        <div style={{position:'absolute',bottom:0,left:0,right:0,padding:`0 ${18*S}px ${16*S}px`,zIndex:5}}>
+          <div style={{fontFamily:FO,fontWeight:900,fontSize:23*S,color:'#fff',textAlign:'center',
+            letterSpacing:1.5*S,textShadow:`0 2px 10px ${G_GOLD.mid}88`}}>{player.nick||'???'}</div>
+          <div style={{height:1.5,margin:`${8*S}px 0`,
+            background:`linear-gradient(90deg,transparent,${G_GOLD.mid},transparent)`}}/>
+          <div style={{display:'grid',gridTemplateColumns:'repeat(6,1fr)',gap:2*S}}>
+            {sa.map((a,i)=>(
+              <div key={a.id} style={{textAlign:'center'}}>
+                <div style={{fontFamily:FHUD,fontWeight:700,fontSize:8.5*S,color:G_GOLD.mid,opacity:.92,letterSpacing:.3}}>{a.name.slice(0,3).toUpperCase()}</div>
+                <div style={{fontFamily:FO,fontWeight:800,fontSize:18*S,color:'#fff'}}>{Math.round(scores[a.id]??0)}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </ShieldFrameRich>
+      {/* crystal fan — outside shield so it spills over border */}
+      <CrystalFan cx="86%" cy="20%" count={18} a0={50} a1={270} rMin={40} rMax={110} thin S={S} op={0.92}/>
+    </div>
+  );
+};
+
+// ── TotwCard (Dream Lobby) ──
+const TotwCard = ({ player, card, attrs, scale=1 }) => {
+  const S=scale;
+  const W=270*S, H=408*S;
+  const t=getTier(card?.overall??0);
+  const blackBg=`linear-gradient(165deg,#0a0a0e 0%,#14141a 50%,#0a0a0e 100%)`;
+  const sa=(attrs||[]).slice(0,6);
+  const scores=card?.scores||{};
+  const shards=[
+    {left:'6%', top:'10%',w:34,h:42,rot: 8, op:.16},
+    {left:'76%',top:'12%',w:38,h:48,rot:-10,op:.18},
+    {left:'4%', top:'62%',w:32,h:40,rot:-12,op:.14},
+    {left:'78%',top:'66%',w:36,h:44,rot: 10,op:.16},
+  ];
+  const v2Sparkles=[[12,10],[30,18],[48,8],[66,14],[82,22],[8,32],[22,42],[40,36],[58,30],[74,44],[90,36],[14,56],[32,64],[50,58],[68,70],[84,62],[22,78],[60,78]];
+  const v2Streaks=[[18,6],[38,12],[56,4],[72,16],[88,8],[4,26],[26,36],[44,28],[62,38],[78,30],[96,38],[16,50],[34,60],[52,52],[70,60],[86,54],[10,76],[44,74]];
+  return (
+    <div style={{position:'relative',width:W,height:H,
+      filter:'drop-shadow(0 14px 32px rgba(0,0,0,0.7))',flexShrink:0}}>
+      <ShieldFrameThin S={S} bg={blackBg}>
+        <div style={{position:'absolute',inset:0,opacity:.65,
+          backgroundImage:`radial-gradient(80% 60% at 50% 18%,rgba(255,215,0,0.07),transparent 60%),radial-gradient(60% 70% at 50% 100%,rgba(0,0,0,0.4),transparent 60%)`}}/>
+        {shards.map((p,i)=>(
+          <div key={i} style={{position:'absolute',left:p.left,top:p.top,
+            width:p.w*S,height:p.h*S,transform:`rotate(${p.rot}deg)`,
+            background:`linear-gradient(135deg,${G_GOLD.mid}77,${G_GOLD.deep}44)`,
+            clipPath:'polygon(20% 0, 100% 25%, 80% 100%, 0 70%)',
+            opacity:p.op,border:`1px solid ${G_GOLD.mid}88`,
+            boxShadow:`0 0 6px ${G_GOLD.mid}55`}}/>
+        ))}
+        <div style={{position:'absolute',inset:0,
+          background:`radial-gradient(60% 40% at 50% 28%,${t.glow}33,transparent 60%)`,
+          mixBlendMode:'screen'}}/>
+        <GoldFramework S={S} sz={130}/>
+        {v2Sparkles.map(([x,y],i)=>(
+          <div key={`sp${i}`} className="lbc-spark2" style={{position:'absolute',left:`${x}%`,top:`${y}%`,
+            width:3*S,height:3*S,background:G_GOLD.hi,borderRadius:'50%',
+            boxShadow:`0 0 6px ${G_GOLD.mid},0 0 12px ${G_GOLD.mid}99`,
+            animationDelay:`${(i*0.17)%3}s`}}/>
+        ))}
+        {v2Streaks.map(([x,y],i)=>(
+          <div key={`st${i}`} className="lbc-spark2" style={{position:'absolute',left:`${x}%`,top:`${y}%`,
+            width:2*S,height:(4+i%4)*S,background:t.glow,opacity:.7,
+            clipPath:'polygon(50% 0, 100% 100%, 0 100%)',
+            boxShadow:`0 0 4px ${t.glow}`,
+            animationDelay:`${(i*0.13)%2}s`}}/>
+        ))}
+        {/* photo */}
+        <div style={{position:'absolute',top:'9%',left:0,right:0,height:'58%',overflow:'hidden'}}>
+          {(player.photoClean||player.photo) ?
+            <img src={player.photoClean||player.photo} alt="" style={{position:'absolute',bottom:0,left:'50%',
+              transform:'translateX(-50%)',height:'100%',objectFit:'contain',
+              filter:`drop-shadow(0 -4px 16px ${t.glow}55)`}}/> :
+            <div style={{position:'absolute',inset:0,display:'flex',alignItems:'center',justifyContent:'center',
+              fontFamily:FO,fontWeight:900,fontSize:80*S,color:'rgba(255,255,255,0.045)'}}>{(player.nick||'').slice(0,2)}</div>
+          }
+        </div>
+        <div style={{position:'absolute',bottom:0,left:0,right:0,height:'42%',
+          background:`linear-gradient(to top,#000 38%,transparent)`}}/>
+        {/* header */}
+        <div style={{position:'absolute',top:22*S,left:24*S,lineHeight:.82,zIndex:5}}>
+          <div style={{fontFamily:FO,fontWeight:900,fontSize:50*S,color:'#fff',
+            textShadow:`0 2px 12px ${t.glow}99`,letterSpacing:-1}}>{card?.overall??0}</div>
+          <div style={{fontFamily:FHUD,fontWeight:700,fontSize:9*S,letterSpacing:2.4*S,color:t.score,
+            marginTop:4*S,textTransform:'uppercase',whiteSpace:'nowrap'}}>DREAM LOBBY</div>
+          <img src="/logo.png" alt="" style={{width:42*S,marginTop:6*S,opacity:.9,
+            filter:`drop-shadow(0 0 6px ${t.glow}99)`}}
+            onError={e=>{e.target.style.display='none'}}/>
+        </div>
+        {/* footer */}
+        <div style={{position:'absolute',bottom:0,left:0,right:0,padding:`0 ${18*S}px ${16*S}px`,zIndex:5}}>
+          <div style={{fontFamily:FO,fontWeight:900,fontSize:23*S,color:'#fff',textAlign:'center',
+            letterSpacing:1.5*S,textShadow:`0 2px 10px ${t.glow}88`}}>{player.nick||'???'}</div>
+          <div style={{height:1.5,margin:`${8*S}px 0`,
+            background:`linear-gradient(90deg,transparent,${G_GOLD.mid},transparent)`}}/>
+          <div style={{display:'grid',gridTemplateColumns:'repeat(6,1fr)',gap:2*S}}>
+            {sa.map((a,i)=>(
+              <div key={a.id} style={{textAlign:'center'}}>
+                <div style={{fontFamily:FHUD,fontWeight:700,fontSize:8.5*S,color:t.score,opacity:.92,letterSpacing:.3}}>{a.name.slice(0,3).toUpperCase()}</div>
+                <div style={{fontFamily:FO,fontWeight:800,fontSize:18*S,color:'#fff'}}>{Math.round(scores[a.id]??0)}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </ShieldFrameThin>
+    </div>
+  );
+};
+
+// ── roteador de carta ──
+const AnyCard = ({ player, card, attrs, scale=1, reveal=false }) => {
+  const lvl = TIER_LEVEL[getTier(card?.overall??0).name] ?? 0;
+  if(lvl===4) return <GoatCard player={player} card={card} attrs={attrs} scale={scale}/>;
+  if(lvl===3) return <TotwCard player={player} card={card} attrs={attrs} scale={scale}/>;
+  return <PlayerCard player={player} card={card} attrs={attrs} scale={scale} reveal={reveal}/>;
+};
+
+// ═══ PLAYER CARD ═════════════════════════════════════════════
 const PlayerCard = ({ player, card, attrs, scale=1, reveal=false }) => {
   const t = getTier(card.overall);
   const lvl = TIER_LEVEL[t.name] ?? 0;
@@ -781,6 +1093,108 @@ const AttrsTab = ({ attrs, setAttrs }) => {
     </div>
   );
 };
+// ═══ PACK OPENING ════════════════════════════════════════════
+const PackOpening = ({ player, card, attrs, onDismiss }) => {
+  const [phase, setPhase] = useState(0);
+  const t = getTier(card?.overall??0);
+  const lvl = TIER_LEVEL[t.name]??0;
+  const ringCol = lvl>=3 ? G_GOLD.mid : t.glow;
+  useEffect(()=>{
+    const steps=[80,600,1100,1700,2500,3100,3700];
+    const timers=steps.map((d,i)=>setTimeout(()=>setPhase(i),d));
+    return ()=>timers.forEach(clearTimeout);
+  },[]);
+  const handleClick=()=>{ if(phase>=6) onDismiss&&onDismiss(); };
+  return (
+    <div onClick={handleClick} style={{
+      position:'fixed',inset:0,zIndex:9000,overflow:'hidden',
+      background:'radial-gradient(80% 60% at 50% 50%,rgba(20,4,4,0.92),rgba(0,0,0,0.98))',
+      opacity:phase>=0?1:0,transition:'opacity .35s',
+      cursor:phase>=6?'pointer':'default',
+    }}>
+      {/* fumaça */}
+      <div style={{position:'absolute',inset:0,opacity:phase>=1?1:0,transition:'opacity .7s'}}>
+        <div className="lbc-smoke" style={{position:'absolute',inset:0,
+          backgroundImage:'url(/smoke-red.png)',backgroundSize:'200%',backgroundPosition:'40% 40%',opacity:.85,mixBlendMode:'screen'}}/>
+        <div style={{position:'absolute',inset:0,
+          backgroundImage:'url(/smoke-red.png)',backgroundSize:'140%',backgroundPosition:'20% 60%',opacity:.6,mixBlendMode:'screen'}}/>
+        <div style={{position:'absolute',inset:0,
+          backgroundImage:'url(/smoke-red.png)',backgroundSize:'180%',backgroundPosition:'60% 30%',
+          opacity:lvl>=3?.35:.2,mixBlendMode:'screen',
+          filter:lvl>=3?'hue-rotate(34deg)':'none'}}/>
+      </div>
+      {/* radial de cor */}
+      <div style={{position:'absolute',inset:0,
+        background:`radial-gradient(45% 35% at 50% 50%,${ringCol}${phase>=3?'55':'20'},transparent 70%)`,
+        transition:'all .8s',opacity:phase>=1?1:0}}/>
+      {/* pincelada branca */}
+      <div style={{position:'absolute',top:'50%',left:'-30%',width:'160%',
+        transform:'translateY(-50%) rotate(-7deg)',
+        animation:phase>=2?'lbcPackSwipe 1.1s cubic-bezier(.4,0,.2,1) forwards':'none',
+        opacity:phase>=2?1:0}}>
+        <img src="/paint-swoosh.png" alt="" style={{width:'100%',display:'block',opacity:.85}}/>
+      </div>
+      {/* raios (tier alto) */}
+      {phase>=3&&lvl>=3&&(
+        <div style={{position:'absolute',top:'50%',left:'50%',width:1000,height:1000,
+          transform:'translate(-50%,-50%)',pointerEvents:'none'}}>
+          {Array.from({length:12}).map((_,i)=>(
+            <div key={i} style={{position:'absolute',top:'50%',left:'50%',
+              width:4,height:600,background:`linear-gradient(${ringCol},transparent)`,
+              transformOrigin:'50% 0',transform:`translate(-50%,0) rotate(${i*30}deg)`,
+              opacity:phase>=4?.4:0,transition:'opacity .6s',
+              filter:`blur(2px) drop-shadow(0 0 8px ${ringCol})`}}/>
+          ))}
+        </div>
+      )}
+      {/* burst ring */}
+      {phase>=4&&(
+        <div style={{position:'absolute',top:'50%',left:'50%',width:200,height:200,
+          transform:'translate(-50%,-50%)',borderRadius:'50%',
+          border:`3px solid ${ringCol}`,animation:'lbcPackBurst 1.1s cubic-bezier(.2,.6,.4,1) forwards',
+          boxShadow:`0 0 40px ${ringCol}`}}/>
+      )}
+      {/* carta */}
+      <div style={{position:'absolute',top:'50%',left:'50%',
+        animation:phase>=3?'lbcPackCardIn 1.0s cubic-bezier(.2,.7,.3,1) forwards':'none',
+        opacity:phase>=3?1:0}}>
+        <AnyCard player={player} card={card} attrs={attrs} scale={1.2}/>
+      </div>
+      {/* tier gigante atrás */}
+      {phase>=5&&(
+        <div style={{position:'absolute',top:'50%',left:'50%',
+          transform:'translate(-50%,-50%)',
+          fontFamily:FO,fontWeight:900,fontSize:220,color:'transparent',
+          WebkitTextStroke:`1px ${ringCol}33`,letterSpacing:14,whiteSpace:'nowrap',
+          opacity:0,animation:'lbcPackTierIn .8s ease-out forwards',
+          pointerEvents:'none',zIndex:-1}}>{t.lbl}</div>
+      )}
+      {/* cue continuar */}
+      {phase>=6&&(
+        <div style={{position:'absolute',bottom:48,left:0,right:0,textAlign:'center',
+          fontFamily:FHUD,fontWeight:600,fontSize:11,letterSpacing:4,
+          color:'#fff',opacity:.85,textTransform:'uppercase',
+          animation:'lbcPackCue 1.4s ease-in-out infinite'}}>
+          CLIQUE PARA CONTINUAR
+        </div>
+      )}
+      {/* logo */}
+      <div style={{position:'absolute',top:24,left:28,opacity:phase>=5?.85:0,transition:'opacity .8s'}}>
+        <img src="/logo.png" alt="" style={{height:42,filter:`drop-shadow(0 0 10px ${R})`}}
+          onError={e=>{e.target.style.display='none'}}/>
+      </div>
+      {/* label topo */}
+      {phase>=5&&(
+        <div style={{position:'absolute',top:36,left:0,right:0,textAlign:'center',
+          fontFamily:FHUD,fontWeight:700,fontSize:11,letterSpacing:5,
+          color:ringCol,textShadow:`0 0 12px ${ringCol}`,
+          opacity:0,animation:'lbcPackCue .8s ease-out forwards'}}>
+          OVERALL REVELADO · {t.lbl}
+        </div>
+      )}
+    </div>
+  );
+};
 // ═══ DOMINGO ═════════════════════════════════════════════════
 const TAGS = [
   {id:'baiter',    label:'Baiter',    type:'neg'},
@@ -796,7 +1210,8 @@ const SundayTab = ({ players, attrs, sessions, setSessions }) => {
   const [scoring, setScoring] = useState(null);
   const [scores,  setScores]  = useState({});
   const [tags,    setTags]    = useState({});
-  const [preview, setPreview] = useState(null);
+  const [preview,  setPreview]  = useState(null);
+  const [packOpen, setPackOpen] = useState(null); // {card, player}
 
   const baseOverall = scoring ? calc(scores, attrs) : 0;
   const negCount = TAGS.filter(t => t.type==='neg' && tags[t.id]).length;
@@ -812,6 +1227,7 @@ const SundayTab = ({ players, attrs, sessions, setSessions }) => {
     const c  = {playerId:scoring.id, scores:{...scores}, overall, tags:{...tags}};
     const nc = [...cards.filter(x => x.playerId!==scoring.id), c];
     setCards(nc); setPreview({card:c, player:scoring}); setScoring(null);
+    setPackOpen({card:c, player:scoring});
   };
   const saveSess = () => {
     if(!cards.length) return;
@@ -834,7 +1250,7 @@ const SundayTab = ({ players, attrs, sessions, setSessions }) => {
           <div style={{display:'flex',gap:24,flexWrap:'wrap',alignItems:'flex-start'}}>
             <div style={{flexShrink:0}}>
               <SectionLabel color={tier.txt}>Prévia ao Vivo</SectionLabel>
-              <PlayerCard player={scoring} card={{scores,overall,tags}} attrs={attrs} scale={0.88}/>
+              <AnyCard player={scoring} card={{scores,overall,tags}} attrs={attrs} scale={0.88}/>
             </div>
             <div style={{flex:1,minWidth:260}}>
               {/* Header: nome + overall */}
@@ -895,7 +1311,7 @@ const SundayTab = ({ players, attrs, sessions, setSessions }) => {
                 </div>
               ))}
               <div style={{display:'flex',gap:8,marginTop:16}}>
-                <Btn onClick={gen} v="success">✨ Gerar Cartinha</Btn>
+                <Btn onClick={gen} v="success" style={{fontSize:15,padding:'12px 24px',letterSpacing:2}}>★ REVELAR CARTA</Btn>
                 <Btn onClick={() => setScoring(null)} v="danger">✕ Cancelar</Btn>
               </div>
             </div>
@@ -908,9 +1324,13 @@ const SundayTab = ({ players, attrs, sessions, setSessions }) => {
             ✅ Cartinha de {preview.player.nick} gerada!
           </div>
           <div style={{display:'flex',justifyContent:'center'}}>
-            <PlayerCard player={preview.player} card={preview.card} attrs={attrs} scale={1.05} reveal/>
+            <AnyCard player={preview.player} card={preview.card} attrs={attrs} scale={1.05} reveal/>
           </div>
         </Panel>
+      )}
+      {packOpen && (
+        <PackOpening player={packOpen.player} card={packOpen.card} attrs={attrs}
+          onDismiss={()=>setPackOpen(null)}/>
       )}
       {!players.length ? (
         <Panel style={{textAlign:'center',padding:'40px 20px'}}>
@@ -947,7 +1367,7 @@ const SundayTab = ({ players, attrs, sessions, setSessions }) => {
                   const c = cards.find(x => x.playerId===p.id);
                   return c ? (
                     <div key={p.id} style={{cursor:'pointer'}} onClick={() => setPreview({card:c,player:p})}>
-                      <PlayerCard player={p} card={c} attrs={attrs} scale={0.65}/>
+                      <AnyCard player={p} card={c} attrs={attrs} scale={0.65}/>
                     </div>
                   ) : null;
                 })}
@@ -995,7 +1415,7 @@ const HistoryTab = ({ sessions, players, attrs }) => {
           <div style={{display:'flex',gap:14,flexWrap:'wrap'}}>
             {[...(sess.cards||[])].sort((a,b) => b.overall-a.overall).map(c => {
               const p = players.find(pl => pl.id===c.playerId);
-              return p ? <PlayerCard key={c.playerId} player={p} card={c} attrs={attrs} scale={0.85}/> : null;
+              return p ? <AnyCard key={c.playerId} player={p} card={c} attrs={attrs} scale={0.85}/> : null;
             })}
           </div>
         </>
@@ -1209,65 +1629,90 @@ export default function App() {
   if(!authed) return <LoginScreen onLogin={() => setAuthed(true)}/>;
   const logout = () => { sv('lbc2_auth', false); setAuthed(false); };
   const TABS = [
-    {id:'home',    icon:'🏠', label:'Home'},
-    {id:'players', icon:'👥', label:'Jogadores'},
-    {id:'attrs',   icon:'⚙️', label:'Atributos'},
-    {id:'sunday',  icon:'🎮', label:'Domingo'},
-    {id:'history', icon:'📊', label:'Histórico'},
-    {id:'config',  icon:'🔧', label:'Config'},
+    {id:'home',    icon:'◆', label:'HOME'},
+    {id:'players', icon:'☰', label:'JOGADORES'},
+    {id:'attrs',   icon:'◇', label:'ATRIBUTOS'},
+    {id:'sunday',  icon:'▲', label:'DOMINGO'},
+    {id:'history', icon:'◉', label:'HISTÓRICO'},
+    {id:'config',  icon:'⚙', label:'CONFIG'},
   ];
   return (
-    <div style={{background:'#130e0e',minHeight:'100vh',color:'#f0e8e8',display:'flex',flexDirection:'column'}}>
-      <div style={{
-        background:'linear-gradient(90deg,#0e0404,#1a0606,#0e0404)',
-        borderBottom:'1px solid rgba(255,255,255,0.10)',
-        padding:'12px 20px', display:'flex', alignItems:'center', gap:16,
-        position:'relative', overflow:'hidden',
-      }}>
-        <div style={{position:'absolute',bottom:0,left:0,right:0,height:1.5,
-          background:`linear-gradient(90deg,transparent,${R},#ff4422,${R},transparent)`,
-          backgroundSize:'200% 100%', animation:'lbcHdr 3s linear infinite'}}/>
-        <div style={{position:'absolute',top:0,right:0,width:200,height:'100%',
-          background:'radial-gradient(ellipse 80% 120% at 100% 50%,rgba(180,10,10,0.12) 0%,transparent 70%)',pointerEvents:'none'}}/>
-        <div style={{flexShrink:0,display:'flex',alignItems:'center',gap:4,filter:`drop-shadow(0 0 8px ${R}66)`}}>
-          <FL1IP size={1.35}/>
-        </div>
-        <div style={{width:1,height:32,background:'rgba(200,17,17,0.2)',flexShrink:0}}/>
-        <div style={{flex:1}}>
-          <div style={{fontSize:17,fontWeight:900,fontFamily:FO,letterSpacing:2.5,
-            background:`linear-gradient(90deg,${R},#ff6644,#ffffff)`,
-            WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent'}}>
-            LOBBÃO CRAFT
-          </div>
-          <div style={{fontSize:9.5,color:'#907070',letterSpacing:4,fontFamily:F,fontWeight:700,textTransform:'uppercase',marginTop:1}}>
-            Ranking Semanal · CS2
-          </div>
-        </div>
-        <button onClick={logout} title="Sair" style={{
-          background:'none',border:'1px solid rgba(200,17,17,0.15)',borderRadius:7,
-          padding:'5px 10px',cursor:'pointer',color:'#907070',fontSize:11,
-          fontFamily:F,fontWeight:700,letterSpacing:1,textTransform:'uppercase',
-          transition:'all .2s',flexShrink:0,
-        }}
-          onMouseEnter={e=>{e.target.style.borderColor='rgba(200,17,17,.4)';e.target.style.color='#cc4444';}}
-          onMouseLeave={e=>{e.target.style.borderColor='rgba(200,17,17,0.15)';e.target.style.color='#3a1515';}}
-        >🚪 Sair</button>
+    <div style={{background:'#0a0606',minHeight:'100vh',color:'#f0e8e8',display:'flex',flexDirection:'column',position:'relative'}}>
+      {/* ── PageBg fumaça ── */}
+      <div style={{position:'fixed',inset:0,zIndex:0,pointerEvents:'none'}}>
+        <div style={{position:'absolute',inset:0,background:`radial-gradient(120% 80% at 50% -10%,#2a0808,#16110f 55%,#0a0606 100%)`}}/>
+        <div className="lbc-smoke" style={{position:'absolute',inset:0,
+          backgroundImage:'url(/smoke-red.png)',backgroundSize:'80%',backgroundPosition:'30% 20%',
+          opacity:.32,mixBlendMode:'screen'}}/>
+        <div style={{position:'absolute',inset:0,
+          backgroundImage:'url(/smoke-red.png)',backgroundSize:'120%',backgroundPosition:'70% 80%',
+          opacity:.22,mixBlendMode:'screen'}}/>
+        <div style={{position:'absolute',left:0,bottom:0,width:'40%',height:'40%',
+          background:'radial-gradient(circle at 0% 100%,rgba(0,180,220,0.06),transparent 60%)'}}/>
       </div>
-      <div style={{background:'rgba(18,8,8,0.97)',backdropFilter:'blur(20px)',borderBottom:'1px solid rgba(200,17,17,0.18)',display:'flex',overflowX:'auto',padding:'0 8px'}}>
-        {TABS.map(t => (
-          <button key={t.id} className="lbc-nav-btn" onClick={() => setTab(t.id)} style={{
-            background:'none', border:'none', cursor:'pointer',
-            padding:'11px 15px', fontSize:11.5, fontWeight:700, fontFamily:F, letterSpacing:1.5,
-            color: tab===t.id ? R : '#a07070',
-            borderBottom: tab===t.id ? `2px solid ${R}` : '2px solid transparent',
-            textTransform:'uppercase', transition:'color .2s', whiteSpace:'nowrap',
-            display:'flex', alignItems:'center', gap:6,
-          }}>
-            <span style={{fontSize:13}}>{t.icon}</span>{t.label}
+      {/* ── Header ── */}
+      <header style={{position:'relative',overflow:'hidden',borderBottom:'1px solid rgba(255,255,255,0.07)',zIndex:10,flexShrink:0}}>
+        <div style={{position:'absolute',inset:0,background:'linear-gradient(180deg,#0e0404,#1a0606 55%,#0e0404)'}}/>
+        <div className="lbc-smoke" style={{position:'absolute',inset:0,
+          backgroundImage:'url(/smoke-red.png)',backgroundSize:'60%',backgroundPosition:'10% 20%',
+          opacity:.5,mixBlendMode:'screen'}}/>
+        <div style={{position:'absolute',top:-60,right:-60,width:280,height:280,
+          background:'radial-gradient(circle,rgba(204,17,17,0.35),transparent 70%)',pointerEvents:'none'}}/>
+        <img src="/paint-swoosh.png" alt="" style={{position:'absolute',top:-20,right:-60,width:360,
+          transform:'rotate(8deg)',opacity:.10,pointerEvents:'none'}}
+          onError={e=>{e.target.style.display='none'}}/>
+        <div style={{position:'relative',display:'flex',alignItems:'center',gap:20,padding:'14px 24px'}}>
+          <img src="/logo.png" alt="FL1IP" style={{height:48,filter:`drop-shadow(0 0 12px ${R}bb)`}}
+            onError={e=>{e.target.style.display='none'}}/>
+          <div style={{flex:1}}>
+            <div style={{fontFamily:FO,fontWeight:900,fontSize:26,letterSpacing:3,lineHeight:1,
+              background:`linear-gradient(90deg,${R},#ff6644 45%,#ffffff)`,
+              WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent'}}>LOBBÃO CRAFT</div>
+            <div style={{fontFamily:FHUD,fontWeight:500,fontSize:10,letterSpacing:3,color:'rgba(255,255,255,0.45)',marginTop:3}}>
+              RANKING SEMANAL · CS2
+            </div>
+          </div>
+          <button onClick={logout} style={{
+            fontFamily:FHUD,fontWeight:600,fontSize:11,letterSpacing:2,
+            color:'rgba(255,255,255,0.55)',background:'rgba(0,0,0,0.4)',
+            border:'1px solid rgba(255,255,255,0.10)',padding:'8px 14px',cursor:'pointer',
+            textTransform:'uppercase',transition:'all .2s',flexShrink:0,
+          }}
+            onMouseEnter={e=>{e.currentTarget.style.color='#ff4444';e.currentTarget.style.borderColor='rgba(200,17,17,.4)';}}
+            onMouseLeave={e=>{e.currentTarget.style.color='rgba(255,255,255,0.55)';e.currentTarget.style.borderColor='rgba(255,255,255,0.10)';}}>
+            SAIR ↗
           </button>
-        ))}
-      </div>
-      <div style={{flex:1,padding:20,overflowY:'auto'}}>
+        </div>
+        {/* linha animada */}
+        <div className="lbc-hdr-line" style={{position:'absolute',bottom:0,left:0,right:0,height:2,
+          background:`linear-gradient(90deg,transparent,${R} 30%,#ff4422 50%,${R} 70%,transparent)`,
+          backgroundSize:'200% 100%',animation:'lbcHdrLine 4s linear infinite'}}/>
+      </header>
+      {/* ── Nav ── */}
+      <nav style={{position:'relative',background:'rgba(10,4,4,0.92)',backdropFilter:'blur(14px)',
+        borderBottom:'1px solid rgba(255,255,255,0.06)',zIndex:10,flexShrink:0}}>
+        <div style={{display:'flex',gap:0,padding:'0 16px',overflowX:'auto'}}>
+          {TABS.map(t => {
+            const isActive = tab===t.id;
+            return (
+              <button key={t.id} onClick={()=>setTab(t.id)} style={{
+                position:'relative',display:'flex',alignItems:'center',gap:7,
+                padding:'13px 16px',background:'transparent',border:'none',cursor:'pointer',
+                fontFamily:FHUD,fontWeight:700,fontSize:11,letterSpacing:2.2,
+                color:isActive?R:'rgba(255,255,255,0.45)',transition:'color .15s',
+                textTransform:'uppercase',whiteSpace:'nowrap',
+              }}
+                onMouseEnter={e=>{if(!isActive)e.currentTarget.style.color='rgba(255,255,255,0.78)';}}
+                onMouseLeave={e=>{if(!isActive)e.currentTarget.style.color='rgba(255,255,255,0.45)';}}>
+                <span style={{fontSize:11,opacity:.8}}>{t.icon}</span>{t.label}
+                {isActive && <span style={{position:'absolute',left:12,right:12,bottom:0,height:2,
+                  background:R,boxShadow:`0 0 10px ${R}`}}/>}
+              </button>
+            );
+          })}
+        </div>
+      </nav>
+      <div style={{flex:1,padding:20,overflowY:'auto',position:'relative',zIndex:1}}>
         {tab==='home'    && <HomeTab    players={players} sessions={sessions} attrs={attrs}/>}
         {tab==='players' && <PlayersTab players={players} setPlayers={sp} apiKey={apiKey}/>}
         {tab==='attrs'   && <AttrsTab   attrs={attrs} setAttrs={sa}/>}
