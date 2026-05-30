@@ -1074,16 +1074,18 @@ const PlayersTab = ({ players, setPlayers, apiKey }) => {
   };
   const del = id => { if(confirm('Remover jogador?')) setPlayers(players.filter(p => p.id!==id)); };
   return (
-    <div>
-      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:20}}>
-        <SectionLabel>👥 Jogadores ({players.length})</SectionLabel>
-        <Btn onClick={() => openForm()}>+ Adicionar</Btn>
+    <div style={{maxWidth:1180,margin:'0 auto',padding:'14px 6px 70px'}}>
+      {/* hero */}
+      <div style={{display:'flex',alignItems:'flex-end',justifyContent:'space-between',flexWrap:'wrap',gap:20,marginBottom:28}}>
+        <div>
+          <SectionLabel style={{marginBottom:0}}>ELENCO DO LOBBÃO · {players.length} JOGADOR{players.length===1?'':'ES'}</SectionLabel>
+          <h1 style={{fontFamily:FO,fontWeight:900,fontSize:44,color:'#f0e8e8',margin:'6px 0 0',letterSpacing:-1}}>OS <span style={{color:R}}>JOGADORES</span></h1>
+        </div>
+        <Btn size="lg" onClick={()=>openForm()}>+ ADICIONAR JOGADOR</Btn>
       </div>
       {open && (
-        <Panel style={{marginBottom:20}}>
-          <div style={{fontSize:14,fontWeight:700,color:'#f0dada',marginBottom:18,fontFamily:F,letterSpacing:.5}}>
-            {editId ? '✏️ Editar' : '➕ Novo'} Jogador
-          </div>
+        <Panel style={{marginBottom:24,padding:24}}>
+          <SectionLabel style={{marginBottom:18}}>{editId ? '✏️ EDITAR JOGADOR' : '➕ NOVO JOGADOR'}</SectionLabel>
           <div style={{display:'flex',gap:24,flexWrap:'wrap'}}>
             <div style={{flex:1,minWidth:210}}>
               <Field label="Nick na Live"    value={form.nick}   onChange={v => setForm(f=>({...f,nick:v}))}/>
@@ -1126,26 +1128,38 @@ const PlayersTab = ({ players, setPlayers, apiKey }) => {
           </div>
         </Panel>
       )}
-      <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(148px,1fr))',gap:12}}>
-        {players.map(p => (
-          <Panel key={p.id} style={{padding:16,textAlign:'center'}}>
-            {(p.photoClean || p.photo)
-              ? <img src={p.photoClean||p.photo} style={{width:70,height:92,objectFit:p.photoClean?'contain':'cover',borderRadius:8,background:'rgba(0,0,0,.4)'}}/>
-              : <div style={{width:70,height:92,borderRadius:8,background:'rgba(35,12,12,0.85)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:30,margin:'0 auto',border:'1px solid rgba(255,255,255,0.06)'}}>👤</div>
-            }
-            <div style={{fontWeight:700,marginTop:10,fontSize:14,color:'#f0e8e8',fontFamily:F}}>{p.nick}</div>
-            {p.gcNick && <div style={{fontSize:10.5,color:'#c09090',marginTop:2,fontFamily:F}}>{p.gcNick}</div>}
-            <div style={{display:'flex',gap:7,justifyContent:'center',marginTop:11}}>
-              <Btn onClick={() => openForm(p)} v="ghost"  size="xs">✏️</Btn>
-              <Btn onClick={() => del(p.id)}   v="danger" size="xs">🗑️</Btn>
-            </div>
-          </Panel>
+      <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(170px,1fr))',gap:16}}>
+        {players.map((p,i) => (
+          <div key={p.id} className="lbc-pop" style={{animationDelay:`${i*0.05}s`}}>
+            <Panel style={{padding:18,textAlign:'center'}}>
+              <div style={{width:90,height:120,margin:'0 auto',borderRadius:10,overflow:'hidden',
+                background:'linear-gradient(170deg,#1a0606,#0a0404)',border:'1px solid rgba(255,255,255,0.08)',
+                position:'relative',boxShadow:`0 4px 14px rgba(0,0,0,0.5)`}}>
+                {(p.photoClean || p.photo) ? (
+                  <img src={p.photoClean||p.photo} alt="" style={{width:'100%',height:'100%',
+                    objectFit:p.photoClean?'contain':'cover',background:'rgba(0,0,0,.3)'}}/>
+                ) : (
+                  <div style={{position:'absolute',inset:0,display:'flex',alignItems:'center',justifyContent:'center',
+                    fontFamily:FO,fontWeight:900,fontSize:34,color:'rgba(255,255,255,0.15)',letterSpacing:-1}}>
+                    {(p.nick||'??').slice(0,2).toUpperCase()}
+                  </div>
+                )}
+              </div>
+              <div style={{fontFamily:FO,fontWeight:800,marginTop:12,fontSize:17,color:'#f0e8e8',letterSpacing:.5}}>{p.nick}</div>
+              {p.gcNick && <div style={{fontFamily:FHUD,fontSize:10,color:'#907070',marginTop:2,letterSpacing:1,textTransform:'uppercase'}}>{p.gcNick}</div>}
+              <div style={{display:'flex',gap:6,justifyContent:'center',marginTop:12}}>
+                <Btn onClick={() => openForm(p)} v="ghost"  size="xs">✏️ Editar</Btn>
+                <Btn onClick={() => del(p.id)}   v="danger" size="xs">🗑️</Btn>
+              </div>
+            </Panel>
+          </div>
         ))}
       </div>
       {!players.length && !open && (
-        <Panel style={{textAlign:'center',padding:'40px 20px'}}>
+        <Panel style={{textAlign:'center',padding:'40px 20px',maxWidth:540,margin:'40px auto'}}>
           <div style={{fontSize:44,marginBottom:12}}>👥</div>
           <div style={{fontSize:14,color:'#c09090',fontFamily:F,fontWeight:600}}>Nenhum jogador cadastrado.</div>
+          <div style={{fontSize:12,color:'#907070',marginTop:6,fontFamily:F}}>Clique em "+ Adicionar Jogador" pra começar.</div>
         </Panel>
       )}
     </div>
@@ -1167,42 +1181,79 @@ const AttrsTab = ({ attrs, setAttrs }) => {
     }
     setForm({name:'',weight:'10'});
   };
+  const totalCol = total===100 ? '#33bb55' : '#ff8844';
   return (
-    <div>
-      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:20}}>
-        <SectionLabel>⚙️ Atributos</SectionLabel>
-        <span style={{fontSize:13,color:total===100?'#44dd88':'#ff8844',fontWeight:700,fontFamily:F}}>
-          Peso total: {total}% {total===100?'✅':'⚠️'}
-        </span>
+    <div style={{maxWidth:1180,margin:'0 auto',padding:'14px 6px 70px'}}>
+      {/* hero */}
+      <div style={{marginBottom:28}}>
+        <SectionLabel style={{marginBottom:0}}>FÓRMULA DO OVERALL</SectionLabel>
+        <h1 style={{fontFamily:FO,fontWeight:900,fontSize:44,color:'#f0e8e8',margin:'6px 0 0',letterSpacing:-1}}>OS <span style={{color:R}}>ATRIBUTOS</span></h1>
+        <div style={{fontFamily:F,fontSize:15,color:'#c09090',marginTop:8,maxWidth:620}}>
+          Cada atributo pesa diferente no overall. A soma dos pesos é <span style={{fontFamily:FO,fontWeight:800,color:totalCol}}>{total}%</span> {total===100?'✅':'⚠️ (ideal: 100%)'}. Ajuste como o Lobbão valoriza cada skill.
+        </div>
       </div>
-      <Panel style={{marginBottom:16}}>
-        <div style={{display:'flex',gap:10,flexWrap:'wrap',alignItems:'flex-end'}}>
-          <div style={{flex:1,minWidth:160,marginBottom:0}}>
+
+      {/* form de novo atributo */}
+      <Panel style={{padding:'18px 22px',marginBottom:20}}>
+        <SectionLabel style={{marginBottom:14}}>{editId ? '✏️ EDITAR ATRIBUTO' : '+ NOVO ATRIBUTO'}</SectionLabel>
+        <div style={{display:'flex',gap:12,flexWrap:'wrap',alignItems:'flex-end'}}>
+          <div style={{flex:1,minWidth:180}}>
             <Field label="Nome do Atributo" value={form.name} onChange={v => setForm(f=>({...f,name:v}))}/>
           </div>
-          <div style={{width:95,marginBottom:0}}>
+          <div style={{width:110}}>
             <Field label="Peso %" value={form.weight} onChange={v => setForm(f=>({...f,weight:v}))} type="number"/>
           </div>
-          <div style={{paddingBottom:1,display:'flex',gap:7}}>
-            <Btn onClick={save}>{editId ? '✔ Salvar' : '+ Adicionar'}</Btn>
-            {editId && <Btn onClick={() => { setEditId(null); setForm({name:'',weight:'10'}); }} v="danger">✕</Btn>}
+          <div style={{paddingBottom:14,display:'flex',gap:8}}>
+            <Btn onClick={save} v="success">{editId ? '✔ Salvar' : '+ Adicionar'}</Btn>
+            {editId && <Btn onClick={() => { setEditId(null); setForm({name:'',weight:'10'}); }} v="ghost">✕ Cancelar</Btn>}
           </div>
         </div>
       </Panel>
-      <div style={{display:'flex',flexDirection:'column',gap:8}}>
-        {attrs.map(a => (
-          <Panel key={a.id} style={{padding:'12px 16px',borderRadius:10}}>
-            <div style={{display:'flex',alignItems:'center',gap:12}}>
-              <div style={{flex:1,fontWeight:700,color:'#f0e8e8',fontSize:14,fontFamily:F}}>{a.name}</div>
-              <div style={{fontSize:12.5,color:R,fontWeight:700,width:38,textAlign:'right',fontFamily:FO}}>{a.weight}%</div>
-              <div style={{width:80,height:4,background:'rgba(255,255,255,0.07)',borderRadius:2}}>
-                <div style={{width:`${Math.min(100,a.weight)}%`,height:'100%',background:`linear-gradient(90deg,#880000,${R})`,borderRadius:2}}/>
+
+      {/* grid de atributos */}
+      <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(280px,1fr))',gap:14,marginBottom:36}}>
+        {attrs.map((a,i) => (
+          <div key={a.id} className="lbc-pop" style={{animationDelay:`${i*0.05}s`}}>
+            <Panel accent={R} style={{padding:'18px 20px'}}>
+              <div style={{display:'flex',justifyContent:'space-between',alignItems:'baseline'}}>
+                <div style={{flex:1,minWidth:0}}>
+                  <div style={{fontFamily:FO,fontWeight:800,fontSize:20,color:'#f0e8e8',letterSpacing:.5}}>{a.name}</div>
+                  <div style={{fontFamily:FHUD,fontWeight:600,fontSize:10,letterSpacing:2,color:'#907070',textTransform:'uppercase',marginTop:2}}>
+                    SIGLA · {a.name.slice(0,3).toUpperCase()}
+                  </div>
+                </div>
+                <div style={{fontFamily:FO,fontWeight:900,fontSize:32,color:R,textShadow:`0 0 12px ${R}55`,letterSpacing:-1}}>{a.weight}%</div>
               </div>
-              <Btn onClick={() => { setForm({name:a.name,weight:String(a.weight)}); setEditId(a.id); }} v="ghost"  size="xs">✏️</Btn>
-              <Btn onClick={() => setAttrs(attrs.filter(x => x.id!==a.id))}                             v="danger" size="xs">🗑️</Btn>
-            </div>
-          </Panel>
+              <div style={{height:6,marginTop:14,background:'rgba(255,255,255,0.07)',borderRadius:3,overflow:'hidden'}}>
+                <div style={{height:'100%',width:`${Math.min(100,(a.weight/25)*100)}%`,background:`linear-gradient(90deg,${R},#ff6644)`,borderRadius:3,boxShadow:`0 0 6px ${R}66`}}/>
+              </div>
+              <div style={{display:'flex',gap:6,marginTop:14,justifyContent:'flex-end'}}>
+                <Btn onClick={() => { setForm({name:a.name,weight:String(a.weight)}); setEditId(a.id); }} v="ghost"  size="xs">✏️ Editar</Btn>
+                <Btn onClick={() => { if(confirm(`Remover "${a.name}"?`)) setAttrs(attrs.filter(x => x.id!==a.id)); }} v="danger" size="xs">🗑️</Btn>
+              </div>
+            </Panel>
+          </div>
         ))}
+      </div>
+
+      {/* tags reference */}
+      <SectionLabel style={{marginBottom:14}}>TAGS DE ESTILO · MULTIPLICADORES</SectionLabel>
+      <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(200px,1fr))',gap:12}}>
+        {TAGS.map((tg,i) => {
+          const isPos = tg.type==='pos';
+          const col = isPos ? '#33bb55' : '#ff7755';
+          return (
+            <div key={tg.id} className="lbc-pop" style={{animationDelay:`${i*0.04}s`}}>
+              <Panel style={{padding:'14px 18px',display:'flex',alignItems:'center',gap:14}}>
+                <div style={{fontFamily:FO,fontWeight:900,fontSize:22,color:col,width:24,textAlign:'center'}}>{isPos?'+':'−'}</div>
+                <div style={{flex:1,minWidth:0}}>
+                  <div style={{fontFamily:FO,fontWeight:800,fontSize:16,color:'#f0e8e8'}}>{tg.label}</div>
+                  <div style={{fontFamily:FHUD,fontWeight:600,fontSize:9.5,letterSpacing:1.5,color:'#907070'}}>×{isPos?'1.1':'0.9'}</div>
+                </div>
+              </Panel>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
@@ -1349,96 +1400,156 @@ const SundayTab = ({ players, attrs, sessions, setSessions }) => {
     alert(`✅ Sessão salva com ${cards.length} cartinha${cards.length>1?'s':''}!`);
   };
   const ratedIds = cards.map(c => c.playerId);
+  const dateLabel = date ? new Date(date+'T12:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'}).toUpperCase() : '';
   return (
-    <div>
-      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:20,flexWrap:'wrap',gap:12}}>
-        <SectionLabel>🎮 Sessão Domingo</SectionLabel>
+    <div style={{maxWidth:1180,margin:'0 auto',padding:'14px 6px 70px'}}>
+      {/* hero */}
+      <div style={{display:'flex',alignItems:'flex-end',justifyContent:'space-between',flexWrap:'wrap',gap:20,marginBottom:24}}>
+        <div>
+          <SectionLabel style={{marginBottom:0}}>AVALIAÇÃO DE DOMINGO · {dateLabel}</SectionLabel>
+          <h1 style={{fontFamily:FO,fontWeight:900,fontSize:44,color:'#f0e8e8',margin:'6px 0 0',letterSpacing:-1}}>MONTAR A <span style={{color:R}}>CARTA</span></h1>
+        </div>
         <div style={{display:'flex',gap:10,alignItems:'center',flexWrap:'wrap'}}>
-          <input type="date" value={date} onChange={e => setDate(e.target.value)}
-            style={{background:'rgba(15,4,4,.85)',border:'1px solid rgba(255,255,255,0.08)',borderRadius:8,padding:'8px 12px',color:'#f0e8e8',fontSize:13,fontFamily:F,outline:'none'}}/>
+          <input type="date" value={date} onChange={e=>setDate(e.target.value)}
+            style={{background:'rgba(15,4,4,.85)',border:'1px solid rgba(255,255,255,0.14)',borderRadius:8,padding:'10px 14px',color:'#f0e8e8',fontSize:13,fontFamily:F,outline:'none'}}/>
           <Btn onClick={saveSess} v="success" disabled={!cards.length}>💾 Salvar Sessão ({cards.length})</Btn>
         </div>
       </div>
-      {scoring && (
-        <Panel style={{marginBottom:20,borderColor:`${tier.brd}40`,boxShadow:`0 0 30px ${tier.glow}22`}}>
-          <div style={{display:'flex',gap:24,flexWrap:'wrap',alignItems:'flex-start'}}>
-            <div style={{flexShrink:0}}>
-              <SectionLabel color={tier.txt}>Prévia ao Vivo</SectionLabel>
-              <AnyCard player={scoring} card={{scores,overall,tags}} attrs={attrs} scale={0.88}/>
-            </div>
-            <div style={{flex:1,minWidth:260}}>
-              {/* Header: nome + overall */}
-              <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:12,flexWrap:'wrap',gap:8}}>
-                <div style={{fontSize:18,fontWeight:700,color:'#f0e8e8',fontFamily:F,letterSpacing:.5}}>{scoring.nick}</div>
-                <div style={{display:'flex',alignItems:'baseline',gap:6}}>
-                  <div style={{fontSize:28,fontWeight:900,color:tier.score,textShadow:`0 0 15px ${tier.glow}`,fontFamily:FO}}>
-                    {overall}
-                  </div>
-                  <span style={{fontSize:12,fontWeight:600,color:tier.txt,fontFamily:F}}>{tier.lbl}</span>
-                  {mult !== 1.0 && (
-                    <span style={{fontSize:11,fontWeight:700,fontFamily:F,letterSpacing:.5,
-                      color: mult > 1 ? '#44dd88' : '#ff6655',
-                      background: mult > 1 ? 'rgba(68,221,136,0.12)' : 'rgba(255,80,80,0.12)',
-                      border: `1px solid ${mult > 1 ? 'rgba(68,221,136,0.3)' : 'rgba(255,80,80,0.3)'}`,
-                      borderRadius:5, padding:'2px 6px',
-                    }}>
-                      {mult > 1 ? '▲' : '▼'} {mult > 1 ? '+10%' : '-10%'}
-                    </span>
-                  )}
-                </div>
+
+      {!players.length ? (
+        <Panel style={{textAlign:'center',padding:'40px 20px',maxWidth:540,margin:'40px auto'}}>
+          <div style={{fontSize:44,marginBottom:12}}>👥</div>
+          <div style={{fontSize:14,color:'#c09090',fontFamily:F,fontWeight:600}}>Cadastre jogadores primeiro.</div>
+        </Panel>
+      ) : !scoring ? (
+        <>
+          {/* seletor de jogador */}
+          <SectionLabel style={{marginBottom:14}}>QUEM TÁ NA MIRA?</SectionLabel>
+          <div style={{display:'flex',gap:8,flexWrap:'wrap',marginBottom:30}}>
+            {players.map(p => {
+              const rated = ratedIds.includes(p.id);
+              return (
+                <button key={p.id} onClick={()=>start(p)} className="lbc-ppl-pick" style={{
+                  fontFamily:FHUD,fontWeight:700,fontSize:12,letterSpacing:1.4,padding:'10px 16px',
+                  background: rated ? 'rgba(68,221,136,0.12)' : 'rgba(255,255,255,0.05)',
+                  color: rated ? '#44dd88' : '#f0e8e8',
+                  border: `1px solid ${rated ? 'rgba(68,221,136,0.4)' : 'rgba(255,255,255,0.13)'}`,
+                  cursor:'pointer',textTransform:'uppercase',transition:'all .15s',
+                  display:'flex',alignItems:'center',gap:9,borderRadius:8,
+                }}>
+                  {(p.photoClean||p.photo)
+                    ? <img src={p.photoClean||p.photo} alt="" style={{width:24,height:24,borderRadius:'50%',objectFit:'cover'}}/>
+                    : <span style={{fontSize:14}}>👤</span>}
+                  {p.nick}{rated && <span style={{fontSize:11}}>✓</span>}
+                </button>
+              );
+            })}
+          </div>
+
+          {ratedIds.length > 0 && (
+            <>
+              <SectionLabel color="#44dd88" style={{marginBottom:14}}>✅ AVALIADOS NESTA SESSÃO · {ratedIds.length}</SectionLabel>
+              <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(200px,1fr))',gap:18,justifyItems:'center',marginBottom:24}}>
+                {players.filter(p => ratedIds.includes(p.id)).map((p,i) => {
+                  const c = cards.find(x => x.playerId===p.id);
+                  return c ? (
+                    <div key={p.id} className="lbc-pop" style={{animationDelay:`${i*0.05}s`,cursor:'pointer'}} onClick={() => setPreview({card:c,player:p})}>
+                      <AnyCard player={p} card={c} attrs={attrs} scale={0.74}/>
+                    </div>
+                  ) : null;
+                })}
               </div>
-              {/* Tags comportamentais */}
-              <div style={{display:'flex',flexWrap:'wrap',gap:7,marginBottom:18}}>
+            </>
+          )}
+        </>
+      ) : (
+        // ── modo edição: 2 colunas (sliders | preview sticky) ──
+        <div style={{display:'grid',gridTemplateColumns:'1fr minmax(280px,340px)',gap:30,alignItems:'start'}}>
+          {/* coluna esquerda — sliders + tags */}
+          <div>
+            <Panel style={{padding:'22px 26px',marginBottom:18}}>
+              <div style={{display:'flex',justifyContent:'space-between',alignItems:'baseline',marginBottom:16,flexWrap:'wrap',gap:8}}>
+                <SectionLabel style={{marginBottom:0}}>ATRIBUTOS · {scoring.nick}</SectionLabel>
+                <Btn onClick={() => setScoring(null)} v="ghost" size="xs">✕ Trocar jogador</Btn>
+              </div>
+              {attrs.map(a => {
+                const v = scores[a.id]??50;
+                const at = getTier(v);
+                return (
+                  <div key={a.id} style={{marginBottom:18}}>
+                    <div style={{display:'flex',justifyContent:'space-between',alignItems:'baseline',marginBottom:7}}>
+                      <div style={{fontFamily:FHUD,fontWeight:700,fontSize:12.5,letterSpacing:1,color:'#f0e8e8',textTransform:'uppercase'}}>
+                        {a.name} <span style={{color:'#806060',fontSize:10,letterSpacing:.5}}>· peso {a.weight}%</span>
+                      </div>
+                      <div style={{fontFamily:FO,fontWeight:900,fontSize:26,color:at.score,textShadow:`0 0 10px ${at.glow}55`,minWidth:44,textAlign:'right'}}>{Math.round(v)}</div>
+                    </div>
+                    <input type="range" className="lbc-range" min="0" max="100" step="1" value={v}
+                      onChange={e => setScores(s => ({...s,[a.id]:Number(e.target.value)}))}
+                      style={{'--c':tier.brd,'--p':`${v}%`,width:'100%'}}/>
+                  </div>
+                );
+              })}
+            </Panel>
+
+            <Panel style={{padding:'20px 26px'}}>
+              <SectionLabel style={{marginBottom:14}}>TAGS DE ESTILO <span style={{color:'#806060',fontWeight:500,letterSpacing:1}}>· ajustam o multiplicador</span></SectionLabel>
+              <div style={{display:'flex',flexWrap:'wrap',gap:9}}>
                 {TAGS.map(tag => {
                   const on = !!tags[tag.id];
                   const neg = tag.type === 'neg';
-                  const activeColor = neg ? '#ff5555' : '#44dd88';
-                  const activeBg   = neg ? 'rgba(255,60,60,0.18)' : 'rgba(68,221,136,0.18)';
-                  const activeBrd  = neg ? 'rgba(255,60,60,0.45)' : 'rgba(68,221,136,0.45)';
+                  const col = neg ? '#ff7755' : '#33bb55';
                   return (
-                    <button key={tag.id} onClick={() => toggleTag(tag.id)} style={{
-                      background: on ? activeBg : 'rgba(255,255,255,0.04)',
-                      border: `1px solid ${on ? activeBrd : 'rgba(255,255,255,0.1)'}`,
-                      borderRadius:20, padding:'4px 12px',
-                      color: on ? activeColor : '#4a3535',
-                      fontSize:11.5, fontWeight:700, fontFamily:F, letterSpacing:.6,
-                      cursor:'pointer', transition:'all .15s',
-                      boxShadow: on ? `0 0 10px ${activeColor}44` : 'none',
+                    <button key={tag.id} onClick={()=>toggleTag(tag.id)} style={{
+                      fontFamily:FHUD,fontWeight:700,fontSize:11.5,letterSpacing:1,padding:'8px 14px',
+                      background: on ? `${col}22` : 'rgba(255,255,255,0.04)',
+                      color: on ? col : '#907070',
+                      border: `1px solid ${on ? col : 'rgba(255,255,255,0.13)'}`,
+                      cursor:'pointer',display:'flex',alignItems:'center',gap:6,transition:'all .15s',borderRadius:6,
                     }}>
-                      {on ? (neg ? '💀' : '✨') : (neg ? '💀' : '✨')} {tag.label}
+                      <span style={{fontSize:13,fontWeight:900}}>{neg?'−':'+'}</span>{tag.label}
                     </button>
                   );
                 })}
               </div>
-              {attrs.map(a => (
-                <div key={a.id} style={{marginBottom:16}}>
-                  <div style={{display:'flex',justifyContent:'space-between',marginBottom:4}}>
-                    <span style={{fontSize:13,color:'#c8a8a8',fontFamily:F,fontWeight:600}}>{a.name}</span>
-                    <span style={{fontSize:14,fontWeight:700,color:R,fontFamily:FO}}>{Math.round(scores[a.id]??50)}</span>
-                  </div>
-                  <input type="range" className="lbc-range" min="0" max="100" step="1" value={scores[a.id]??50}
-                    onChange={e => setScores(s => ({...s,[a.id]:Number(e.target.value)}))}
-                    style={{'--c':tier.brd,'--p':`${scores[a.id]??50}%`,width:'100%'}}/>
-                  <div style={{display:'flex',justifyContent:'space-between',fontSize:9.5,color:'#907070',marginTop:2,fontFamily:F}}>
-                    <span>0</span><span>50</span><span>100</span>
-                  </div>
-                </div>
-              ))}
-              <div style={{display:'flex',gap:8,marginTop:16}}>
-                <Btn onClick={gen} v="success" style={{fontSize:15,padding:'12px 24px',letterSpacing:2}}>★ REVELAR CARTA</Btn>
-                <Btn onClick={() => setScoring(null)} v="danger">✕ Cancelar</Btn>
-              </div>
-            </div>
+            </Panel>
           </div>
-        </Panel>
+
+          {/* coluna direita — preview ao vivo (sticky) */}
+          <div style={{position:'sticky',top:20}}>
+            <SectionLabel style={{marginBottom:14,textAlign:'center'}}>PREVIEW AO VIVO</SectionLabel>
+            <div style={{display:'flex',justifyContent:'center',marginBottom:16}}>
+              <AnyCard player={scoring} card={{scores,overall,tags}} attrs={attrs} scale={0.92}/>
+            </div>
+            <Panel style={{padding:'14px 18px',marginBottom:14}}>
+              <div style={{display:'flex',justifyContent:'space-between',fontFamily:F,fontSize:13,color:'#c09090',marginBottom:6}}>
+                <span>Overall base</span>
+                <span style={{fontFamily:FO,fontWeight:800,fontSize:16,color:'#f0e8e8'}}>{baseOverall}</span>
+              </div>
+              <div style={{display:'flex',justifyContent:'space-between',fontFamily:F,fontSize:13,color:'#c09090',marginBottom:6}}>
+                <span>Multiplicador tags</span>
+                <span style={{fontFamily:FO,fontWeight:800,fontSize:16,color: mult>1 ? '#44dd88' : mult<1 ? '#ff7755' : '#907070'}}>×{mult.toFixed(2)}</span>
+              </div>
+              <div style={{borderTop:'1px solid rgba(255,255,255,0.08)',marginTop:8,paddingTop:8,
+                display:'flex',justifyContent:'space-between',alignItems:'baseline'}}>
+                <span style={{fontFamily:FHUD,fontWeight:700,fontSize:11,letterSpacing:2,color:tier.brd,textTransform:'uppercase'}}>{tier.lbl}</span>
+                <span style={{fontFamily:FO,fontWeight:900,fontSize:32,color:tier.score,textShadow:`0 0 14px ${tier.glow}77`,letterSpacing:-1}}>{overall}</span>
+              </div>
+            </Panel>
+            <Btn onClick={gen} v="success" size="lg" style={{width:'100%'}}>★ REVELAR CARTA</Btn>
+          </div>
+        </div>
       )}
+
       {preview && !scoring && (
-        <Panel style={{marginBottom:20,textAlign:'center',padding:'24px 20px'}}>
+        <Panel style={{marginTop:20,textAlign:'center',padding:'24px 20px'}}>
           <div style={{fontSize:15,color:'#44dd88',marginBottom:16,fontWeight:700,fontFamily:F,letterSpacing:.5}}>
             ✅ Cartinha de {preview.player.nick} gerada!
           </div>
           <div style={{display:'flex',justifyContent:'center'}}>
             <AnyCard player={preview.player} card={preview.card} attrs={attrs} scale={1.05} reveal/>
+          </div>
+          <div style={{marginTop:16}}>
+            <Btn onClick={()=>setPreview(null)} v="ghost" size="sm">✕ Fechar</Btn>
           </div>
         </Panel>
       )}
@@ -1446,127 +1557,143 @@ const SundayTab = ({ players, attrs, sessions, setSessions }) => {
         <PackOpening player={packOpen.player} card={packOpen.card} attrs={attrs}
           onDismiss={()=>setPackOpen(null)}/>
       )}
-      {!players.length ? (
-        <Panel style={{textAlign:'center',padding:'40px 20px'}}>
-          <div style={{fontSize:44,marginBottom:12}}>👥</div>
-          <div style={{fontSize:14,color:'#c09090',fontFamily:F,fontWeight:600}}>Cadastre jogadores primeiro.</div>
-        </Panel>
-      ) : (
-        <>
-          {players.filter(p => !ratedIds.includes(p.id)).length > 0 && (
-            <div style={{marginBottom:24}}>
-              <SectionLabel>⏳ Aguardando avaliação ({players.filter(p=>!ratedIds.includes(p.id)).length})</SectionLabel>
-              <div style={{display:'flex',gap:10,flexWrap:'wrap'}}>
-                {players.filter(p => !ratedIds.includes(p.id)).map(p => (
-                  <button key={p.id} className="lbc-ppl-pick" onClick={() => start(p)} style={{
-                    background:'rgba(255,255,255,0.027)',border:'1px solid rgba(255,255,255,0.07)',
-                    borderRadius:10,padding:'10px 16px',cursor:'pointer',
-                    color:'#f0e8e8',fontSize:13,fontWeight:700,fontFamily:F,letterSpacing:.5,
-                    display:'flex',alignItems:'center',gap:9,
-                  }}>
-                    {(p.photoClean||p.photo)
-                      ? <img src={p.photoClean||p.photo} style={{width:30,height:30,borderRadius:'50%',objectFit:'cover'}}/>
-                      : <span style={{fontSize:18}}>👤</span>}
-                    {p.nick}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-          {ratedIds.length > 0 && (
-            <div>
-              <SectionLabel color="#44dd88">✅ Avaliados ({ratedIds.length})</SectionLabel>
-              <div style={{display:'flex',gap:14,flexWrap:'wrap'}}>
-                {players.filter(p => ratedIds.includes(p.id)).map(p => {
-                  const c = cards.find(x => x.playerId===p.id);
-                  return c ? (
-                    <div key={p.id} style={{cursor:'pointer'}} onClick={() => setPreview({card:c,player:p})}>
-                      <AnyCard player={p} card={c} attrs={attrs} scale={0.65}/>
-                    </div>
-                  ) : null;
-                })}
-              </div>
-            </div>
-          )}
-        </>
-      )}
     </div>
   );
 };
 // ═══ HISTÓRICO ═══════════════════════════════════════════════
 const HistoryTab = ({ sessions, players, attrs }) => {
   const sorted = [...sessions].sort((a,b) => b.date.localeCompare(a.date));
-  const [selId, setSelId] = useState(null);
-  const sess = sorted.find(s => s.id===selId) || sorted[0];
+  const [openId, setOpenId] = useState(sorted[0]?.id || null);
   if(!sessions.length) return (
-    <Panel style={{textAlign:'center',padding:'40px 20px'}}>
-      <div style={{fontSize:44,marginBottom:12}}>📊</div>
-      <div style={{fontSize:14,color:'#c09090',fontFamily:F,fontWeight:600}}>Nenhuma sessão salva ainda.</div>
-    </Panel>
+    <div style={{maxWidth:1180,margin:'0 auto',padding:'14px 6px 70px'}}>
+      <div style={{marginBottom:28}}>
+        <SectionLabel style={{marginBottom:0}}>ARQUIVO DE DOMINGOS</SectionLabel>
+        <h1 style={{fontFamily:FO,fontWeight:900,fontSize:44,color:'#f0e8e8',margin:'6px 0 0',letterSpacing:-1}}>O <span style={{color:R}}>HISTÓRICO</span></h1>
+      </div>
+      <Panel style={{textAlign:'center',padding:'40px 20px',maxWidth:540,margin:'40px auto'}}>
+        <div style={{fontSize:44,marginBottom:12}}>📊</div>
+        <div style={{fontSize:14,color:'#c09090',fontFamily:F,fontWeight:600}}>Nenhuma sessão salva ainda.</div>
+        <div style={{fontSize:12,color:'#907070',marginTop:6,fontFamily:F}}>Avalie um domingo e salve a sessão pra começar a montar o histórico.</div>
+      </Panel>
+    </div>
   );
   return (
-    <div>
-      <SectionLabel>📊 Histórico</SectionLabel>
-      <div style={{display:'flex',gap:8,flexWrap:'wrap',marginBottom:22}}>
-        {sorted.map(s => (
-          <button key={s.id} onClick={() => setSelId(s.id)} style={{
-            background: sess?.id===s.id ? RD : 'rgba(255,255,255,0.027)',
-            border:`1px solid ${sess?.id===s.id?'rgba(200,17,17,.4)':'rgba(255,255,255,0.07)'}`,
-            borderRadius:8, padding:'7px 16px', cursor:'pointer',
-            color: sess?.id===s.id ? '#ff6655' : '#6a4040',
-            fontSize:12.5, fontWeight:700, fontFamily:F, letterSpacing:.5, transition:'all .2s',
-          }}>
-            {new Date(s.date+'T12:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'short'})}
-            <span style={{marginLeft:6,opacity:.55,fontSize:11}}>({s.cards?.length||0})</span>
-          </button>
-        ))}
+    <div style={{maxWidth:1180,margin:'0 auto',padding:'14px 6px 70px'}}>
+      <div style={{marginBottom:28}}>
+        <SectionLabel style={{marginBottom:0}}>ARQUIVO DE DOMINGOS</SectionLabel>
+        <h1 style={{fontFamily:FO,fontWeight:900,fontSize:44,color:'#f0e8e8',margin:'6px 0 0',letterSpacing:-1}}>O <span style={{color:R}}>HISTÓRICO</span></h1>
       </div>
-      {sess && (
-        <>
-          <div style={{fontSize:13,color:'#c09090',marginBottom:18,fontFamily:F,fontWeight:600}}>
-            {new Date(sess.date+'T12:00').toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long',year:'numeric'})}
-          </div>
-          <div style={{display:'flex',gap:14,flexWrap:'wrap'}}>
-            {[...(sess.cards||[])].sort((a,b) => b.overall-a.overall).map(c => {
-              const p = players.find(pl => pl.id===c.playerId);
-              return p ? <AnyCard key={c.playerId} player={p} card={c} attrs={attrs} scale={0.85}/> : null;
-            })}
-          </div>
-        </>
-      )}
+
+      <div style={{display:'flex',flexDirection:'column',gap:14}}>
+        {sorted.map((s,i) => {
+          const ranked = [...(s.cards||[])].sort((a,b)=>b.overall-a.overall);
+          const top = ranked[0];
+          const topPlayer = top ? players.find(p => p.id===top.playerId) : null;
+          const isOpen = openId === s.id;
+          const topTier = top ? getTier(top.overall) : null;
+          const dateLong = new Date(s.date+'T12:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'});
+          const weekday  = new Date(s.date+'T12:00').toLocaleDateString('pt-BR',{weekday:'long'});
+          return (
+            <div key={s.id} className="lbc-pop" style={{animationDelay:`${i*0.05}s`}}>
+              <Panel accent={topTier?.brd || R} style={{padding:0}}>
+                <button onClick={()=>setOpenId(isOpen?null:s.id)} style={{
+                  width:'100%',display:'flex',alignItems:'center',gap:18,padding:'18px 24px',
+                  background:'transparent',border:'none',cursor:'pointer',textAlign:'left',color:'inherit',
+                }}>
+                  <div style={{flex:1,minWidth:0}}>
+                    <div style={{fontFamily:FO,fontWeight:900,fontSize:22,color:'#f0e8e8',letterSpacing:.5}}>{dateLong}</div>
+                    <div style={{fontFamily:FHUD,fontWeight:600,fontSize:10.5,letterSpacing:1.5,color:'#907070',textTransform:'uppercase',marginTop:3}}>
+                      {weekday} · {ranked.length} cart{ranked.length===1?'a':'as'}{topPlayer && top ? ` · top: ${topPlayer.nick} (${top.overall})` : ''}
+                    </div>
+                  </div>
+                  <div style={{fontFamily:FHUD,fontWeight:700,fontSize:18,color:R,transform:isOpen?'rotate(90deg)':'none',transition:'transform .2s'}}>▸</div>
+                </button>
+                {isOpen && (
+                  <div style={{padding:'0 24px 26px'}}>
+                    <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(220px,1fr))',gap:18,justifyItems:'center',paddingTop:6}}>
+                      {ranked.map((c,j) => {
+                        const p = players.find(pl => pl.id===c.playerId);
+                        if(!p) return null;
+                        return (
+                          <div key={c.playerId} className="lbc-pop" style={{animationDelay:`${j*0.04}s`}}>
+                            <AnyCard player={p} card={c} attrs={attrs} scale={0.74}/>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+              </Panel>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 };
 // ═══ CONFIG ══════════════════════════════════════════════════
-const ConfigTab = ({ apiKey, setApiKey }) => {
+const ConfigTab = ({ apiKey, setApiKey, onLogout }) => {
   const [key, setKey] = useState(apiKey);
   const [ok,  setOk]  = useState(false);
   const save = () => { setApiKey(key); setOk(true); setTimeout(() => setOk(false), 2500); };
+  const resetWeek = () => {
+    if(confirm('Resetar a sessão em andamento? (não apaga histórico)')) localStorage.removeItem('lbc2_current');
+  };
   return (
-    <div>
-      <SectionLabel>🔧 Configurações</SectionLabel>
-      <Panel style={{maxWidth:500,marginBottom:16}}>
-        <div style={{fontSize:14,fontWeight:700,color:'#f0dada',marginBottom:12,fontFamily:F}}>🖼️ Remove.bg — Remoção de Fundo</div>
-        <p style={{fontSize:12.5,color:'#c09090',marginBottom:16,lineHeight:1.75,fontFamily:F}}>
+    <div style={{maxWidth:780,margin:'0 auto',padding:'14px 6px 70px'}}>
+      <div style={{marginBottom:28}}>
+        <SectionLabel style={{marginBottom:0}}>PREFERÊNCIAS DA LIVE</SectionLabel>
+        <h1 style={{fontFamily:FO,fontWeight:900,fontSize:44,color:'#f0e8e8',margin:'6px 0 0',letterSpacing:-1}}>CONFIG</h1>
+      </div>
+
+      <Panel style={{padding:'24px 26px',marginBottom:16}}>
+        <SectionLabel style={{marginBottom:16}}>IDENTIDADE</SectionLabel>
+        <Field label="Nome da live" value="FL1IP" onChange={()=>{}}/>
+        <Field label="Horário da live" value="Todos os dias às 20h" onChange={()=>{}}/>
+        <Field label="Dia do ranking" value="Domingo" onChange={()=>{}}/>
+      </Panel>
+
+      <Panel style={{padding:'24px 26px',marginBottom:16}}>
+        <SectionLabel style={{marginBottom:14}}>REMOVE.BG · REMOÇÃO DE FUNDO</SectionLabel>
+        <p style={{fontSize:13,color:'#c09090',marginBottom:16,lineHeight:1.7,fontFamily:F}}>
           Crie uma conta gratuita em{' '}
-          <a href="https://www.remove.bg/api" target="_blank" rel="noreferrer" style={{color:R}}>remove.bg</a>
+          <a href="https://www.remove.bg/api" target="_blank" rel="noreferrer" style={{color:R,textDecoration:'none',borderBottom:`1px solid ${R}55`}}>remove.bg</a>
           {' '}(50 fotos/mês grátis) e cole sua API key abaixo.
         </p>
         <Field label="API Key do remove.bg" value={key} onChange={setKey} placeholder="Ex: abc123XYZ..."/>
         <Btn onClick={save} v={ok?'success':'primary'}>{ok ? '✅ Salvo!' : '💾 Salvar API Key'}</Btn>
       </Panel>
-      <Panel style={{maxWidth:500}}>
-        <div style={{fontSize:14,fontWeight:700,color:'#f0dada',marginBottom:16,fontFamily:F}}>🏅 Faixas de Rating</div>
-        {TIERS.map(t => (
-          <div key={t.name} style={{display:'flex',alignItems:'center',gap:12,marginBottom:12}}>
-            <div style={{width:10,height:10,borderRadius:'50%',background:t.brd,boxShadow:`0 0 8px ${t.glow}`,flexShrink:0}}/>
-            <div style={{width:80,fontWeight:700,color:t.txt,fontSize:13.5,fontFamily:F}}>{t.name}</div>
-            <div style={{fontSize:12,color:'#c09090',width:90,fontFamily:F}}>{t.min}–{t.max} pts</div>
-            <div style={{flex:1,height:5,background:'rgba(255,255,255,0.06)',borderRadius:3}}>
-              <div style={{width:`${((t.max-t.min)/99)*100}%`,height:'100%',background:`linear-gradient(90deg,${t.glow}88,${t.brd})`,borderRadius:3,boxShadow:`0 0 6px ${t.glow}66`}}/>
+
+      <Panel style={{padding:'24px 26px',marginBottom:16}}>
+        <SectionLabel style={{marginBottom:14}}>FAIXAS DE RATING</SectionLabel>
+        <div style={{display:'flex',flexDirection:'column',gap:10}}>
+          {TIERS.map(t => (
+            <div key={t.name} style={{display:'flex',alignItems:'center',gap:14}}>
+              <div style={{width:10,height:10,borderRadius:'50%',background:t.brd,boxShadow:`0 0 10px ${t.glow}`,flexShrink:0}}/>
+              <div style={{minWidth:130,fontFamily:FHUD,fontWeight:700,fontSize:11,letterSpacing:2,color:t.brd,textTransform:'uppercase'}}>{t.lbl}</div>
+              <div style={{fontFamily:FHUD,fontSize:11,color:'#806060',width:80,letterSpacing:1}}>{t.min}–{t.max} pts</div>
+              <div style={{flex:1,height:5,background:'rgba(255,255,255,0.06)',borderRadius:3,overflow:'hidden'}}>
+                <div style={{width:`${((t.max-t.min)/99)*100}%`,height:'100%',background:`linear-gradient(90deg,${t.glow}88,${t.brd})`,boxShadow:`0 0 6px ${t.glow}66`}}/>
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
+      </Panel>
+
+      <Panel style={{padding:'24px 26px',marginBottom:16}}>
+        <SectionLabel style={{marginBottom:14}}>ATMOSFERA</SectionLabel>
+        <p style={{fontSize:13,color:'#c09090',marginBottom:0,lineHeight:1.7,fontFamily:F}}>
+          Ajuste vibe, fumaça e pulso no botão flutuante <span style={{fontSize:14}}>🌫️</span> no canto inferior direito.
+          Três presets — <b style={{color:'#f0e8e8'}}>Lobbão · Estádio · Tático</b> — trocam a paleta inteira via CSS.
+        </p>
+      </Panel>
+
+      <Panel accent="#ff7755" style={{padding:'24px 26px'}}>
+        <SectionLabel color="#ff7755" style={{marginBottom:14}}>ZONA DE PERIGO</SectionLabel>
+        <div style={{display:'flex',gap:10,flexWrap:'wrap'}}>
+          <Btn v="danger" onClick={resetWeek}>⟲ Resetar Semana</Btn>
+          {onLogout && <Btn v="danger" onClick={onLogout}>↗ Sair da Conta</Btn>}
+        </div>
       </Panel>
     </div>
   );
@@ -1625,9 +1752,9 @@ const LoginScreen = ({ onLogin }) => {
             WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent'}}>
             LOBBÃO CRAFT
           </div>
-          <div style={{fontSize:10,color:'#907070',letterSpacing:4,fontWeight:700,
+          <div style={{fontFamily:FHUD,fontSize:10,color:'#907070',letterSpacing:3,fontWeight:500,
             textTransform:'uppercase',marginTop:6}}>
-            Ranking Semanal · CS2
+            Acesso Restrito · Admin da Live
           </div>
         </div>
 
@@ -1640,10 +1767,6 @@ const LoginScreen = ({ onLogin }) => {
           boxShadow:'0 8px 40px rgba(0,0,0,0.6)',
           animation:'lbcLoginPulse 3s ease-in-out infinite',
         }}>
-          <div style={{fontSize:11,fontWeight:700,letterSpacing:2.5,color:'#c09090',
-            textTransform:'uppercase',marginBottom:22,textAlign:'center'}}>
-            🔐 Área Restrita
-          </div>
 
           {/* Campo Login */}
           <div style={{marginBottom:14}}>
@@ -1685,19 +1808,19 @@ const LoginScreen = ({ onLogin }) => {
           )}
 
           <button onClick={tryLogin} className="lbc-btn" style={{
-            width:'100%',padding:'11px',
-            background:`linear-gradient(135deg,#990000,${R})`,
-            border:'1px solid rgba(200,50,50,0.4)',
-            borderRadius:8,color:'#fff',fontSize:13.5,fontWeight:700,
-            fontFamily:F,letterSpacing:1,textTransform:'uppercase',
+            width:'100%',padding:'14px',
+            background:`linear-gradient(180deg,${R},#dd1100)`,
+            border:'1px solid #dd1100',
+            borderRadius:8,color:'#fff',fontSize:15,fontWeight:700,
+            fontFamily:FHUD,letterSpacing:1.6,textTransform:'uppercase',
             cursor:'pointer',transition:'all .15s',
           }}>
-            Entrar
+            Entrar no Lobby ▸
           </button>
         </div>
 
-        <div style={{textAlign:'center',marginTop:18,fontSize:10.5,color:'#806060',fontWeight:600,letterSpacing:1}}>
-          FL1IP · Lobbão CS2
+        <div style={{textAlign:'center',marginTop:20,fontSize:12,color:'#806060',fontFamily:F}}>
+          Toda semana tem ranking novo. Bora?
         </div>
       </div>
     </div>
@@ -1976,14 +2099,14 @@ export default function App() {
           })}
         </div>
       </nav>
-      <div style={{flex:1,padding:20,overflowY:'auto',position:'relative',zIndex:1}}>
+      <div style={{flex:1,padding:'18px 22px',overflowY:'auto',position:'relative',zIndex:1}}>
         <div key={tab} className="lbc-screen">
           {tab==='home'    && <HomeTab    players={players} sessions={sessions} attrs={attrs} onGoSunday={()=>setTab('sunday')}/>}
           {tab==='players' && <PlayersTab players={players} setPlayers={sp} apiKey={apiKey}/>}
           {tab==='attrs'   && <AttrsTab   attrs={attrs} setAttrs={sa}/>}
           {tab==='sunday'  && <SundayTab  players={players} attrs={attrs} sessions={sessions} setSessions={ss}/>}
           {tab==='history' && <HistoryTab sessions={sessions} players={players} attrs={attrs}/>}
-          {tab==='config'  && <ConfigTab  apiKey={apiKey} setApiKey={sk}/>}
+          {tab==='config'  && <ConfigTab  apiKey={apiKey} setApiKey={sk} onLogout={logout}/>}
         </div>
       </div>
       <TweaksPanel>
