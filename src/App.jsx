@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 // ═══ BRAND COLORS ════════════════════════════════════════════
 const R  = '#cc1111';
-const RG = '#dd1100';
 const RD = 'rgba(200,17,17,0.15)';
 // ═══ TIERS ═══════════════════════════════════════════════════
 const TIERS = [
@@ -54,17 +53,12 @@ const GCSS = `
 ::-webkit-scrollbar{width:5px;height:5px}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:#5a3535;border-radius:3px}
-input[type=range]{-webkit-appearance:none;height:4px;border-radius:2px;outline:none;cursor:pointer;background:linear-gradient(90deg,var(--c,#cc1111) var(--p,50%),rgba(255,255,255,0.12) var(--p,50%))}
-input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:15px;height:15px;border-radius:50%;cursor:pointer;background:var(--c,#cc1111);border:2px solid rgba(0,0,0,0.5);box-shadow:0 0 8px var(--c,#cc1111)}
-.lbc-nav-btn:hover{color:#e04444!important}
 .lbc-ppl-pick{transition:all .2s!important}
 .lbc-ppl-pick:hover{border-color:#cc1111!important;background:rgba(200,17,17,0.10)!important;transform:translateY(-2px);box-shadow:0 6px 20px rgba(200,17,17,0.18)!important}
 .lbc-btn:hover:not(:disabled){filter:brightness(1.18);transform:translateY(-1px)}
 .lbc-btn:active:not(:disabled){transform:translateY(0)}
 @keyframes lbcShine{0%,100%{left:-130%}40%,60%{left:160%}}
 @keyframes lbcGem{0%,100%{opacity:.3;transform:scale(1)}50%{opacity:1;transform:scale(2.2)}}
-@keyframes lbcFloat{0%,100%{transform:translateX(-50%) translateY(0px)}50%{transform:translateX(-50%) translateY(-6px)}}
-@keyframes lbcHdr{0%{background-position:0% 50%}100%{background-position:200% 50%}}
 @keyframes lbcReveal{from{opacity:0;transform:scale(.88) translateY(16px)}to{opacity:1;transform:scale(1) translateY(0)}}
 @keyframes lbcRain{0%{transform:translate(0,0) rotate(0deg);opacity:.95}50%{transform:translate(-6px,18px) rotate(140deg);opacity:1}100%{transform:translate(-14px,40px) rotate(280deg);opacity:.25}}
 @keyframes lbcSpark2{0%,100%{opacity:.35;transform:scale(.7)}50%{opacity:1;transform:scale(1.25)}}
@@ -131,15 +125,6 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:15px;heigh
 const F    = "'Rajdhani','Segoe UI',sans-serif";
 const FO   = "'Saira Condensed','Arial Black',Impact,sans-serif";
 const FHUD = "'Chakra Petch','Segoe UI',sans-serif";
-const FM   = "'Permanent Marker','Impact',cursive";
-// ═══ FL1IP LOGO ══════════════════════════════════════════════
-const FL1IP = ({ size = 1, opacity = 1 }) => (
-  <span style={{fontFamily:FM, fontSize:22*size, letterSpacing:1*size, opacity}}>
-    <span style={{color:'#fff', WebkitTextStroke:`${1*size}px rgba(0,0,0,0.7)`}}>FL</span>
-    <span style={{color:R,     WebkitTextStroke:`${1*size}px rgba(0,0,0,0.7)`}}>1</span>
-    <span style={{color:'#fff', WebkitTextStroke:`${1*size}px rgba(0,0,0,0.7)`}}>IP</span>
-  </span>
-);
 // ═══ BASE COMPONENTS ═════════════════════════════════════════
 const Btn = ({ children, onClick, v='primary', size='md', disabled, style={} }) => {
   const vs = {
@@ -521,10 +506,6 @@ const PlayerCard = ({ player, card, attrs, scale=1, reveal=false }) => {
   const W = CARD_W[lvl] * scale;
   const H = CARD_H[lvl] * scale;
   const sa = attrs.slice(0, 6);
-  const isDia  = isDestaque;
-  const isGold = lvl === 3;
-  const isSilv = lvl === 2;
-  const bA = isDestaque ? 'bb' : '55';
 
   // Destaque: gold theme overrides tier colors
   const dBrd = '#c8a020', dGlow = '#d4a030', dScore = '#ffd700', dTxt = '#e8c870';
@@ -552,7 +533,6 @@ const PlayerCard = ({ player, card, attrs, scale=1, reveal=false }) => {
       animation: reveal ? 'lbcReveal .5s cubic-bezier(.34,1.56,.64,1) forwards' : 'none',
     }}>
       <style>{`
-        @keyframes lbcFloat{0%,100%{transform:translateX(-50%) translateY(0px)}50%{transform:translateX(-50%) translateY(-${6*S}px)}}
         @keyframes lbcPulseBlue{0%,100%{opacity:.28}50%{opacity:.75}}
         @keyframes lbcBorderGlow{0%,100%{opacity:.6}50%{opacity:1}}
       `}</style>
