@@ -329,36 +329,56 @@ const GoatCard = ({ player, card, attrs, scale=1 }) => {
   return (
     <div style={{position:'relative',width:W,height:H,
       filter:'drop-shadow(0 18px 40px rgba(0,0,0,0.7))',flexShrink:0}}>
-      <ShieldFrameRich S={S} bg={navyBg}>
+      {/* ── Shield border layers ── */}
+      <div style={{position:'absolute',inset:0,clipPath:SHIELD,
+        background:`linear-gradient(160deg,${G_GOLD.hi} 0%,${G_GOLD.mid} 25%,${G_GOLD.lo} 50%,${G_GOLD.mid} 75%,${G_GOLD.hi} 100%)`,
+        filter:`drop-shadow(0 0 22px ${G_GOLD.mid}66)`}}/>
+      <div style={{position:'absolute',inset:5*S,clipPath:SHIELD,background:'#0d0a04'}}/>
+      <div style={{position:'absolute',inset:7*S,clipPath:SHIELD,
+        background:`linear-gradient(160deg,${G_GOLD.mid},${G_GOLD.deep},${G_GOLD.mid})`}}/>
+
+      {/* ── Background layer: navy + halo + decorative (BEHIND fan and photo) ── */}
+      <div style={{position:'absolute',inset:8.5*S,clipPath:SHIELD,overflow:'hidden',background:navyBg}}>
         <div style={{position:'absolute',inset:0,
           background:`radial-gradient(70% 55% at 50% 28%,${G_GOLD.mid}3a,transparent 60%)`}}/>
         <ConfettiRain count={30} side="even" S={S} slow/>
         <ShieldSparkles count={32} S={S}/>
         <ShieldCorners S={S}/>
         <TopChevron S={S}/>
-        {/* photo */}
-        <div style={{position:'absolute',top:'9%',left:0,right:0,height:'58%',overflow:'hidden'}}>
+      </div>
+
+      {/* ── Crystal fan — spills over border, painted ABOVE bg/decoratives ── */}
+      <CrystalFan cx="86%" cy="20%" count={18} a0={50} a1={270} rMin={40} rMax={110} thin S={S} op={0.92}/>
+
+      {/* ── Top layer: photo (over fan) + fades + header + footer, clipped to inner shield ── */}
+      <div style={{position:'absolute',inset:8.5*S,clipPath:SHIELD,overflow:'hidden',pointerEvents:'none'}}>
+        {/* photo — rises from below with mask fade at top & bottom (covers the fan rays) */}
+        <div style={{position:'absolute',top:'14%',left:0,right:0,bottom:'18%',overflow:'hidden'}}>
           {(player.photoClean||player.photo) ?
             <img src={player.photoClean||player.photo} alt="" style={{position:'absolute',bottom:0,left:'50%',
-              transform:'translateX(-50%)',height:'100%',objectFit:'contain',
-              filter:`drop-shadow(0 -4px 20px ${G_GOLD.mid}66)`}}/> :
+              transform:'translateX(-50%)',height:'100%',objectFit:'contain',objectPosition:'center bottom',
+              maskImage:'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.35) 6%, #000 22%, #000 78%, transparent 100%)',
+              WebkitMaskImage:'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.35) 6%, #000 22%, #000 78%, transparent 100%)',
+              filter:`drop-shadow(0 -4px 22px ${G_GOLD.mid}66)`}}/> :
             <div style={{position:'absolute',inset:0,display:'flex',alignItems:'center',justifyContent:'center',
               fontFamily:FO,fontWeight:900,fontSize:80*S,color:'rgba(255,255,255,0.045)'}}>{(player.nick||'').slice(0,2)}</div>
           }
         </div>
-        {/* silk fade */}
+        {/* silk navy fade — softens transition between photo bottom and footer */}
         <div style={{position:'absolute',bottom:'-6%',left:'-10%',right:'-10%',height:'46%',
           background:`radial-gradient(55% 80% at 50% 30%,${NAVY.c1}cc,transparent 60%)`,filter:'blur(8px)'}}/>
-        <div style={{position:'absolute',bottom:0,left:0,right:0,height:'40%',
-          background:`linear-gradient(to top,${NAVY.c0}f5 38%,transparent)`}}/>
-        {/* header */}
-        <div style={{position:'absolute',top:22*S,left:24*S,lineHeight:.82,zIndex:5}}>
+        {/* footer dark fade — solid floor */}
+        <div style={{position:'absolute',bottom:0,left:0,right:0,height:'38%',
+          background:`linear-gradient(to top,${NAVY.c0} 52%,${NAVY.c0}cc 78%,transparent)`}}/>
+        {/* header — strict left-align with flex */}
+        <div style={{position:'absolute',top:22*S,left:24*S,lineHeight:.82,zIndex:5,
+          display:'flex',flexDirection:'column',alignItems:'flex-start'}}>
           <div style={{fontFamily:FO,fontWeight:900,fontSize:50*S,color:G_GOLD.hi,
             textShadow:`0 2px 14px ${G_GOLD.mid}cc,0 0 22px ${G_GOLD.mid}55`,letterSpacing:-1}}>{card?.overall??0}</div>
           <div style={{fontFamily:FHUD,fontWeight:700,fontSize:9*S,letterSpacing:2.4*S,color:G_GOLD.hi,
             marginTop:4*S,textTransform:'uppercase',whiteSpace:'nowrap',
             textShadow:`0 1px 6px ${G_GOLD.deep}`}}>GOAT</div>
-          <img src="/logo.png" alt="" style={{width:42*S,marginTop:6*S,opacity:.9,
+          <img src="/logo.png" alt="" style={{width:42*S,marginTop:8*S,opacity:.9,display:'block',
             filter:`drop-shadow(0 0 6px ${G_GOLD.hi}99)`}}
             onError={e=>{e.target.style.display='none'}}/>
         </div>
@@ -377,9 +397,7 @@ const GoatCard = ({ player, card, attrs, scale=1 }) => {
             ))}
           </div>
         </div>
-      </ShieldFrameRich>
-      {/* crystal fan — outside shield so it spills over border */}
-      <CrystalFan cx="86%" cy="20%" count={18} a0={50} a1={270} rMin={40} rMax={110} thin S={S} op={0.92}/>
+      </div>
     </div>
   );
 };
