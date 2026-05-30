@@ -260,11 +260,9 @@ const TopChevron = ({ S=1 }) => (
 );
 const GoldFramework = ({ S=1, sz=140 }) => {
   const W=sz*S, H=sz*1.1*S;
-  const fade='linear-gradient(to bottom, #000 0%, #000 42%, rgba(0,0,0,0.25) 78%, transparent 100%)';
   return (
-    <div style={{position:'absolute',top:'10%',left:'50%',transform:'translateX(-50%)',
-      width:W,height:H,pointerEvents:'none',
-      maskImage:fade,WebkitMaskImage:fade}}>
+    <div style={{position:'absolute',top:'9%',left:'50%',transform:'translateX(-50%)',
+      width:W,height:H,pointerEvents:'none'}}>
       <div style={{position:'absolute',top:'22%',left:'22%',width:'56%',height:'56%',
         background:`linear-gradient(135deg,rgba(255,235,150,0.22),rgba(40,28,8,0.55))`,
         clipPath:'polygon(50% 0, 100% 50%, 50% 100%, 0 50%)',
@@ -440,7 +438,7 @@ const TotwCard = ({ player, card, attrs, scale=1 }) => {
         <div style={{position:'absolute',inset:0,
           background:`radial-gradient(60% 40% at 50% 28%,${t.glow}33,transparent 60%)`,
           mixBlendMode:'screen'}}/>
-        <GoldFramework S={S} sz={115}/>
+        <GoldFramework S={S} sz={120}/>
         {v2Sparkles.map(([x,y],i)=>(
           <div key={`sp${i}`} className="lbc-spark2" style={{position:'absolute',left:`${x}%`,top:`${y}%`,
             width:3*S,height:3*S,background:G_GOLD.hi,borderRadius:'50%',
@@ -459,8 +457,8 @@ const TotwCard = ({ player, card, attrs, scale=1 }) => {
           {(player.photoClean||player.photo) ?
             <img src={player.photoClean||player.photo} alt="" style={{position:'absolute',bottom:0,left:'50%',
               transform:'translateX(-50%)',height:'100%',objectFit:'contain',objectPosition:'center bottom',
-              maskImage:'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.35) 6%, #000 22%, #000 78%, transparent 100%)',
-              WebkitMaskImage:'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.35) 6%, #000 22%, #000 78%, transparent 100%)',
+              maskImage:'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.55) 4%, #000 14%, #000 78%, transparent 100%)',
+              WebkitMaskImage:'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.55) 4%, #000 14%, #000 78%, transparent 100%)',
               filter:`drop-shadow(0 -4px 18px ${t.glow}55)`}}/> :
             <div style={{position:'absolute',inset:0,display:'flex',alignItems:'center',justifyContent:'center',
               fontFamily:FO,fontWeight:900,fontSize:80*S,color:'rgba(255,255,255,0.045)'}}>{(player.nick||'').slice(0,2)}</div>
