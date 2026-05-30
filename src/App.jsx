@@ -177,6 +177,22 @@ const NAVY   = { c0:'#00041e', c1:'#0c1d68', c2:'#040933' };
 const SHIELD = 'polygon(47% 1%, 50% 4.2%, 53% 1%, 91% 3%, 100% 11%, 100% 86%, 86% 100%, 14% 100%, 0 86%, 0 11%, 9% 3%)';
 
 // ── helpers ──
+const CrystalFan = ({ cx, cy, count=12, a0=180, a1=360, rMin=50, rMax=130, thin, S=1, op=1 }) => {
+  const out = [];
+  for(let i=0;i<count;i++){
+    const t=count>1?i/(count-1):0;
+    const a=a0+(a1-a0)*t;
+    const len=rMin+(rMax-rMin)*(0.45+0.55*Math.abs(Math.sin(i*1.7+0.5)));
+    const w=thin?2.5:3+Math.abs(Math.sin(i*0.9))*2.5;
+    const o=op*(0.55+0.4*Math.abs(Math.sin(i*0.83+0.3)));
+    out.push(<div key={i} style={{position:'absolute',left:cx,top:cy,width:w*S,height:len*S,
+      transform:`translateX(-50%) rotate(${a}deg)`,transformOrigin:'50% 0',
+      background:`linear-gradient(180deg,${G_GOLD.hi},${G_GOLD.mid} 40%,${G_GOLD.lo})`,
+      clipPath:'polygon(50% 0, 100% 50%, 50% 100%, 0 50%)',
+      boxShadow:`0 0 5px ${G_GOLD.mid}aa`,opacity:o}}/>);
+  }
+  return out;
+};
 const ConfettiRain = ({ count=20, side='left', S=1, slow }) => {
   const out=[];
   const xR=side==='left'?[4,42]:side==='right'?[58,96]:[4,96];
@@ -429,38 +445,8 @@ const GoatCard = ({ player, card, attrs, scale=1 }) => {
         <TopChevron S={S}/>
       </div>
 
-      {/* ── Burst dourado no canto superior direito — vaza pra fora da carta ── */}
-      {/* glow point na origem */}
-      <div style={{position:'absolute',top:-12*S,right:-12*S,
-        width:90*S,height:90*S,borderRadius:'50%',
-        background:`radial-gradient(circle,${G_GOLD.hi}aa 0%,${G_GOLD.mid}66 28%,${G_GOLD.mid}22 55%,transparent 75%)`,
-        pointerEvents:'none',filter:'blur(2px)'}}/>
-      {[
-        // beams altos (vazam pra cima)
-        {top:-46*S, right:18*S,  w:6*S, h:175*S, rot: 10, op:.96},
-        {top:-36*S, right:42*S,  w:5*S, h:152*S, rot: -2, op:.86},
-        {top:-30*S, right:66*S,  w:7*S, h:158*S, rot: 16, op:.82},
-        // beams médios
-        {top:-16*S, right:22*S,  w:4*S, h:118*S, rot: 22, op:.72},
-        {top:-12*S, right:90*S,  w:5*S, h:122*S, rot: -6, op:.76},
-        // acentos finos
-        {top: -6*S, right:54*S,  w:3*S, h: 88*S, rot:  6, op:.62},
-        {top: -8*S, right:112*S, w:4*S, h: 82*S, rot:-12, op:.55},
-        {top: -3*S, right:34*S,  w:3*S, h: 70*S, rot: 30, op:.50},
-        // spill pra direita (mais horizontais)
-        {top: 18*S, right:-18*S, w:5*S, h: 95*S, rot: 65, op:.72},
-        {top: 38*S, right:-26*S, w:4*S, h: 82*S, rot: 78, op:.58},
-      ].map((b,i)=>(
-        <div key={`brs${i}`} style={{
-          position:'absolute', top:b.top, right:b.right,
-          width:b.w, height:b.h,
-          transform:`rotate(${b.rot}deg)`, transformOrigin:'50% 0%',
-          background:`linear-gradient(180deg,${G_GOLD.hi} 0%,${G_GOLD.mid} 35%,${G_GOLD.deep} 75%,transparent 100%)`,
-          boxShadow:`0 0 8px ${G_GOLD.hi}aa, 0 0 18px ${G_GOLD.mid}88`,
-          opacity:b.op,
-          pointerEvents:'none',
-        }}/>
-      ))}
+      {/* ── Leque dourado sutil no canto superior direito — vaza pra fora da carta ── */}
+      <CrystalFan cx="86%" cy="20%" count={16} a0={50} a1={260} rMin={35} rMax={95} thin S={S} op={0.45}/>
 
       {/* ── Top layer: photo + fades + header + footer, clipped to inner shield ── */}
       <div style={{position:'absolute',inset:8.5*S,clipPath:SHIELD,overflow:'hidden',pointerEvents:'none'}}>
