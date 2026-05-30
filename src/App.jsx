@@ -249,7 +249,7 @@ const ShieldCorners = ({ S=1, col }) => {
   ));
 };
 const TopChevron = ({ S=1 }) => (
-  <div style={{position:'absolute',top:10*S,left:'50%',transform:'translateX(-50%)',
+  <div style={{position:'absolute',top:22*S,left:'50%',transform:'translateX(-50%)',
     display:'flex',flexDirection:'column',gap:1,alignItems:'center',zIndex:4}}>
     {[0,1].map(i=>(
       <div key={i} style={{width:14*S,height:7*S,background:G_GOLD.hi,
@@ -378,16 +378,19 @@ const GoatCard = ({ player, card, attrs, scale=1 }) => {
           <div style={{fontFamily:FHUD,fontWeight:700,fontSize:9*S,letterSpacing:2.4*S,color:G_GOLD.hi,
             marginTop:4*S,textTransform:'uppercase',whiteSpace:'nowrap',
             textShadow:`0 1px 6px ${G_GOLD.deep}`}}>GOAT</div>
-          <img src="/logo.png" alt="" style={{width:42*S,marginTop:8*S,opacity:.9,display:'block',
-            filter:`drop-shadow(0 0 6px ${G_GOLD.hi}99)`}}
-            onError={e=>{e.target.style.display='none'}}/>
         </div>
         {/* footer */}
-        <div style={{position:'absolute',bottom:0,left:0,right:0,padding:`0 ${18*S}px ${16*S}px`,zIndex:5}}>
+        <div style={{position:'absolute',bottom:0,left:0,right:0,padding:`0 ${18*S}px ${14*S}px`,zIndex:5}}>
           <div style={{fontFamily:FO,fontWeight:900,fontSize:23*S,color:'#fff',textAlign:'center',
             letterSpacing:1.5*S,textShadow:`0 2px 10px ${G_GOLD.mid}88`}}>{player.nick||'???'}</div>
-          <div style={{height:1.5,margin:`${8*S}px 0`,
-            background:`linear-gradient(90deg,transparent,${G_GOLD.mid},transparent)`}}/>
+          {/* FL1IP logo destacada entre o nome e os stats */}
+          <div style={{display:'flex',alignItems:'center',gap:10*S,margin:`${6*S}px 0 ${4*S}px`}}>
+            <div style={{flex:1,height:1,background:`linear-gradient(90deg,transparent,${G_GOLD.mid}88)`}}/>
+            <img src="/logo.png" alt="" style={{height:30*S,opacity:.95,display:'block',
+              filter:`drop-shadow(0 0 10px ${G_GOLD.hi}bb)`}}
+              onError={e=>{e.target.style.display='none'}}/>
+            <div style={{flex:1,height:1,background:`linear-gradient(90deg,${G_GOLD.mid}88,transparent)`}}/>
+          </div>
           <div style={{display:'grid',gridTemplateColumns:'repeat(6,1fr)',gap:2*S}}>
             {sa.map((a,i)=>(
               <div key={a.id} style={{textAlign:'center'}}>
@@ -473,16 +476,19 @@ const TotwCard = ({ player, card, attrs, scale=1 }) => {
             <div>DREAM</div>
             <div>LOBBY</div>
           </div>
-          <img src="/logo.png" alt="" style={{width:42*S,marginTop:8*S,opacity:.9,
-            filter:`drop-shadow(0 0 6px ${t.glow}99)`}}
-            onError={e=>{e.target.style.display='none'}}/>
         </div>
         {/* footer */}
-        <div style={{position:'absolute',bottom:0,left:0,right:0,padding:`0 ${18*S}px ${16*S}px`,zIndex:5}}>
+        <div style={{position:'absolute',bottom:0,left:0,right:0,padding:`0 ${18*S}px ${14*S}px`,zIndex:5}}>
           <div style={{fontFamily:FO,fontWeight:900,fontSize:23*S,color:'#fff',textAlign:'center',
             letterSpacing:1.5*S,textShadow:`0 2px 10px ${t.glow}88`}}>{player.nick||'???'}</div>
-          <div style={{height:1.5,margin:`${8*S}px 0`,
-            background:`linear-gradient(90deg,transparent,${G_GOLD.mid},transparent)`}}/>
+          {/* FL1IP logo destacada entre o nome e os stats */}
+          <div style={{display:'flex',alignItems:'center',gap:10*S,margin:`${6*S}px 0 ${4*S}px`}}>
+            <div style={{flex:1,height:1,background:`linear-gradient(90deg,transparent,${G_GOLD.mid}88)`}}/>
+            <img src="/logo.png" alt="" style={{height:30*S,opacity:.95,display:'block',
+              filter:`drop-shadow(0 0 10px ${t.glow}bb)`}}
+              onError={e=>{e.target.style.display='none'}}/>
+            <div style={{flex:1,height:1,background:`linear-gradient(90deg,${G_GOLD.mid}88,transparent)`}}/>
+          </div>
           <div style={{display:'grid',gridTemplateColumns:'repeat(6,1fr)',gap:2*S}}>
             {sa.map((a,i)=>(
               <div key={a.id} style={{textAlign:'center'}}>
