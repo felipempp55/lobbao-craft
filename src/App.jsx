@@ -1743,8 +1743,8 @@ const LoginScreen = ({ onLogin }) => {
         {/* Logo */}
         <div style={{textAlign:'center', marginBottom:36}}>
           <div style={{marginBottom:10}}>
-            <img src="/logo.png" alt="" style={{width:64,height:64,objectFit:'contain',
-              filter:`drop-shadow(0 0 14px ${R}aa)`}}
+            <img src="/logo.png" alt="" style={{height:80,objectFit:'contain',
+              filter:`drop-shadow(0 0 18px ${R}aa)`}}
               onError={e=>{e.target.style.display='none';}}/>
           </div>
           <div style={{fontSize:26,fontWeight:900,fontFamily:FO,letterSpacing:3,
@@ -1998,8 +1998,9 @@ export default function App() {
   if(!loaded) return (
     <div style={{background:'#130e0e',height:'100vh',display:'flex',alignItems:'center',justifyContent:'center'}}>
       <div style={{textAlign:'center'}}>
-        <FL1IP size={2.2}/>
-        <div style={{marginTop:16,fontSize:11,letterSpacing:4,fontWeight:900,fontFamily:FO,color:'#cc3333',textShadow:`0 0 20px ${R}`}}>
+        <img src="/logo.png" alt="FL1IP" style={{height:90,filter:`drop-shadow(0 0 22px ${R}aa)`}}
+          onError={e=>{e.target.style.display='none'}}/>
+        <div style={{marginTop:20,fontSize:11,letterSpacing:4,fontWeight:900,fontFamily:FO,color:'#cc3333',textShadow:`0 0 20px ${R}`}}>
           CARREGANDO...
         </div>
       </div>
@@ -2049,7 +2050,7 @@ export default function App() {
           transform:'rotate(-12deg) scaleX(-1)',opacity:.08,pointerEvents:'none'}}
           onError={e=>{e.target.style.display='none'}}/>
         <div style={{position:'relative',display:'flex',alignItems:'center',gap:20,padding:'14px 24px'}}>
-          <img src="/logo.png" alt="FL1IP" style={{height:48,filter:`drop-shadow(0 0 12px ${R}bb)`}}
+          <img src="/logo.png" alt="FL1IP" style={{height:56,filter:`drop-shadow(0 0 14px ${R}cc)`}}
             onError={e=>{e.target.style.display='none'}}/>
           <div style={{flex:1}}>
             <div style={{fontFamily:FO,fontWeight:900,fontSize:26,letterSpacing:3,lineHeight:1,
