@@ -30,8 +30,35 @@ const DATTRS = [
   {id:'consist',name:'Consistência', weight:10},
 ];
 // ═══ STORAGE (localStorage) ══════════════════════════════════
-const sv = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} };
+const sv = (k, v) => {
+  try { localStorage.setItem(k, JSON.stringify(v)); return true; }
+  catch (e) {
+    if (e && (e.name === 'QuotaExceededError' || e.code === 22 || e.code === 1014)) {
+      console.error('localStorage cheio:', e);
+      alert('⚠️ Armazenamento cheio!\n\nAs fotos podem estar muito grandes ou tem muito histórico. Tente:\n• Apagar sessões antigas do histórico\n• Re-enviar fotos (agora elas são comprimidas)');
+    } else {
+      console.error('Erro ao salvar:', e);
+    }
+    return false;
+  }
+};
 const ld = (k, d) => { try { const r = localStorage.getItem(k); return r ? JSON.parse(r) : d; } catch { return d; } };
+// Comprime imagem base64 → reduz dimensões e qualidade, mantendo PNG p/ fotos com transparência
+const compressImage = (dataUrl, maxSide = 480, quality = 0.82) => new Promise(resolve => {
+  const img = new Image();
+  img.onload = () => {
+    const scale = Math.min(1, maxSide / Math.max(img.width, img.height));
+    const w = Math.round(img.width * scale);
+    const h = Math.round(img.height * scale);
+    const canvas = document.createElement('canvas');
+    canvas.width = w; canvas.height = h;
+    canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+    const isPng = /^data:image\/png/i.test(dataUrl);
+    resolve(canvas.toDataURL(isPng ? 'image/png' : 'image/jpeg', quality));
+  };
+  img.onerror = () => resolve(dataUrl); // fallback p/ original se falhar
+  img.src = dataUrl;
+});
 // ═══ UTILS ═══════════════════════════════════════════════════
 const calc = (sc, at) => {
   let t = 0, w = 0;
@@ -1121,7 +1148,12 @@ const PlayersTab = ({ players, setPlayers, apiKey }) => {
   const handleFile = e => {
     const f = e.target.files[0]; if(!f) return;
     const r = new FileReader();
-    r.onload = () => { setPhoto(r.result); setPhotoClean(null); };
+    r.onload = async () => {
+      // comprime antes de guardar — uma foto crua de celular pode ter 2-5MB em base64
+      const compressed = await compressImage(r.result, 480, 0.82);
+      setPhoto(compressed);
+      setPhotoClean(null);
+    };
     r.readAsDataURL(f);
   };
   const removeBg = async () => {
@@ -1139,7 +1171,11 @@ const PlayersTab = ({ players, setPlayers, apiKey }) => {
       if(!resp.ok) { setErr(`Erro ${resp.status}: verifique a API key.`); return; }
       const out = await resp.blob();
       const rd  = new FileReader();
-      rd.onload = () => setPhotoClean(rd.result);
+      rd.onload = async () => {
+        // comprime mantendo PNG (preserva transparência)
+        const compressed = await compressImage(rd.result, 480, 0.92);
+        setPhotoClean(compressed);
+      };
       rd.readAsDataURL(out);
     } catch(e) { setErr('Erro: '+e.message); }
     finally    { setLoading(false); }
@@ -2138,6 +2174,23 @@ export default function App() {
     r.setAttribute('data-fumaca', tweak.fumaca);
     r.setAttribute('data-pulso',  tweak.pulso);
   }, [tweak.vibe, tweak.fumaca, tweak.pulso]);
+  // Migração: comprime fotos antigas/grandes que estouram o quota do localStorage
+  useEffect(() => {
+    if(!loaded || !players.length) return;
+    const big = p => (p.photo && p.photo.length > 200000) || (p.photoClean && p.photoClean.length > 200000);
+    if(!players.some(big)) return;
+    (async () => {
+      const updated = await Promise.all(players.map(async p => {
+        if(!big(p)) return p;
+        const photo      = p.photo      && p.photo.length      > 200000 ? await compressImage(p.photo,      480, 0.82) : p.photo;
+        const photoClean = p.photoClean && p.photoClean.length > 200000 ? await compressImage(p.photoClean, 480, 0.92) : p.photoClean;
+        return { ...p, photo, photoClean };
+      }));
+      setPlayers(updated);
+      sv('lbc2_p', updated);
+      console.log('🗜️ Fotos comprimidas para economizar storage');
+    })();
+  }, [loaded]);
   const sp = v => { setPlayers(v);  sv('lbc2_p', v); };
   const sa = v => { setAttrs(v);    sv('lbc2_a', v); };
   const ss = v => { setSessions(v); sv('lbc2_s', v); };
