@@ -1449,9 +1449,10 @@ const TAGS = [
   {id:'esforçado', label:'Esforçado',    type:'pos'},
   {id:'deagle',    label:'Desert Eagle', type:'pos'},
 ];
-const SundayTab = ({ players, attrs, sessions, setSessions }) => {
-  const [date,    setDate]    = useState(new Date().toISOString().split('T')[0]);
-  const [cards,   setCards]   = useState([]);
+const SundayTab = ({ players, attrs, sessions, setSessions, curSession, setCurSession }) => {
+  const { date, cards } = curSession;
+  const setDate  = d => setCurSession({...curSession, date:d});
+  const setCards = c => setCurSession({...curSession, cards:c});
   const [scoring, setScoring] = useState(null);
   const [scores,  setScores]  = useState({});
   const [tags,    setTags]    = useState({});
@@ -1474,10 +1475,18 @@ const SundayTab = ({ players, attrs, sessions, setSessions }) => {
     setCards(nc); setPreview({card:c, player:scoring}); setScoring(null);
     setPackOpen({card:c, player:scoring});
   };
+  const deleteCard = (pid) => {
+    const p = players.find(x => x.id===pid);
+    if(confirm(`Remover a cartinha de ${p?.nick||'jogador'}?`)) {
+      setCards(cards.filter(x => x.playerId !== pid));
+      if(preview?.player?.id === pid) setPreview(null);
+    }
+  };
   const saveSess = () => {
     if(!cards.length) return;
     setSessions([...sessions.filter(s => s.date!==date), {id:Date.now().toString(),date,cards:[...cards]}]);
     alert(`✅ Sessão salva com ${cards.length} cartinha${cards.length>1?'s':''}!`);
+    setCurSession({date:new Date().toISOString().split('T')[0], cards:[]});
   };
   const ratedIds = cards.map(c => c.playerId);
   const dateLabel = date ? new Date(date+'T12:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'}).toUpperCase() : '';
@@ -1533,8 +1542,23 @@ const SundayTab = ({ players, attrs, sessions, setSessions }) => {
                 {players.filter(p => ratedIds.includes(p.id)).map((p,i) => {
                   const c = cards.find(x => x.playerId===p.id);
                   return c ? (
-                    <div key={p.id} className="lbc-pop" style={{animationDelay:`${i*0.05}s`,cursor:'pointer'}} onClick={() => setPreview({card:c,player:p})}>
-                      <AnyCard player={p} card={c} attrs={attrs} scale={0.74}/>
+                    <div key={p.id} className="lbc-pop" style={{animationDelay:`${i*0.05}s`,position:'relative'}}>
+                      <div style={{cursor:'pointer'}} onClick={() => setPreview({card:c,player:p})}>
+                        <AnyCard player={p} card={c} attrs={attrs} scale={0.74}/>
+                      </div>
+                      <button onClick={()=>deleteCard(p.id)} title="Excluir cartinha" style={{
+                        position:'absolute', top:-6, right:-6, zIndex:10,
+                        width:32, height:32, borderRadius:'50%',
+                        background:'rgba(180,30,30,0.95)', border:'2px solid rgba(255,80,80,0.65)',
+                        color:'#fff', fontSize:14, fontWeight:700, cursor:'pointer',
+                        boxShadow:'0 3px 10px rgba(0,0,0,0.65), 0 0 12px rgba(255,80,80,0.35)',
+                        display:'flex', alignItems:'center', justifyContent:'center',
+                        transition:'all .15s',
+                      }}
+                        onMouseEnter={e=>{e.currentTarget.style.background='rgba(220,40,40,1)';e.currentTarget.style.transform='scale(1.1)';}}
+                        onMouseLeave={e=>{e.currentTarget.style.background='rgba(180,30,30,0.95)';e.currentTarget.style.transform='none';}}>
+                        ✕
+                      </button>
                     </div>
                   ) : null;
                 })}
@@ -2075,6 +2099,7 @@ export default function App() {
   const [attrs,    setAttrs]    = useState(DATTRS);
   const [sessions, setSessions] = useState([]);
   const [apiKey,   setApiKey]   = useState('');
+  const [curSession, setCurSession] = useState({date:new Date().toISOString().split('T')[0], cards:[]});
   const [loaded,   setLoaded]   = useState(false);
   const [authed,   setAuthed]   = useState(false);
   const [tweak,    setTweak]    = useTweaks({vibe:'live',fumaca:'padrao',pulso:'vivo'});
@@ -2090,6 +2115,7 @@ export default function App() {
     setAttrs(ld('lbc2_a', DATTRS));
     setSessions(ld('lbc2_s', []));
     setApiKey(ld('lbc2_k', ''));
+    setCurSession(ld('lbc2_current', {date:new Date().toISOString().split('T')[0], cards:[]}));
     setLoaded(true);
   }, []);
   useEffect(() => {
@@ -2102,6 +2128,7 @@ export default function App() {
   const sa = v => { setAttrs(v);    sv('lbc2_a', v); };
   const ss = v => { setSessions(v); sv('lbc2_s', v); };
   const sk = v => { setApiKey(v);   sv('lbc2_k', v); };
+  const sc = v => { setCurSession(v); sv('lbc2_current', v); };
   if(!loaded) return (
     <div style={{background:'#130e0e',height:'100vh',display:'flex',alignItems:'center',justifyContent:'center'}}>
       <div style={{textAlign:'center'}}>
@@ -2212,7 +2239,7 @@ export default function App() {
           {tab==='home'    && <HomeTab    players={players} sessions={sessions} attrs={attrs} onGoSunday={()=>setTab('sunday')}/>}
           {tab==='players' && <PlayersTab players={players} setPlayers={sp} apiKey={apiKey}/>}
           {tab==='attrs'   && <AttrsTab   attrs={attrs} setAttrs={sa}/>}
-          {tab==='sunday'  && <SundayTab  players={players} attrs={attrs} sessions={sessions} setSessions={ss}/>}
+          {tab==='sunday'  && <SundayTab  players={players} attrs={attrs} sessions={sessions} setSessions={ss} curSession={curSession} setCurSession={sc}/>}
           {tab==='history' && <HistoryTab sessions={sessions} players={players} attrs={attrs} onDelete={id => ss(sessions.filter(s => s.id !== id))}/>}
           {tab==='config'  && <ConfigTab  apiKey={apiKey} setApiKey={sk} onLogout={logout}/>}
         </div>
