@@ -494,7 +494,7 @@ const GoatCard = ({ player, card, attrs, scale=1 }) => {
               onError={e=>{e.target.style.display='none'}}/>
             <div style={{flex:1,height:1,background:`linear-gradient(90deg,${G_GOLD.mid}77,transparent)`}}/>
           </div>
-          <div style={{display:'grid',gridTemplateColumns:'repeat(6,1fr)',gap:2*S}}>
+          <div style={{display:'grid',gridTemplateColumns:`repeat(${sa.length},1fr)`,gap:2*S}}>
             {sa.map((a,i)=>(
               <div key={a.id} style={{textAlign:'center'}}>
                 <div style={{fontFamily:FHUD,fontWeight:700,fontSize:8.5*S,color:G_GOLD.mid,opacity:.92,letterSpacing:.3}}>{a.name.slice(0,3).toUpperCase()}</div>
@@ -597,7 +597,7 @@ const TotwCard = ({ player, card, attrs, scale=1 }) => {
               onError={e=>{e.target.style.display='none'}}/>
             <div style={{flex:1,height:1,background:`linear-gradient(90deg,${G_GOLD.mid}77,transparent)`}}/>
           </div>
-          <div style={{display:'grid',gridTemplateColumns:'repeat(6,1fr)',gap:2*S}}>
+          <div style={{display:'grid',gridTemplateColumns:`repeat(${sa.length},1fr)`,gap:2*S}}>
             {sa.map((a,i)=>(
               <div key={a.id} style={{textAlign:'center'}}>
                 <div style={{fontFamily:FHUD,fontWeight:700,fontSize:8.5*S,color:t.score,opacity:.92,letterSpacing:.3}}>{a.name.slice(0,3).toUpperCase()}</div>
