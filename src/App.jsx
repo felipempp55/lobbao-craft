@@ -1405,15 +1405,29 @@ const PackOpening = ({ player, card, attrs, onDismiss }) => {
         opacity:phase>=3?1:0}}>
         <AnyCard player={player} card={card} attrs={attrs} scale={1.2}/>
       </div>
-      {/* tier gigante atrás */}
-      {phase>=5&&(
-        <div style={{position:'absolute',top:'50%',left:'50%',
-          transform:'translate(-50%,-50%)',
-          fontFamily:FO,fontWeight:900,fontSize:220,color:'transparent',
-          WebkitTextStroke:`1px ${ringCol}33`,letterSpacing:14,whiteSpace:'nowrap',
-          opacity:0,animation:'lbcPackTierIn .8s ease-out forwards',
-          pointerEvents:'none',zIndex:-1}}>{t.lbl}</div>
-      )}
+      {/* tier gigante atrás — dividido em 2 metades flanqueando a carta */}
+      {phase>=5 && (() => {
+        const lbl = t.lbl;
+        const parts = lbl.includes(' ')
+          ? lbl.split(' ')
+          : (() => { const m = Math.ceil(lbl.length/2); return [lbl.slice(0,m), lbl.slice(m)]; })();
+        const [leftW, rightW] = parts.length === 2 ? parts : [parts[0], ''];
+        const baseStyle = {
+          position:'absolute', top:'50%',
+          fontFamily:FO, fontWeight:900, fontSize:170, color:'transparent',
+          WebkitTextStroke:`1px ${ringCol}44`, letterSpacing:14, whiteSpace:'nowrap',
+          opacity:0, animation:'lbcPackTierIn .8s ease-out forwards',
+          pointerEvents:'none', zIndex:-1, lineHeight:1,
+        };
+        return (
+          <>
+            <div style={{...baseStyle, right:`calc(50% + 220px)`, transform:'translateY(-50%)', textAlign:'right'}}>{leftW}</div>
+            {rightW && (
+              <div style={{...baseStyle, left:`calc(50% + 220px)`, transform:'translateY(-50%)', textAlign:'left'}}>{rightW}</div>
+            )}
+          </>
+        );
+      })()}
       {/* cue continuar */}
       {phase>=6&&(
         <div style={{position:'absolute',bottom:48,left:0,right:0,textAlign:'center',
