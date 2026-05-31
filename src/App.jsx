@@ -1594,25 +1594,32 @@ const SundayTab = ({ players, attrs, sessions, setSessions }) => {
             </Panel>
           </div>
 
-          {/* coluna direita — preview ao vivo (sticky) */}
+          {/* coluna direita — nota prévia (sem revelar a carta) */}
           <div style={{position:'sticky',top:20}}>
-            <SectionLabel style={{marginBottom:14,textAlign:'center'}}>PREVIEW AO VIVO</SectionLabel>
-            <div style={{display:'flex',justifyContent:'center',marginBottom:16}}>
-              <AnyCard player={scoring} card={{scores,overall,tags}} attrs={attrs} scale={0.92}/>
-            </div>
+            <SectionLabel style={{marginBottom:14,textAlign:'center'}}>NOTA PRÉVIA</SectionLabel>
+            {/* Display numérico grande — só a nota, sem a carta */}
+            <Panel accent={tier.brd} style={{padding:'30px 20px 26px',textAlign:'center',marginBottom:14}}>
+              <div style={{fontFamily:FHUD,fontWeight:700,fontSize:11,letterSpacing:3,color:tier.brd,textTransform:'uppercase',marginBottom:10}}>
+                {tier.lbl}
+              </div>
+              <div style={{fontFamily:FO,fontWeight:900,fontSize:96,color:tier.score,
+                textShadow:`0 0 30px ${tier.glow}aa, 0 0 60px ${tier.glow}55`,
+                lineHeight:1,letterSpacing:-3}}>
+                {overall}
+              </div>
+              <div style={{fontFamily:F,fontSize:11,color:'#907070',marginTop:12,letterSpacing:.5,fontStyle:'italic'}}>
+                Carta ainda não revelada
+              </div>
+            </Panel>
+            {/* Breakdown */}
             <Panel style={{padding:'14px 18px',marginBottom:14}}>
               <div style={{display:'flex',justifyContent:'space-between',fontFamily:F,fontSize:13,color:'#c09090',marginBottom:6}}>
                 <span>Overall base</span>
                 <span style={{fontFamily:FO,fontWeight:800,fontSize:16,color:'#f0e8e8'}}>{baseOverall}</span>
               </div>
-              <div style={{display:'flex',justifyContent:'space-between',fontFamily:F,fontSize:13,color:'#c09090',marginBottom:6}}>
+              <div style={{display:'flex',justifyContent:'space-between',fontFamily:F,fontSize:13,color:'#c09090'}}>
                 <span>Multiplicador tags</span>
                 <span style={{fontFamily:FO,fontWeight:800,fontSize:16,color: mult>1 ? '#44dd88' : mult<1 ? '#ff7755' : '#907070'}}>×{mult.toFixed(2)}</span>
-              </div>
-              <div style={{borderTop:'1px solid rgba(255,255,255,0.08)',marginTop:8,paddingTop:8,
-                display:'flex',justifyContent:'space-between',alignItems:'baseline'}}>
-                <span style={{fontFamily:FHUD,fontWeight:700,fontSize:11,letterSpacing:2,color:tier.brd,textTransform:'uppercase'}}>{tier.lbl}</span>
-                <span style={{fontFamily:FO,fontWeight:900,fontSize:32,color:tier.score,textShadow:`0 0 14px ${tier.glow}77`,letterSpacing:-1}}>{overall}</span>
               </div>
             </Panel>
             <Btn onClick={gen} v="success" size="lg" style={{width:'100%'}}>★ REVELAR CARTA</Btn>
