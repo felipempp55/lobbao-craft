@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
+import * as db from "./db";
 // ═══ BRAND COLORS ════════════════════════════════════════════
 const R  = '#cc1111';
 const RD = 'rgba(200,17,17,0.15)';
@@ -1180,13 +1181,29 @@ const PlayersTab = ({ players, setPlayers, apiKey }) => {
     } catch(e) { setErr('Erro: '+e.message); }
     finally    { setLoading(false); }
   };
-  const save = () => {
+  const save = async () => {
     if(!form.nick.trim()) { setErr('Nick é obrigatório!'); return; }
-    if(editId)
-      setPlayers(players.map(p => p.id===editId ? {...p,...form,photo:photo||p.photo,photoClean:photoClean||p.photoClean} : p));
-    else
-      setPlayers([...players, {id:Date.now().toString(),...form,photo,photoClean}]);
-    setOpen(false);
+    setLoading(true); setErr('');
+    try {
+      const id = editId || Date.now().toString();
+      // Sobe fotos pro Storage se forem novas (data URLs); senão mantém URL existente
+      const existing = editId ? players.find(p => p.id===editId) : null;
+      let photoUrl      = photo;
+      let photoCleanUrl = photoClean;
+      if (photo && photo.startsWith('data:'))           photoUrl      = await db.uploadPhoto(photo,      id, 'photo');
+      if (photoClean && photoClean.startsWith('data:')) photoCleanUrl = await db.uploadPhoto(photoClean, id, 'clean');
+      // Mantém fotos antigas se não veio nova
+      if (!photoUrl      && existing) photoUrl      = existing.photo;
+      if (!photoCleanUrl && existing) photoCleanUrl = existing.photoClean;
+      const updated = { id, ...form, photo:photoUrl, photoClean:photoCleanUrl };
+      if(editId) setPlayers(players.map(p => p.id===editId ? updated : p));
+      else       setPlayers([...players, updated]);
+      setOpen(false);
+    } catch (e) {
+      setErr('Erro ao salvar: ' + e.message);
+    } finally {
+      setLoading(false);
+    }
   };
   const del = id => { if(confirm('Remover jogador?')) setPlayers(players.filter(p => p.id!==id)); };
   return (
@@ -2160,13 +2177,36 @@ export default function App() {
       s.textContent = GCSS;
       document.head.appendChild(s);
     }
-    setAuthed(!!ld('lbc2_auth', false));
-    setPlayers(ld('lbc2_p', []));
-    setAttrs(ld('lbc2_a', DATTRS));
-    setSessions(ld('lbc2_s', []));
-    setApiKey(ld('lbc2_k', ''));
-    setCurSession(ld('lbc2_current', {date:new Date().toISOString().split('T')[0], cards:[]}));
-    setLoaded(true);
+    setAuthed(!!ld('lbc2_auth', false)); // login flip/9975 fica em localStorage
+    (async () => {
+      try {
+        // Migra localStorage → Supabase no primeiro load (uma vez só)
+        await db.migrateFromLocalStorageIfNeeded();
+        const [ps, as, ss_, ak, cs] = await Promise.all([
+          db.loadPlayers(),
+          db.loadAttrs(),
+          db.loadSessions(),
+          db.loadSetting('apiKey', ''),
+          db.loadCurrentSession(),
+        ]);
+        // Se não tem atributos no DB, popula com os defaults
+        if (!as.length) {
+          await db.saveAttrs(DATTRS);
+          setAttrs(DATTRS);
+        } else {
+          setAttrs(as);
+        }
+        setPlayers(ps);
+        setSessions(ss_);
+        setApiKey(ak);
+        setCurSession(cs);
+      } catch (e) {
+        console.error('Falha ao carregar do Supabase:', e);
+        alert('⚠️ Falha ao conectar com o Supabase.\n' + e.message + '\n\nVerifique sua conexão e tente recarregar.');
+      } finally {
+        setLoaded(true);
+      }
+    })();
   }, []);
   useEffect(() => {
     const r = document.documentElement;
@@ -2174,28 +2214,55 @@ export default function App() {
     r.setAttribute('data-fumaca', tweak.fumaca);
     r.setAttribute('data-pulso',  tweak.pulso);
   }, [tweak.vibe, tweak.fumaca, tweak.pulso]);
-  // Migração: comprime fotos antigas/grandes que estouram o quota do localStorage
-  useEffect(() => {
-    if(!loaded || !players.length) return;
-    const big = p => (p.photo && p.photo.length > 200000) || (p.photoClean && p.photoClean.length > 200000);
-    if(!players.some(big)) return;
-    (async () => {
-      const updated = await Promise.all(players.map(async p => {
-        if(!big(p)) return p;
-        const photo      = p.photo      && p.photo.length      > 200000 ? await compressImage(p.photo,      480, 0.82) : p.photo;
-        const photoClean = p.photoClean && p.photoClean.length > 200000 ? await compressImage(p.photoClean, 480, 0.92) : p.photoClean;
-        return { ...p, photo, photoClean };
-      }));
-      setPlayers(updated);
-      sv('lbc2_p', updated);
-      console.log('🗜️ Fotos comprimidas para economizar storage');
-    })();
-  }, [loaded]);
-  const sp = v => { setPlayers(v);  sv('lbc2_p', v); };
-  const sa = v => { setAttrs(v);    sv('lbc2_a', v); };
-  const ss = v => { setSessions(v); sv('lbc2_s', v); };
-  const sk = v => { setApiKey(v);   sv('lbc2_k', v); };
-  const sc = v => { setCurSession(v); sv('lbc2_current', v); };
+  // Setters async — atualizam state local imediatamente e persistem no Supabase em background
+  const sp = async (v) => {
+    setPlayers(v);
+    try {
+      // Diff: descobre players novos/editados e apagados
+      const prevIds = new Set(players.map(p => p.id));
+      const nextIds = new Set(v.map(p => p.id));
+      const toDelete = players.filter(p => !nextIds.has(p.id));
+      const toUpsert = v.filter(p => {
+        const prev = players.find(x => x.id === p.id);
+        return !prev || JSON.stringify(prev) !== JSON.stringify(p);
+      });
+      await Promise.all([
+        ...toDelete.map(p => db.deletePlayer(p.id)),
+        ...toUpsert.map(p => db.upsertPlayer(p)),
+      ]);
+    } catch (e) { console.error('Erro ao salvar jogadores:', e); alert('Erro ao salvar: ' + e.message); }
+  };
+  const sa = async (v) => {
+    setAttrs(v);
+    try { await db.saveAttrs(v); }
+    catch (e) { console.error('Erro ao salvar atributos:', e); alert('Erro ao salvar: ' + e.message); }
+  };
+  const ss = async (v) => {
+    setSessions(v);
+    try {
+      const prevIds = new Set(sessions.map(s => s.id));
+      const nextIds = new Set(v.map(s => s.id));
+      const toDelete = sessions.filter(s => !nextIds.has(s.id));
+      const toUpsert = v.filter(s => {
+        const prev = sessions.find(x => x.id === s.id);
+        return !prev || JSON.stringify(prev) !== JSON.stringify(s);
+      });
+      await Promise.all([
+        ...toDelete.map(s => db.deleteSession(s.id)),
+        ...toUpsert.map(s => db.upsertSession(s)),
+      ]);
+    } catch (e) { console.error('Erro ao salvar sessões:', e); alert('Erro ao salvar: ' + e.message); }
+  };
+  const sk = async (v) => {
+    setApiKey(v);
+    try { await db.saveSetting('apiKey', v); }
+    catch (e) { console.error('Erro ao salvar API key:', e); alert('Erro ao salvar: ' + e.message); }
+  };
+  const sc = async (v) => {
+    setCurSession(v);
+    try { await db.saveCurrentSession(v); }
+    catch (e) { console.error('Erro ao salvar sessão atual:', e); }
+  };
   if(!loaded) return (
     <div style={{background:'#130e0e',height:'100vh',display:'flex',alignItems:'center',justifyContent:'center'}}>
       <div style={{textAlign:'center'}}>
