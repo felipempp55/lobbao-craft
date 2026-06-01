@@ -1779,10 +1779,10 @@ const HistoryTab = ({ sessions, players, attrs, onDelete }) => {
 
   // Helpers de export — garantem que a sessão esteja aberta antes de capturar
   const ensureOpen = (sid) => new Promise(resolve => {
-    if (openId === sid) return resolve();
+    if (openId === sid) return setTimeout(resolve, 120); // pequeno wait pra DOM estabilizar
     setOpenId(sid);
-    // espera o React renderizar + DOM ficar pronto
-    setTimeout(resolve, 350);
+    // espera React render + animações pop-in + DOM pronto
+    setTimeout(resolve, 700);
   });
 
   const handleExportInstagram = async (s) => {
