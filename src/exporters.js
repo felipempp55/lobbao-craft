@@ -1,10 +1,11 @@
 // ═══════════════════════════════════════════════════════════
-//  Exporters — gera PDF / PNG das cartas via html2canvas + jspdf
+//  Exporters — gera PDF / PNG das cartas via html-to-image + jspdf
+//  Trocamos html2canvas → html-to-image (suporte muito melhor a
+//  backdrop-filter, clip-path, filter, drop-shadow das cartas)
 // ═══════════════════════════════════════════════════════════
-import html2canvas from 'html2canvas';
+import * as htmlToImage from 'html-to-image';
 import { jsPDF } from 'jspdf';
 
-// Ordem dos tiers de cima pra baixo nas páginas do PDF
 const TIER_ORDER = ['GOAT', 'Dream Lobby', 'Bom Player', 'Bagre', 'Melhor Freezar'];
 const APP_BG = '#16110f';
 
@@ -31,8 +32,8 @@ function downloadDataUrl(dataUrl, filename) {
 
 const slug = s => String(s || '').replace(/[^\w-]+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
 
-// Aguarda todas as <img> dentro do elemento carregarem (ou expirar)
-function waitForImages(el, timeoutMs = 1200) {
+// Aguarda imgs carregarem
+function waitForImages(el, timeoutMs = 1500) {
   const imgs = Array.from(el.querySelectorAll('img'));
   if (!imgs.length) return Promise.resolve();
   return Promise.race([
@@ -47,26 +48,52 @@ function waitForImages(el, timeoutMs = 1200) {
   ]);
 }
 
-// Captura um elemento como canvas com várias proteções
-async function captureElement(el, { scale = 2.5, bg = APP_BG } = {}) {
+// Pequeno delay para garantir DOM/CSS estável
+const wait = ms => new Promise(r => setTimeout(r, ms));
+
+// Captura via html-to-image — duas tentativas (com cache bust no retry)
+async function captureElement(el, { pixelRatio = 2.5, bg = APP_BG } = {}) {
   await waitForImages(el);
-  return html2canvas(el, {
+  await wait(60);
+
+  const opts = {
     backgroundColor: bg,
-    scale,
-    useCORS: true,
-    allowTaint: true,
-    logging: false,
-    imageTimeout: 0,
-    removeContainer: true,
-    onclone: (doc) => {
-      // Remove imagens que não carregaram (causam erro 'createPattern width=0')
-      doc.querySelectorAll('img').forEach(img => {
-        if (!img.complete || img.naturalWidth === 0) img.style.display = 'none';
-      });
-      // Garante que nenhum elemento tem width/height zerado por display:none
-      // (deixa só os naturalmente invisíveis)
+    pixelRatio,
+    cacheBust: true,
+    skipFonts: false,
+    // pula scrollbars e pseudo elementos problemáticos
+    filter: (node) => {
+      if (node.tagName === 'SCRIPT' || node.tagName === 'STYLE') return true;
+      // se um elemento tem display:none, ignora
+      try {
+        if (node.style && node.style.display === 'none') return false;
+      } catch {}
+      return true;
     },
-  });
+  };
+
+  try {
+    const canvas = await htmlToImage.toCanvas(el, opts);
+    if (canvas.width && canvas.height) return canvas;
+    throw new Error('canvas vazio');
+  } catch (e) {
+    console.warn('captura 1 falhou, retry...', e?.message || e);
+    await wait(120);
+    // Retry: usa toPng + criar canvas manualmente — mais robusto pra alguns navegadores
+    const dataUrl = await htmlToImage.toPng(el, { ...opts, cacheBust: true });
+    const img = new Image();
+    await new Promise((res, rej) => {
+      img.onload = res;
+      img.onerror = rej;
+      img.src = dataUrl;
+    });
+    const c = document.createElement('canvas');
+    c.width = img.width;
+    c.height = img.height;
+    const ctx = c.getContext('2d');
+    ctx.drawImage(img, 0, 0);
+    return c;
+  }
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -74,8 +101,8 @@ async function captureElement(el, { scale = 2.5, bg = APP_BG } = {}) {
 // ═══════════════════════════════════════════════════════════
 export async function exportCardAsPDF(el, filename = 'cartinha.pdf') {
   if (!el) throw new Error('Elemento da carta não encontrado');
-  const canvas = await captureElement(el, { scale: 3, bg: APP_BG });
-  if (!canvas.width || !canvas.height) throw new Error('Captura da carta retornou vazia');
+  const canvas = await captureElement(el, { pixelRatio: 3, bg: APP_BG });
+  if (!canvas.width || !canvas.height) throw new Error('Captura retornou vazia');
 
   const pdf = new jsPDF({ unit: 'pt', format: 'a4', orientation: 'portrait' });
   const pdfW = pdf.internal.pageSize.getWidth();
@@ -96,7 +123,7 @@ export async function exportCardAsPDF(el, filename = 'cartinha.pdf') {
 }
 
 // ═══════════════════════════════════════════════════════════
-//  2) Sessão completa → PDF organizado por tier (1 página por tier)
+//  2) Sessão → PDF organizado por tier
 // ═══════════════════════════════════════════════════════════
 export async function exportSessionAsPDFByTier({ cardElements, cards, getTier, sessionDateLabel }) {
   const groups = {};
@@ -106,16 +133,18 @@ export async function exportSessionAsPDFByTier({ cardElements, cards, getTier, s
     groups[t.name].items.push(c);
   });
 
-  // Pré-captura tudo
   const captured = new Map();
+  const failures = [];
   for (const c of cards) {
     const el = cardElements[c.playerId];
-    if (!el) continue;
+    if (!el) { failures.push(c.playerId); continue; }
     try {
-      const canvas = await captureElement(el, { scale: 2, bg: APP_BG });
+      const canvas = await captureElement(el, { pixelRatio: 2, bg: APP_BG });
       if (canvas.width && canvas.height) captured.set(c.playerId, canvas);
+      else failures.push(c.playerId);
     } catch (e) {
       console.warn('captura falhou', c.playerId, e);
+      failures.push(c.playerId);
     }
   }
   if (!captured.size) throw new Error('Nenhuma carta foi capturada com sucesso');
@@ -128,35 +157,32 @@ export async function exportSessionAsPDFByTier({ cardElements, cards, getTier, s
   for (const tierName of TIER_ORDER) {
     const group = groups[tierName];
     if (!group || !group.items.length) continue;
+    const drawable = group.items.filter(c => captured.has(c.playerId));
+    if (!drawable.length) continue;
 
     if (!first) pdf.addPage();
     first = false;
 
-    // Fundo escuro
     pdf.setFillColor(22, 17, 15);
     pdf.rect(0, 0, pdfW, pdfH, 'F');
 
-    // Barra colorida no topo
     const [tr, tg, tb] = hexToRgb(group.tier.brd || '#cc1111');
     pdf.setFillColor(tr, tg, tb);
     pdf.rect(0, 0, pdfW, 8, 'F');
 
-    // Header texto
     pdf.setTextColor(255, 255, 255);
     pdf.setFont('helvetica', 'bold');
     pdf.setFontSize(36);
     pdf.text(tierName.toUpperCase(), pdfW / 2, 70, { align: 'center' });
     pdf.setTextColor(200, 200, 200);
     pdf.setFontSize(11);
-    pdf.text(`${group.items.length} jogador${group.items.length > 1 ? 'es' : ''} • ${sessionDateLabel}`, pdfW / 2, 92, { align: 'center' });
+    pdf.text(`${drawable.length} jogador${drawable.length > 1 ? 'es' : ''} • ${sessionDateLabel}`, pdfW / 2, 92, { align: 'center' });
 
-    // Footer
     pdf.setTextColor(120, 120, 120);
     pdf.setFontSize(9);
     pdf.text('LOBBÃO CRAFT • Ranking Semanal CS2', pdfW / 2, pdfH - 18, { align: 'center' });
 
-    // Grid 2 colunas
-    const items = [...group.items].sort((a, b) => b.overall - a.overall);
+    const items = [...drawable].sort((a, b) => b.overall - a.overall);
     const cols = items.length === 1 ? 1 : 2;
     const rows = Math.ceil(items.length / cols);
     const gridTop = 120;
@@ -181,21 +207,23 @@ export async function exportSessionAsPDFByTier({ cardElements, cards, getTier, s
   }
 
   pdf.save(`lobbao-${slug(sessionDateLabel)}-por-tier.pdf`);
+  if (failures.length) {
+    console.warn(`${failures.length} cart${failures.length > 1 ? 'as falharam' : 'a falhou'} na captura`);
+  }
 }
 
 // ═══════════════════════════════════════════════════════════
-//  3) Sessão completa → PNG único pra Instagram
+//  3) Sessão → PNG único pra Instagram
 // ═══════════════════════════════════════════════════════════
 export async function exportSessionAsInstagramImage({ cardElements, cards, sessionDateLabel }) {
   const sorted = [...cards].sort((a, b) => b.overall - a.overall);
 
-  // Captura todas as cartas com bg da app (vai "se misturar" com o fundo final)
   const captured = [];
   for (const c of sorted) {
     const el = cardElements[c.playerId];
     if (!el) continue;
     try {
-      const canvas = await captureElement(el, { scale: 1.8, bg: APP_BG });
+      const canvas = await captureElement(el, { pixelRatio: 1.8, bg: APP_BG });
       if (canvas.width && canvas.height) captured.push({ card: c, canvas });
     } catch (e) {
       console.warn('captura falhou', c.playerId, e);
@@ -206,7 +234,6 @@ export async function exportSessionAsInstagramImage({ cardElements, cards, sessi
   const cardW = captured[0].canvas.width;
   const cardH = captured[0].canvas.height;
 
-  // Grid balanceado
   const n = captured.length;
   let cols;
   if (n <= 2) cols = n;
@@ -223,22 +250,20 @@ export async function exportSessionAsInstagramImage({ cardElements, cards, sessi
   const W = cols * cardW + (cols + 1) * padX;
   const H = headerH + rows * cardH + (rows + 1) * padY + footerH;
 
-  // Limita tamanho máximo do canvas pra evitar OOM em devices fracos
+  // Limita tamanho do canvas final
   const MAX_DIM = 6000;
-  let finalW = W, finalH = H, drawScale = 1;
-  if (W > MAX_DIM || H > MAX_DIM) {
-    drawScale = Math.min(MAX_DIM / W, MAX_DIM / H);
-    finalW = Math.round(W * drawScale);
-    finalH = Math.round(H * drawScale);
-  }
+  let scale = 1;
+  if (W > MAX_DIM || H > MAX_DIM) scale = Math.min(MAX_DIM / W, MAX_DIM / H);
+  const finalW = Math.round(W * scale);
+  const finalH = Math.round(H * scale);
 
   const c = document.createElement('canvas');
   c.width = finalW;
   c.height = finalH;
   const ctx = c.getContext('2d');
-  if (drawScale !== 1) ctx.scale(drawScale, drawScale);
+  if (scale !== 1) ctx.scale(scale, scale);
 
-  // Background gradient vermelho escuro
+  // BG gradient
   const grd = ctx.createRadialGradient(W / 2, 0, 0, W / 2, H / 2, H);
   grd.addColorStop(0, '#3a0a0a');
   grd.addColorStop(0.5, '#16110f');
@@ -246,18 +271,17 @@ export async function exportSessionAsInstagramImage({ cardElements, cards, sessi
   ctx.fillStyle = grd;
   ctx.fillRect(0, 0, W, H);
 
-  // Glow vermelho topo
+  // glow topo
   const topGlow = ctx.createRadialGradient(W / 2, 0, 0, W / 2, 0, W * 0.6);
   topGlow.addColorStop(0, 'rgba(204,17,17,0.25)');
   topGlow.addColorStop(1, 'rgba(204,17,17,0)');
   ctx.fillStyle = topGlow;
   ctx.fillRect(0, 0, W, headerH);
 
-  // Barra vermelha topo
   ctx.fillStyle = '#cc1111';
   ctx.fillRect(0, 0, W, Math.round(cardH * 0.02));
 
-  // Título
+  // título
   ctx.textAlign = 'center';
   const titleSize = Math.round(cardH * 0.20);
   const subSize = Math.round(cardH * 0.07);
@@ -269,7 +293,7 @@ export async function exportSessionAsInstagramImage({ cardElements, cards, sessi
   ctx.font = `700 ${subSize}px "Chakra Petch", sans-serif`;
   ctx.fillText(`DOMINGO • ${sessionDateLabel.toUpperCase()} • ${n} CART${n > 1 ? 'AS' : 'A'}`, W / 2, headerH * 0.82);
 
-  // Cartas com sombra
+  // cartas
   captured.forEach(({ canvas }, i) => {
     const colIdx = i % cols;
     const rowIdx = Math.floor(i / cols);
@@ -282,40 +306,28 @@ export async function exportSessionAsInstagramImage({ cardElements, cards, sessi
     ctx.shadowColor = 'transparent';
   });
 
-  // Footer
+  // footer
   ctx.shadowColor = 'transparent';
   ctx.fillStyle = 'rgba(255,255,255,0.5)';
   ctx.font = `700 ${Math.round(cardH * 0.05)}px "Chakra Petch", sans-serif`;
   ctx.fillText('#LobbãoCraft • Ranking Semanal CS2', W / 2, H - footerH / 2);
 
-  // Barra vermelha bottom
   ctx.fillStyle = '#cc1111';
   ctx.fillRect(0, H - Math.round(cardH * 0.02), W, Math.round(cardH * 0.02));
 
-  // Download — tenta toBlob, com fallback toDataURL se vier null
   const filename = `lobbao-${slug(sessionDateLabel)}-instagram.png`;
   await new Promise((resolve, reject) => {
     try {
       c.toBlob(blob => {
-        if (blob) {
-          downloadBlob(blob, filename);
-          resolve();
-        } else {
-          // Fallback: usa toDataURL (mais pesado mas funciona com canvas grandes)
-          try {
-            const dataUrl = c.toDataURL('image/png');
-            downloadDataUrl(dataUrl, filename);
-            resolve();
-          } catch (err) { reject(err); }
+        if (blob) { downloadBlob(blob, filename); resolve(); }
+        else {
+          try { downloadDataUrl(c.toDataURL('image/png'), filename); resolve(); }
+          catch (err) { reject(err); }
         }
       }, 'image/png');
     } catch (err) {
-      // Se toBlob falhar de cara, fallback
-      try {
-        const dataUrl = c.toDataURL('image/png');
-        downloadDataUrl(dataUrl, filename);
-        resolve();
-      } catch (err2) { reject(err2); }
+      try { downloadDataUrl(c.toDataURL('image/png'), filename); resolve(); }
+      catch (err2) { reject(err2); }
     }
   });
 }
