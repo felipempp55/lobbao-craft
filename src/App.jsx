@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import * as db from "./db";
+import { exportCardAsPDF, exportSessionAsPDFByTier, exportSessionAsInstagramImage } from "./exporters";
 // ═══ BRAND COLORS ════════════════════════════════════════════
 const R  = '#cc1111';
 const RD = 'rgba(200,17,17,0.15)';
@@ -1739,9 +1740,35 @@ const SundayTab = ({ players, attrs, sessions, setSessions, curSession, setCurSe
   );
 };
 // ═══ HISTÓRICO ═══════════════════════════════════════════════
+const ExportBtn = ({ icon, label, onClick, disabled, busy, color='#cc1111' }) => (
+  <button onClick={onClick} disabled={disabled || busy} title={label} style={{
+    display:'flex',alignItems:'center',gap:6,
+    background: busy ? `${color}33` : 'rgba(255,255,255,0.04)',
+    border:`1px solid ${busy ? color : 'rgba(255,255,255,0.12)'}`,
+    borderRadius:8, padding:'9px 13px', cursor: disabled?'not-allowed':'pointer',
+    color: busy ? color : '#f0e8e8', opacity: disabled?.45:1,
+    fontFamily:FHUD,fontWeight:700,fontSize:11,letterSpacing:1.2,textTransform:'uppercase',
+    transition:'all .15s',
+  }}
+    onMouseEnter={e => { if(!disabled && !busy){ e.currentTarget.style.borderColor = color; e.currentTarget.style.background = `${color}1f`; }}}
+    onMouseLeave={e => { if(!disabled && !busy){ e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)'; e.currentTarget.style.background = 'rgba(255,255,255,0.04)'; }}}>
+    <span style={{fontSize:14}}>{busy?'⏳':icon}</span>
+    <span>{busy?'Gerando...':label}</span>
+  </button>
+);
+
 const HistoryTab = ({ sessions, players, attrs, onDelete }) => {
   const sorted = [...sessions].sort((a,b) => b.date.localeCompare(a.date));
   const [openId, setOpenId] = useState(sorted[0]?.id || null);
+  const [busy, setBusy] = useState(null); // {sessionId, kind} | {sessionId, kind:'card', playerId}
+  // refs por sessão → playerId → DOM element
+  const refsBySession = useRef({});
+  const setCardRef = (sid, pid, el) => {
+    if (!refsBySession.current[sid]) refsBySession.current[sid] = {};
+    if (el) refsBySession.current[sid][pid] = el;
+    else delete refsBySession.current[sid][pid];
+  };
+
   const handleDelete = (s) => {
     const dateLabel = new Date(s.date+'T12:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'});
     if(confirm(`Apagar a sessão de ${dateLabel}? (${s.cards?.length||0} cartas) — não dá pra desfazer.`)) {
@@ -1749,6 +1776,54 @@ const HistoryTab = ({ sessions, players, attrs, onDelete }) => {
       if(openId === s.id) setOpenId(null);
     }
   };
+
+  // Helpers de export — garantem que a sessão esteja aberta antes de capturar
+  const ensureOpen = (sid) => new Promise(resolve => {
+    if (openId === sid) return resolve();
+    setOpenId(sid);
+    // espera o React renderizar + DOM ficar pronto
+    setTimeout(resolve, 350);
+  });
+
+  const handleExportInstagram = async (s) => {
+    setBusy({ sessionId: s.id, kind: 'ig' });
+    try {
+      await ensureOpen(s.id);
+      const dateLabel = new Date(s.date+'T12:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric'});
+      await exportSessionAsInstagramImage({
+        cardElements: refsBySession.current[s.id] || {},
+        cards: s.cards || [],
+        sessionDateLabel: dateLabel,
+      });
+    } catch(e) { console.error(e); alert('Erro ao gerar imagem: '+e.message); }
+    finally { setBusy(null); }
+  };
+
+  const handleExportPDF = async (s) => {
+    setBusy({ sessionId: s.id, kind: 'pdf' });
+    try {
+      await ensureOpen(s.id);
+      const dateLabel = new Date(s.date+'T12:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric'});
+      await exportSessionAsPDFByTier({
+        cardElements: refsBySession.current[s.id] || {},
+        cards: s.cards || [],
+        getTier,
+        sessionDateLabel: dateLabel,
+      });
+    } catch(e) { console.error(e); alert('Erro ao gerar PDF: '+e.message); }
+    finally { setBusy(null); }
+  };
+
+  const handleExportCard = async (sessionId, playerId, nick) => {
+    setBusy({ sessionId, kind: 'card', playerId });
+    try {
+      const el = refsBySession.current[sessionId]?.[playerId];
+      if (!el) throw new Error('Cartinha não encontrada no DOM');
+      await exportCardAsPDF(el, `lobbao-${nick||'cartinha'}.pdf`);
+    } catch(e) { console.error(e); alert('Erro ao gerar PDF: '+e.message); }
+    finally { setBusy(null); }
+  };
+
   if(!sessions.length) return (
     <div style={{maxWidth:1180,margin:'0 auto',padding:'14px 6px 70px'}}>
       <div style={{marginBottom:28}}>
@@ -1778,12 +1853,15 @@ const HistoryTab = ({ sessions, players, attrs, onDelete }) => {
           const topTier = top ? getTier(top.overall) : null;
           const dateLong = new Date(s.date+'T12:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'});
           const weekday  = new Date(s.date+'T12:00').toLocaleDateString('pt-BR',{weekday:'long'});
+          const isBusyIg   = busy?.sessionId === s.id && busy.kind === 'ig';
+          const isBusyPdf  = busy?.sessionId === s.id && busy.kind === 'pdf';
+          const anyBusy    = busy?.sessionId === s.id;
           return (
             <div key={s.id} className="lbc-pop" style={{animationDelay:`${i*0.05}s`}}>
               <Panel accent={topTier?.brd || R} style={{padding:0}}>
-                <div style={{display:'flex',alignItems:'center'}}>
+                <div style={{display:'flex',alignItems:'center',flexWrap:'wrap'}}>
                   <button onClick={()=>setOpenId(isOpen?null:s.id)} style={{
-                    flex:1,display:'flex',alignItems:'center',gap:18,padding:'18px 24px',
+                    flex:1,minWidth:240,display:'flex',alignItems:'center',gap:18,padding:'18px 24px',
                     background:'transparent',border:'none',cursor:'pointer',textAlign:'left',color:'inherit',
                   }}>
                     <div style={{flex:1,minWidth:0}}>
@@ -1794,17 +1872,21 @@ const HistoryTab = ({ sessions, players, attrs, onDelete }) => {
                     </div>
                     <div style={{fontFamily:FHUD,fontWeight:700,fontSize:18,color:R,transform:isOpen?'rotate(90deg)':'none',transition:'transform .2s'}}>▸</div>
                   </button>
-                  {onDelete && (
-                    <button onClick={()=>handleDelete(s)} title="Apagar sessão" style={{
-                      background:'rgba(255,80,80,0.08)',border:'1px solid rgba(255,80,80,0.25)',
-                      borderRadius:8,padding:'10px 14px',marginRight:18,cursor:'pointer',
-                      fontSize:16,color:'#ff7755',transition:'all .15s',
-                    }}
-                      onMouseEnter={e=>{e.currentTarget.style.background='rgba(255,80,80,0.18)';e.currentTarget.style.borderColor='rgba(255,80,80,0.5)';}}
-                      onMouseLeave={e=>{e.currentTarget.style.background='rgba(255,80,80,0.08)';e.currentTarget.style.borderColor='rgba(255,80,80,0.25)';}}>
-                      🗑️
-                    </button>
-                  )}
+                  <div style={{display:'flex',alignItems:'center',gap:8,padding:'0 18px 14px',flexWrap:'wrap'}}>
+                    <ExportBtn icon="📷" label="Instagram" onClick={()=>handleExportInstagram(s)} disabled={!ranked.length || anyBusy} busy={isBusyIg} color="#cc1111"/>
+                    <ExportBtn icon="📄" label="PDF Sessão" onClick={()=>handleExportPDF(s)} disabled={!ranked.length || anyBusy} busy={isBusyPdf} color="#ffd700"/>
+                    {onDelete && (
+                      <button onClick={()=>handleDelete(s)} disabled={anyBusy} title="Apagar sessão" style={{
+                        background:'rgba(255,80,80,0.08)',border:'1px solid rgba(255,80,80,0.25)',
+                        borderRadius:8,padding:'9px 13px',cursor:anyBusy?'not-allowed':'pointer',
+                        fontSize:14,color:'#ff7755',transition:'all .15s',opacity:anyBusy?.5:1,
+                      }}
+                        onMouseEnter={e=>{if(!anyBusy){e.currentTarget.style.background='rgba(255,80,80,0.18)';e.currentTarget.style.borderColor='rgba(255,80,80,0.5)';}}}
+                        onMouseLeave={e=>{if(!anyBusy){e.currentTarget.style.background='rgba(255,80,80,0.08)';e.currentTarget.style.borderColor='rgba(255,80,80,0.25)';}}}>
+                        🗑️
+                      </button>
+                    )}
+                  </div>
                 </div>
                 {isOpen && (
                   <div style={{padding:'0 24px 26px'}}>
@@ -1812,9 +1894,32 @@ const HistoryTab = ({ sessions, players, attrs, onDelete }) => {
                       {ranked.map((c,j) => {
                         const p = players.find(pl => pl.id===c.playerId);
                         if(!p) return null;
+                        const isBusyCard = busy?.sessionId === s.id && busy.kind === 'card' && busy.playerId === c.playerId;
                         return (
-                          <div key={c.playerId} className="lbc-pop" style={{animationDelay:`${j*0.04}s`}}>
-                            <AnyCard player={p} card={c} attrs={attrs} scale={0.74}/>
+                          <div key={c.playerId} className="lbc-pop" style={{animationDelay:`${j*0.04}s`,position:'relative'}}>
+                            <div ref={el => setCardRef(s.id, c.playerId, el)}>
+                              <AnyCard player={p} card={c} attrs={attrs} scale={0.74}/>
+                            </div>
+                            <button
+                              onClick={() => handleExportCard(s.id, c.playerId, p.nick)}
+                              disabled={anyBusy}
+                              title={`Baixar PDF da carta de ${p.nick}`}
+                              style={{
+                                position:'absolute', bottom:8, right:8,
+                                background: isBusyCard ? '#ffd70033' : 'rgba(15,5,5,0.85)',
+                                border: `1px solid ${isBusyCard ? '#ffd700' : 'rgba(255,215,0,0.35)'}`,
+                                borderRadius:8, padding:'6px 9px',
+                                cursor: anyBusy?'not-allowed':'pointer',
+                                fontSize:13, color: isBusyCard ? '#ffd700' : '#ffd700',
+                                fontFamily:FHUD,fontWeight:700,letterSpacing:.8,
+                                opacity: anyBusy && !isBusyCard ? .35 : 1,
+                                transition:'all .15s',
+                                backdropFilter:'blur(6px)',
+                              }}
+                              onMouseEnter={e=>{if(!anyBusy){e.currentTarget.style.background='rgba(255,215,0,0.18)';}}}
+                              onMouseLeave={e=>{if(!anyBusy){e.currentTarget.style.background='rgba(15,5,5,0.85)';}}}>
+                              {isBusyCard ? '⏳' : '📄 PDF'}
+                            </button>
                           </div>
                         );
                       })}
